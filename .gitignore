@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+/x64
+*.filters
+*.user
+COEN432_Code/x64
+.vs/
