@@ -149,12 +149,14 @@
     <ClCompile Include="genetic_algorithm.cpp" />
     <ClCompile Include="helper_functions.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="encoding.h" />
     <ClInclude Include="genetic_algorithm.h" />
     <ClInclude Include="helper_functions.h" />
     <ClInclude Include="logging.h" />
+    <ClInclude Include="timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

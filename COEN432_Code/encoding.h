@@ -27,10 +27,16 @@ public:
 	GAEncoding_Ass1(std::string file_name = "");
 	~GAEncoding_Ass1();
 
+	// Utility functions
 	std::vector<std::vector<int>> returnGenome();
 	std::vector<std::vector<std::vector<int>>> returnRandomizedGenome(const unsigned int number_of_genomes);
 	void initializaPopulation(const unsigned int number_of_genomes);
 	int fitnessOfGenome(std::vector<std::vector<int>> genome);
+
+	// Core Functions
+	void parentSelection();		// Select Parents
+	void recombination();		// Crossover / Mutation to generate offspring
+	void survivorSelection();	// Select Survivors
 
 private:
 	int WIDTH = 8;

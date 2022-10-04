@@ -2,7 +2,7 @@
 
 GeneticAlgorithm::GeneticAlgorithm(GAEncoding_Ass1 encoding, int population_size)
 {
-	auto start = std::chrono::steady_clock::now();
+	watch.Start();
 	// This is where we specify our initialization parameters
 	genetic_algo_log() << "Initializing Population with size [" << population_size << "]" << std::endl;
 
@@ -10,15 +10,30 @@ GeneticAlgorithm::GeneticAlgorithm(GAEncoding_Ass1 encoding, int population_size
 	m_encoding = encoding;
 	m_encoding.initializaPopulation(population_size);
 
-
-	auto end = std::chrono::steady_clock::now();
-	std::chrono::duration<double> elapsed_seconds = end - start;
-	genetic_algo_log() << "elapsed time: " << elapsed_seconds.count() << std::endl;
+	
+	genetic_algo_log() << "elapsed time: " << watch.Stop() << std::endl;
 }
 
 
 GeneticAlgorithm::~GeneticAlgorithm()
 {
 
+}
 
+
+void GeneticAlgorithm::parentSelection()
+{
+	m_encoding.parentSelection();
+}
+
+
+void GeneticAlgorithm::recombination()
+{
+	m_encoding.recombination();
+}
+
+
+void GeneticAlgorithm::survivorSelection()
+{
+	m_encoding.survivorSelection();
 }

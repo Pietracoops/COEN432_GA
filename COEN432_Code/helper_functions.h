@@ -14,17 +14,15 @@
 #include <xtensor/xio.hpp>
 #include <xtensor/xview.hpp>
 
-
 #include <vector>
 #include <map>
 #include <algorithm>
 #include <random>
-#include <chrono>
 #include "logging.h"
 
 // Read external files into memory and store in string vector
 /// \return: Vector containing file contents as strings
-std::vector<std::string> readFileIntoMemory(std::string file_path, std::ostream ostream);
+std::vector<std::string> readFileIntoMemory(std::string file_path);
 
 // Perform the rows and columns mismatch checking that was provided with assignment 1
 /// \return: Number of mismatches in genome
@@ -45,5 +43,8 @@ std::vector<std::vector<int>> shuffleVector(std::vector<std::vector<int>> vect);
 // Prints a two dimensional vector
 /// \return: None
 void printVector(std::vector<std::vector<int>> vect);
+
+
+
 
 #endif // HELPER_FUNCTIONS_H_

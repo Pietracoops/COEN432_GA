@@ -1,7 +1,6 @@
 #include "helper_functions.h"
 
-
-std::vector<std::string> readFileIntoMemory(std::string file_path, std::ostream ostream)
+std::vector<std::string> readFileIntoMemory(std::string file_path)
 {
     std::ifstream infile;
     std::filesystem::path p = file_path;          // Get file path

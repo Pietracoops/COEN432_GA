@@ -137,7 +137,7 @@ GAEncoding_Ass1::GAEncoding_Ass1(std::string file_name)
 	std::vector<std::string> vs_file = void_file;
 	if (!file_name.empty())
 	{
-		encoding_log() << "Using File:  file_name" << std::endl;
+		encoding_log() << "Using File: " << file_name << std::endl;
 		vs_file = readFileIntoMemory(file_name);
 	}
 	
@@ -165,4 +165,21 @@ GAEncoding_Ass1::GAEncoding_Ass1(std::string file_name)
 GAEncoding_Ass1::~GAEncoding_Ass1()
 {
 	// Destructor
+}
+
+
+
+void parentSelection()
+{
+
+}
+
+void recombination()
+{
+
+}
+
+void survivorSelection()
+{
+
 }
