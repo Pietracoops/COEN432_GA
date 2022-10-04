@@ -45,6 +45,4 @@ std::vector<std::vector<int>> shuffleVector(std::vector<std::vector<int>> vect);
 void printVector(std::vector<std::vector<int>> vect);
 
 
-
-
 #endif // HELPER_FUNCTIONS_H_

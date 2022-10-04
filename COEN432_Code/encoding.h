@@ -8,6 +8,7 @@
 
 class GAEncoding_Ass1
 {
+	// Tile Class containing any operations required to manipulate Tiles
 	class Tile
 	{
 	public:
@@ -17,8 +18,8 @@ class GAEncoding_Ass1
 		std::string left;
 
 		Tile(std::string constructor = "0000");
-		void rotate(unsigned int rot_value = 1);
-		void printTile();
+		void rotate(unsigned int rot_value = 1); // Rotate the tile up to 3 times
+		void printTile();					     // Print tile information
 
 	};
 
@@ -42,18 +43,26 @@ private:
 	int WIDTH = 8;
 	int HEIGHT = 8;
 
+	// Map containing the indexes of each tile (1 - 64) and the corresponding Tile
+	// Tile object where each individual tile of the puzzle can be stored
 	std::map<int, Tile> m_map_index;
+
+	// The original genome that was extracted from the input file
 	std::vector<std::vector<int>> m_original_genome;
 
-
+	// Population that is generated and manipulated
 	std::vector<std::vector<std::vector<int>>> m_population;
+
+	// The corresponding fitness of the population
 	std::vector<int> m_population_fitness;
 
+	// Offspring that are generated from the population
 	std::vector<std::vector<std::vector<int>>> m_offspring;
 
+	// Encode the input from file to the m_map_index variable
 	void encodeToMap(std::vector<std::vector<std::string>> input);
 
-
+	// Void file in case input file cannot be found
 	std::vector<std::string> void_file{ "2310 2016 6521 1120 4420 5306 2635 1514",
 										"0164 5024 0520 1132 2500 1226 1144 3544",
 										"1012 2025 4501 2553 6231 2645 1004 4051",

@@ -66,7 +66,6 @@ int GAEncoding_Ass1::fitnessOfGenome(std::vector<std::vector<int>> genome)
 		
 		if (m_map_index[genome[i][0]].right != m_map_index[genome[i + 1][0]].left)
 		{
-			//std::cout << "ENCODING: Row Mismatch between [" << i << "] and [" << i + 1 << "]" << std::endl;
 			mismatched++;
 		}
 	}
@@ -77,7 +76,6 @@ int GAEncoding_Ass1::fitnessOfGenome(std::vector<std::vector<int>> genome)
 
 		if (m_map_index[genome[i][0]].bottom != m_map_index[genome[i + WIDTH][0]].top)
 		{
-			//std::cout << "ENCODING: Column Mismatch between [" << i << "] and [" << i + WIDTH << "]" << std::endl;
 			mismatched++;
 		}
 	}
