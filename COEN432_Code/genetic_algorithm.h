@@ -10,7 +10,7 @@ class GeneticAlgorithm
 {
 public:
 
-	GeneticAlgorithm(GAEncoding_Ass1 encoding, int population_size = 1);
+	GeneticAlgorithm(GAEncoding *encoding, int population_size = 1);
 	~GeneticAlgorithm();
 
 	void parentSelection();		// Select Parents
@@ -19,7 +19,7 @@ public:
 
 
 private:
-	GAEncoding_Ass1 m_encoding;
+	GAEncoding *m_encoding;
 	Stopwatch watch;
 };
 

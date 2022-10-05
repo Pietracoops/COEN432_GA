@@ -6,7 +6,23 @@
 
 #include "helper_functions.h"
 
-class GAEncoding_Ass1
+class GAEncoding
+{
+public:
+
+	virtual void initializaPopulation(const unsigned int number_of_genomes);
+
+	// Core Functions
+	virtual void parentSelection();		// Select Parents
+	virtual void recombination();		// Crossover / Mutation to generate offspring
+	virtual void survivorSelection();	// Select Survivors
+
+};
+
+
+
+
+class GAEncoding_Ass1 : public GAEncoding
 {
 	// Tile Class containing any operations required to manipulate Tiles
 	class Tile
@@ -31,13 +47,13 @@ public:
 	// Utility functions
 	std::vector<std::vector<int>> returnGenome();
 	std::vector<std::vector<std::vector<int>>> returnRandomizedGenome(const unsigned int number_of_genomes);
-	void initializaPopulation(const unsigned int number_of_genomes);
+	virtual void initializaPopulation(const unsigned int number_of_genomes) override;
 	int fitnessOfGenome(std::vector<std::vector<int>> genome);
 
 	// Core Functions
-	void parentSelection();		// Select Parents
-	void recombination();		// Crossover / Mutation to generate offspring
-	void survivorSelection();	// Select Survivors
+	virtual void parentSelection() override;		// Select Parents
+	virtual void recombination() override;			// Crossover / Mutation to generate offspring
+	virtual void survivorSelection() override;		// Select Survivors
 
 private:
 	int WIDTH = 8;

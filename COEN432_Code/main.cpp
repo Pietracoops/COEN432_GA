@@ -13,8 +13,9 @@ int main()
 	//ProfTest("Ass1/Ass1Input.txt");
 
 	// Initialize the Encoding based on the input file
-	GAEncoding_Ass1 Encoding("Ass1/Ass1Input.txt");
+	GAEncoding_Ass1 Encoding_Ass1("Ass1/Ass1Input.txt");
 
+	GAEncoding* Encoding = &Encoding_Ass1;
 	// INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
 

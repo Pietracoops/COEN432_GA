@@ -2,6 +2,26 @@
 #include "encoding.h"
 
 
+void GAEncoding::initializaPopulation(const unsigned int number_of_genomes)
+{
+
+}
+
+// Core Functions
+void GAEncoding::parentSelection()
+{
+
+}
+void GAEncoding::recombination()
+{
+
+}
+void GAEncoding::survivorSelection()
+{
+
+}
+
+
 // TILE OBJECTS
 
 GAEncoding_Ass1::Tile::Tile(std::string constructor)
@@ -167,17 +187,17 @@ GAEncoding_Ass1::~GAEncoding_Ass1()
 
 
 
-void parentSelection()
+void GAEncoding_Ass1::parentSelection()
 {
 
 }
 
-void recombination()
+void GAEncoding_Ass1::recombination()
 {
 
 }
 
-void survivorSelection()
+void GAEncoding_Ass1::survivorSelection()
 {
 
 }
