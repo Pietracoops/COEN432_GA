@@ -6,6 +6,13 @@
 
 #include "helper_functions.h"
 
+class Genome
+{
+public:
+	std::vector<std::vector<int>> genome_encoding_2b2_int;
+};
+
+
 class GAEncoding
 {
 public:
@@ -14,9 +21,16 @@ public:
 
 	// Core Functions
 	virtual void parentSelection();		// Select Parents
-	virtual void recombination();		// Crossover / Mutation to generate offspring
 	virtual void survivorSelection();	// Select Survivors
+	virtual void recombination();		// Crossover / Mutation to generate offspring
 
+	// Recombination Functions
+	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps);
+	virtual void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2);
+
+
+	// Utility Functions
+	virtual Genome getGenomeFromPopulation(const unsigned int gen_num);
 };
 
 
@@ -55,9 +69,31 @@ public:
 	virtual void recombination() override;			// Crossover / Mutation to generate offspring
 	virtual void survivorSelection() override;		// Select Survivors
 
+	// Recombination Functions
+	virtual void permutationRandomSwap(Genome& gen, int num_of_swaps);
+	virtual void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2);
+
+	// Utility Functions
+	virtual Genome getGenomeFromPopulation(const unsigned int gen_num);
+
 private:
+
+	// Random tools
+	std::random_device rd;
+	std::mt19937::result_type seed;
+	std::mt19937 gen_mt;
+
 	int WIDTH = 8;
 	int HEIGHT = 8;
+
+	// Population that is generated and manipulated
+	std::vector<Genome> m_population;
+
+	// The corresponding fitness of the population
+	std::vector<int> m_population_fitness;
+
+	// Offspring that are generated from the population
+	std::vector<Genome> m_offspring;
 
 	// Map containing the indexes of each tile (1 - 64) and the corresponding Tile
 	// Tile object where each individual tile of the puzzle can be stored
@@ -65,15 +101,6 @@ private:
 
 	// The original genome that was extracted from the input file
 	std::vector<std::vector<int>> m_original_genome;
-
-	// Population that is generated and manipulated
-	std::vector<std::vector<std::vector<int>>> m_population;
-
-	// The corresponding fitness of the population
-	std::vector<int> m_population_fitness;
-
-	// Offspring that are generated from the population
-	std::vector<std::vector<std::vector<int>>> m_offspring;
 
 	// Encode the input from file to the m_map_index variable
 	void encodeToMap(std::vector<std::vector<std::string>> input);

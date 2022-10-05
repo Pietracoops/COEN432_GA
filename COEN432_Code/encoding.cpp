@@ -10,17 +10,34 @@ void GAEncoding::initializaPopulation(const unsigned int number_of_genomes)
 // Core Functions
 void GAEncoding::parentSelection()
 {
-
+	std::cout << "parentSelection function not implemented." << std::endl;
 }
 void GAEncoding::recombination()
 {
-
+	std::cout << "recombination function not implemented." << std::endl;
 }
 void GAEncoding::survivorSelection()
 {
-
+	std::cout << "survivorSelection function not implemented." << std::endl;
 }
 
+void GAEncoding::permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps)
+{
+	std::cout << "permutationRandomSwap function not implemented." << std::endl;
+}
+
+void GAEncoding::permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2)
+{
+	std::cout << "permutationSwap function not implemented." << std::endl;
+}
+
+Genome GAEncoding::getGenomeFromPopulation(const unsigned int gen_num)
+{
+	std::cout << "getGenomeFromPopulation function not implemented." << std::endl;
+	Genome empty_genome;
+
+	return empty_genome;
+}
 
 // TILE OBJECTS
 
@@ -122,8 +139,10 @@ void GAEncoding_Ass1::initializaPopulation(const unsigned int number_of_genomes)
 
 	for (unsigned int i = 0; i < number_of_genomes; i++)
 	{
+		Genome tmp_gen;
 		std::vector<std::vector<int>> randomized_genome = shuffleVector(m_original_genome);
-		m_population.push_back(randomized_genome);
+		tmp_gen.genome_encoding_2b2_int = randomized_genome;
+		m_population.push_back(tmp_gen);
 		m_population_fitness.push_back(fitnessOfGenome(randomized_genome));
 	}
 	
@@ -177,6 +196,14 @@ GAEncoding_Ass1::GAEncoding_Ass1(std::string file_name)
 	}
 
 	encodeToMap(puzzle_box);
+
+	// Generate a random seed
+	
+	seed = rd() ^ ((std::mt19937::result_type)std::chrono::duration_cast<std::chrono::seconds>(
+			std::chrono::system_clock::now().time_since_epoch()).count() + (std::mt19937::result_type)
+		std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+	gen_mt.seed(seed);
+
 }
 
 
@@ -200,4 +227,51 @@ void GAEncoding_Ass1::recombination()
 void GAEncoding_Ass1::survivorSelection()
 {
 
+}
+
+void GAEncoding_Ass1::permutationRandomSwap(Genome& gen, int num_of_swaps)
+{
+	// Get vector from genome
+	std::vector<std::vector<int>> genome_enc = gen.genome_encoding_2b2_int;
+	
+	// Generate distribution
+	std::uniform_int_distribution<unsigned int> distribution(0, int(genome_enc.size() - 1));
+	std::mt19937 mt(rd());
+
+	// Pick from distribution
+	auto pos1 = distribution(gen_mt);
+	auto pos2 = distribution(gen_mt);
+	
+	// Keep cycling until pos1 and pos2 are different
+	while (pos1 == pos2)
+	{
+		pos2 = distribution(gen_mt);
+	}
+	
+	// Perform an iterswap between the two positions
+	std::iter_swap(genome_enc.begin() + pos1, genome_enc.begin() + pos2);
+	
+	// Store it back into the genome
+	gen.genome_encoding_2b2_int = genome_enc;
+}
+
+void GAEncoding_Ass1::permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2)
+{
+	// Check pos1 and pos2 are not same
+	if (pos1 == pos2)
+	{
+		std::cout << "Position 1 and Position 2 need to be different values." << std::endl;
+	}
+
+	// Get vector from genome
+	std::vector<std::vector<int>> genome_enc = gen.genome_encoding_2b2_int;
+
+	std::iter_swap(genome_enc.begin() + pos1, genome_enc.begin() + pos2);
+
+	gen.genome_encoding_2b2_int = genome_enc;
+}
+
+Genome GAEncoding_Ass1::getGenomeFromPopulation(const unsigned int gen_num)
+{
+	return m_population[gen_num];
 }
