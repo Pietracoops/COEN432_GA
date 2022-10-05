@@ -27,6 +27,11 @@ public:
 	// Recombination Functions
 	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps);
 	virtual void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2);
+	virtual void permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos);
+	virtual void permutationScramble(Genome& gen, std::vector<int> indices);
+	virtual void permutationInvert(Genome& gen, std::vector<int> indices);
+	virtual void permutationPointMutation(Genome& gen, unsigned int pos);
+	virtual void permutationCrossover(Genome& gen, const uint32_t pos1, const uint32_t pos2);
 
 
 	// Utility Functions
@@ -72,6 +77,11 @@ public:
 	// Recombination Functions
 	virtual void permutationRandomSwap(Genome& gen, int num_of_swaps);
 	virtual void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2);
+	virtual void permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos);
+	virtual void permutationScramble(Genome& gen, std::vector<int> indices);
+	virtual void permutationInvert(Genome& gen, std::vector<int> indices);
+	virtual void permutationPointMutation(Genome& gen, unsigned int pos);
+	virtual void permutationCrossover(Genome& gen, const uint32_t pos1, const uint32_t pos2);
 
 	// Utility Functions
 	virtual Genome getGenomeFromPopulation(const unsigned int gen_num);

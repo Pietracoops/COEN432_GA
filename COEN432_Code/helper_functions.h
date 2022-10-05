@@ -39,6 +39,7 @@ int CountRowMismatches(std::vector<std::string> first, std::vector<std::string> 
 // Shuffles a two dimensional vector - note: this function should be overloaded
 /// \return: Shuffled input vector
 std::vector<std::vector<int>> shuffleVector(std::vector<std::vector<int>> vect);
+std::vector<int> shuffleVector(std::vector<int> vect);
 
 // Prints a two dimensional vector
 /// \return: None

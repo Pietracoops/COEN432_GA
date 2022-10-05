@@ -20,13 +20,23 @@ std::vector<std::string> readFileIntoMemory(std::string file_path)
 
 std::vector<std::vector<int>> shuffleVector(std::vector<std::vector<int>> vect)
 {
+	std::vector<std::vector<int>> vect_tmp = vect;
 	auto rd = std::random_device{};
 	auto rng = std::default_random_engine{ rd() };
-	std::shuffle(std::begin(vect), std::end(vect), rng);
+	std::shuffle(std::begin(vect_tmp), std::end(vect_tmp), rng);
 
-	return vect;
+	return vect_tmp;
 }
 
+std::vector<int> shuffleVector(std::vector<int> vect)
+{
+	std::vector<int>  vect_tmp = vect;
+	auto rd = std::random_device{};
+	auto rng = std::default_random_engine{ rd() };
+	std::shuffle(std::begin(vect_tmp), std::end(vect_tmp), rng);
+
+	return vect_tmp;
+}
 
 void printVector(std::vector<std::vector<int>> vect)
 {
