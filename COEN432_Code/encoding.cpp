@@ -7,10 +7,18 @@ void GAEncoding::initializaPopulation(const unsigned int number_of_genomes)
 
 }
 
-// Core Functions
 void GAEncoding::parentSelection()
 {
 	std::cout << "parentSelection function not implemented." << std::endl;
+}
+
+void GAEncoding::parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness)
+{
+	std::cout << "parentSelectionFitnessProportionate function not implemented." << std::endl;
+}
+void GAEncoding::parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, uint32_t window_size, bool replacement)
+{
+	std::cout << "parentSelectionTournament function not implemented." << std::endl;
 }
 void GAEncoding::recombination()
 {
@@ -237,12 +245,21 @@ GAEncoding_Ass1::~GAEncoding_Ass1()
 	// Destructor
 }
 
-
-
 void GAEncoding_Ass1::parentSelection()
 {
 
 }
+
+void GAEncoding_Ass1::parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness)
+{
+
+}
+
+void GAEncoding_Ass1::parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, uint32_t window_size, bool replacement)
+{
+
+}
+
 
 void GAEncoding_Ass1::recombination()
 {
@@ -254,7 +271,7 @@ void GAEncoding_Ass1::survivorSelection()
 
 }
 
-void GAEncoding_Ass1::permutationRandomSwap(Genome& gen, int num_of_swaps)
+void GAEncoding_Ass1::permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps)
 {
 
 	// Generate distribution

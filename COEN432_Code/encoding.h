@@ -20,9 +20,13 @@ public:
 	virtual void initializaPopulation(const unsigned int number_of_genomes);
 
 	// Core Functions
-	virtual void parentSelection();		// Select Parents
 	virtual void survivorSelection();	// Select Survivors
 	virtual void recombination();		// Crossover / Mutation to generate offspring
+
+	// Parent Selection
+	virtual void parentSelection();
+	virtual void parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness);
+	virtual void parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, uint32_t window_size, bool replacement);
 
 	// Recombination Functions
 	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps);
@@ -70,18 +74,23 @@ public:
 	int fitnessOfGenome(std::vector<std::vector<int>> genome);
 
 	// Core Functions
-	virtual void parentSelection() override;		// Select Parents
+	
 	virtual void recombination() override;			// Crossover / Mutation to generate offspring
 	virtual void survivorSelection() override;		// Select Survivors
 
+	// Parent Selection
+	virtual void parentSelection();
+	virtual void parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness) override;
+	virtual void parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, uint32_t window_size, bool replacement) override;
+
 	// Recombination Functions
-	virtual void permutationRandomSwap(Genome& gen, int num_of_swaps);
-	virtual void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2);
-	virtual void permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos);
-	virtual void permutationScramble(Genome& gen, std::vector<int> indices);
-	virtual void permutationInvert(Genome& gen, std::vector<int> indices);
-	virtual void permutationPointMutation(Genome& gen, unsigned int pos);
-	virtual void permutationCrossover(Genome& gen, const uint32_t pos1, const uint32_t pos2);
+	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) override;
+	virtual void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2) override;
+	virtual void permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos) override;
+	virtual void permutationScramble(Genome& gen, std::vector<int> indices) override;
+	virtual void permutationInvert(Genome& gen, std::vector<int> indices) override;
+	virtual void permutationPointMutation(Genome& gen, unsigned int pos) override;
+	virtual void permutationCrossover(Genome& gen, const uint32_t pos1, const uint32_t pos2) override;
 
 	// Utility Functions
 	virtual Genome getGenomeFromPopulation(const unsigned int gen_num);
