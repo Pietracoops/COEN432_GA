@@ -8,12 +8,17 @@
 
 class Genome
 {
+private:
+	int fitness = 0;
 public:
 	Genome() {};
 	inline Genome(std::vector<std::vector<int>> vec) { this->genome_encoding_2b2_int = vec; }
 	std::vector<std::vector<int>> genome_encoding_2b2_int;
-	size_t getSize();
-	int fitness = 0;
+	size_t getSize() const;
+	void setFitness(int f) { fitness = f; }
+	int getFitness() const { return fitness; }
+	std::vector<std::vector<int>> getEncoding() const { return genome_encoding_2b2_int; }
+	
 };
 
 
@@ -29,8 +34,8 @@ public:
 
 	// Parent Selection
 	virtual void parentSelection() = 0;
-	virtual void parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness) = 0;
-	virtual void parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, uint32_t window_size, bool replacement) = 0;
+	virtual void parentSelectionFitnessProportionate(std::vector<Genome> population) = 0;
+	virtual void parentSelectionTournament(std::vector<Genome> population, uint32_t window_size, bool replacement) = 0;
 
 	// Mutation Functions
 	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) = 0;
@@ -47,9 +52,6 @@ public:
 
 	// Population that is generated and manipulated
 	std::vector<Genome> m_population;
-
-	// The corresponding fitness of the population
-	std::vector<int> m_population_fitness;
 
 	// The selected parents from the general population
 	std::vector<Genome> m_parents;
@@ -86,7 +88,7 @@ public:
 	std::vector<std::vector<int>> returnGenome();
 	std::vector<std::vector<std::vector<int>>> returnRandomizedGenome(const unsigned int number_of_genomes);
 	virtual void initializaPopulation(const unsigned int number_of_genomes) override;
-	int fitnessOfGenome(std::vector<std::vector<int>> genome);
+	int fitnessOfGenome(const Genome& genome);
 
 	// Core Functions
 	
@@ -95,8 +97,8 @@ public:
 
 	// Parent Selection
 	virtual void parentSelection();
-	virtual void parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness) override;
-	virtual void parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, uint32_t window_size, bool replacement) override;
+	virtual void parentSelectionFitnessProportionate(std::vector<Genome> population) override;
+	virtual void parentSelectionTournament(std::vector<Genome> population, uint32_t window_size, bool replacement) override;
 
 	// Mutation Functions
 	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) override;
