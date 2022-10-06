@@ -2,75 +2,11 @@
 #include "encoding.h"
 
 
-void GAEncoding::initializaPopulation(const unsigned int number_of_genomes)
+size_t Genome::getSize()
 {
-
+	return this->genome_encoding_2b2_int.size();
 }
 
-void GAEncoding::parentSelection()
-{
-	std::cout << "parentSelection function not implemented." << std::endl;
-}
-
-void GAEncoding::parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness)
-{
-	std::cout << "parentSelectionFitnessProportionate function not implemented." << std::endl;
-}
-void GAEncoding::parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, uint32_t window_size, bool replacement)
-{
-	std::cout << "parentSelectionTournament function not implemented." << std::endl;
-}
-void GAEncoding::recombination()
-{
-	std::cout << "recombination function not implemented." << std::endl;
-}
-void GAEncoding::survivorSelection()
-{
-	std::cout << "survivorSelection function not implemented." << std::endl;
-}
-
-void GAEncoding::permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps)
-{
-	std::cout << "permutationRandomSwap function not implemented." << std::endl;
-}
-
-void GAEncoding::permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2)
-{
-	std::cout << "permutationSwap function not implemented." << std::endl;
-}
-
-void GAEncoding::permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos)
-{
-	std::cout << "permutationInsert function not implemented." << std::endl;
-}
-
-void GAEncoding::permutationScramble(Genome& gen, std::vector<int> indices)
-{
-	std::cout << "permutationScramble function not implemented." << std::endl;
-}
-
-void GAEncoding::permutationInvert(Genome& gen, std::vector<int> indices)
-{
-	std::cout << "permutationInvert function not implemented." << std::endl;
-}
-
-void GAEncoding::permutationPointMutation(Genome& gen, unsigned int pos)
-{
-	std::cout << "permutationPointMutation function not implemented." << std::endl;
-}
-
-void GAEncoding::permutationCrossover(Genome& gen, const uint32_t pos1, const uint32_t pos2)
-{
-	std::cout << "permutationCrossover function not implemented." << std::endl;
-}
-
-Genome GAEncoding::getGenomeFromPopulation(const unsigned int gen_num)
-{
-	std::cout << "getGenomeFromPopulation function not implemented." << std::endl;
-	Genome empty_genome;
-
-	return empty_genome;
-}
 
 // TILE OBJECTS
 
@@ -204,6 +140,7 @@ void GAEncoding_Ass1::encodeToMap(std::vector<std::vector<std::string>> input)
 
 GAEncoding_Ass1::GAEncoding_Ass1(std::string file_name)
 {
+	// Read input file
 	std::vector<std::string> vs_file = void_file;
 	if (!file_name.empty())
 	{
@@ -234,7 +171,7 @@ GAEncoding_Ass1::GAEncoding_Ass1(std::string file_name)
 	
 	seed = rd() ^ ((std::mt19937::result_type)std::chrono::duration_cast<std::chrono::seconds>(
 			std::chrono::system_clock::now().time_since_epoch()).count() + (std::mt19937::result_type)
-		std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+			std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 	gen_mt.seed(seed);
 
 }
@@ -256,12 +193,6 @@ void GAEncoding_Ass1::parentSelectionFitnessProportionate(std::vector<Genome> po
 }
 
 void GAEncoding_Ass1::parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, uint32_t window_size, bool replacement)
-{
-
-}
-
-
-void GAEncoding_Ass1::recombination()
 {
 
 }
@@ -363,9 +294,33 @@ void GAEncoding_Ass1::permutationPointMutation(Genome& gen, unsigned int pos)
 	gen.genome_encoding_2b2_int[pos][1]++;
 }
 
-void GAEncoding_Ass1::permutationCrossover(Genome& gen, const uint32_t pos1, const uint32_t pos2)
+/**
+* Acts on m_parents to create m_offspring
+*/
+void GAEncoding_Ass1::recombination(float crossoverProb)
 {
-	
+	//
+
+}
+
+/**
+* Takes two parents and produces a vector containing 2 offspring genomes
+* 
+* THIS WILL NOT WORK FOR OUR PROBLEM, LEADS TO INADMISSIBLE SOLUTION
+*/
+std::vector<Genome> GAEncoding_Ass1::singlePointCrossover(Genome& parent1, Genome& parent2)
+{
+	std::vector<std::vector<int>> off1vec(parent1.genome_encoding_2b2_int), 
+		off2vec(parent2.genome_encoding_2b2_int);
+
+	// Get random integer between start + 1 and end - 1
+	std::uniform_int_distribution<> distr(1, parent1.getSize() - 1);
+	int splitPoint = distr(gen_mt);
+
+	// Swap the vectors
+	std::swap_ranges(off1vec.begin(), off1vec.begin() + splitPoint, off2vec.end());
+
+	return std::vector<Genome> {Genome(off1vec), Genome(off2vec)};
 
 }
 
