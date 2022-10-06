@@ -111,8 +111,8 @@ void GAEncoding_Ass1::initializaPopulation(const unsigned int number_of_genomes)
 		Genome tmp_gen;
 		std::vector<std::vector<int>> randomized_genome = shuffleVector(m_original_genome);
 		tmp_gen.genome_encoding_2b2_int = randomized_genome;
+		tmp_gen.fitness = fitnessOfGenome(randomized_genome);
 		m_population.push_back(tmp_gen);
-		m_population_fitness.push_back(fitnessOfGenome(randomized_genome));
 	}
 	
 }
@@ -196,7 +196,7 @@ void GAEncoding_Ass1::parentSelection(int strategy, uint32_t carry_over, float s
 	m_parents.clear();
 
 	// 2. Sort according to fitness
-	std::sort(m_population.begin(), m_population.end(), [](const Genome& lhs, const Genome& rhs){return lhs.fitness < rhs.fitness;});
+	std::sort(m_population.begin(), m_population.end(), [](const Genome& lhs, const Genome& rhs){return lhs.fitness > rhs.fitness;});
 
 	// 3. append the carry over to parents + remove them from original population list
 	std::vector<Genome> parents;
@@ -264,6 +264,7 @@ std::vector<Genome> GAEncoding_Ass1::parentSelectionFitnessProportionate(std::ve
 	return parents;
 }
 
+
 std::vector<Genome> GAEncoding_Ass1::parentSelectionTournament(std::vector<Genome> population, float selection_ratio, uint32_t window_size, bool replacement)
 {
 
@@ -273,15 +274,25 @@ std::vector<Genome> GAEncoding_Ass1::parentSelectionTournament(std::vector<Genom
 
 	while (genomes_to_pick != 0)
 	{
+		if (population.size() == 0)
+		{
+			break;
+		}
+
 		std::uniform_int_distribution<unsigned int> distribution(0, int(population.size() - 1));
 
-
 		// Select the indeces
-		std::vector<int> indices;
+		std::vector<size_t> indices;
 		std::vector<Genome> local_tournament;
-		for (unsigned int i = 0; i < window_size; i++)
+		uint32_t number_to_select = std::min(window_size, (uint32_t)population.size());
+		for (unsigned int i = 0; i < number_to_select; i++)
 		{
-			indices.push_back(distribution(gen_mt));
+			unsigned int index;
+			do {
+				index = distribution(gen_mt);
+			} 
+			while (std::find(indices.begin(), indices.end(), index) != indices.end());
+			indices.push_back(index);
 			local_tournament.push_back(population[indices.back()]);
 		}
 
@@ -291,12 +302,20 @@ std::vector<Genome> GAEncoding_Ass1::parentSelectionTournament(std::vector<Genom
 				return a.fitness < b.fitness;
 			});
 		
+		int value = max_it - local_tournament.begin();
 		parents.push_back(population[indices[max_it - local_tournament.begin()]]);
+		//indices.erase(indices.begin() + (max_it - local_tournament.begin()));
+		
 
 		if (!replacement)
 		{
+			population = erase_indices(population, indices);
+		}
+		else
+		{
 			population.erase(population.begin() + indices[max_it - local_tournament.begin()]);
 		}
+		
 		genomes_to_pick--;
 	}
 

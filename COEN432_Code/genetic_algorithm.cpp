@@ -21,9 +21,11 @@ GeneticAlgorithm::~GeneticAlgorithm()
 }
 
 
-void GeneticAlgorithm::parentSelection()
+void GeneticAlgorithm::parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement)
 {
-	//m_encoding->parentSelection();
+	watch.Start();
+	m_encoding->parentSelection(strategy, carry_over, selection_ratio, window_size, replacement);
+	genetic_algo_log() << "Parent Selection time using strategy [" << strategy << "]: " << watch.Stop() << std::endl;
 }
 
 
