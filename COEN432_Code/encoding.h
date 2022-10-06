@@ -28,9 +28,9 @@ public:
 	virtual void recombination(float crossoverProb) = 0;		// Crossover to generate offspring
 
 	// Parent Selection
-	virtual void parentSelection() = 0;
-	virtual void parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness, float selection_ratio) = 0;
-	virtual void parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, float selection_ratio, uint32_t window_size, bool replacement) = 0;
+	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement) = 0;
+	virtual std::vector<Genome> parentSelectionFitnessProportionate(std::vector<Genome> population, float selection_ratio) = 0;
+	virtual std::vector<Genome> parentSelectionTournament(std::vector<Genome> population, float selection_ratio, uint32_t window_size, bool replacement) = 0;
 
 	// Mutation Functions
 	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) = 0;
@@ -94,9 +94,9 @@ public:
 	virtual void survivorSelection() override;		// Select Survivors
 
 	// Parent Selection
-	virtual void parentSelection();
-	virtual void parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness, float selection_ratio) override;
-	virtual void parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, float selection_ratio, uint32_t window_size, bool replacement) override;
+	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement);
+	virtual std::vector<Genome> parentSelectionFitnessProportionate(std::vector<Genome> population, float selection_ratio) override;
+	virtual std::vector<Genome> parentSelectionTournament(std::vector<Genome> population, float selection_ratio, uint32_t window_size, bool replacement) override;
 
 	// Mutation Functions
 	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) override;
@@ -121,6 +121,7 @@ private:
 
 	int WIDTH = 8;
 	int HEIGHT = 8;
+	uint32_t MAX_MISMATCHES = 112;
 
 	// Map containing the indexes of each tile (1 - 64) and the corresponding Tile
 	// Tile object where each individual tile of the puzzle can be stored

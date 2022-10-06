@@ -23,13 +23,13 @@ GeneticAlgorithm::~GeneticAlgorithm()
 
 void GeneticAlgorithm::parentSelection()
 {
-	m_encoding->parentSelection();
+	//m_encoding->parentSelection();
 }
 
 
 void GeneticAlgorithm::recombination()
 {
-	m_encoding->recombination();
+	//m_encoding->recombination();
 }
 
 
