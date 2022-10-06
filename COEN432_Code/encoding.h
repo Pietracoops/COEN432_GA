@@ -29,8 +29,8 @@ public:
 
 	// Parent Selection
 	virtual void parentSelection() = 0;
-	virtual void parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness) = 0;
-	virtual void parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, uint32_t window_size, bool replacement) = 0;
+	virtual void parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness, float selection_ratio) = 0;
+	virtual void parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, float selection_ratio, uint32_t window_size, bool replacement) = 0;
 
 	// Mutation Functions
 	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) = 0;
@@ -95,8 +95,8 @@ public:
 
 	// Parent Selection
 	virtual void parentSelection();
-	virtual void parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness) override;
-	virtual void parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, uint32_t window_size, bool replacement) override;
+	virtual void parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness, float selection_ratio) override;
+	virtual void parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, float selection_ratio, uint32_t window_size, bool replacement) override;
 
 	// Mutation Functions
 	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) override;

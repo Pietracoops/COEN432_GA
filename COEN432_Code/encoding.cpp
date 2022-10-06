@@ -187,12 +187,12 @@ void GAEncoding_Ass1::parentSelection()
 
 }
 
-void GAEncoding_Ass1::parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness)
+void GAEncoding_Ass1::parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness, float selection_ratio)
 {
 
 }
 
-void GAEncoding_Ass1::parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, uint32_t window_size, bool replacement)
+void GAEncoding_Ass1::parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, float selection_ratio, uint32_t window_size, bool replacement)
 {
 
 }
