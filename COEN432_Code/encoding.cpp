@@ -7,10 +7,18 @@ void GAEncoding::initializaPopulation(const unsigned int number_of_genomes)
 
 }
 
-// Core Functions
 void GAEncoding::parentSelection()
 {
 	std::cout << "parentSelection function not implemented." << std::endl;
+}
+
+void GAEncoding::parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness)
+{
+	std::cout << "parentSelectionFitnessProportionate function not implemented." << std::endl;
+}
+void GAEncoding::parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, uint32_t window_size, bool replacement)
+{
+	std::cout << "parentSelectionTournament function not implemented." << std::endl;
 }
 void GAEncoding::recombination()
 {
@@ -29,6 +37,31 @@ void GAEncoding::permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps)
 void GAEncoding::permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2)
 {
 	std::cout << "permutationSwap function not implemented." << std::endl;
+}
+
+void GAEncoding::permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos)
+{
+	std::cout << "permutationInsert function not implemented." << std::endl;
+}
+
+void GAEncoding::permutationScramble(Genome& gen, std::vector<int> indices)
+{
+	std::cout << "permutationScramble function not implemented." << std::endl;
+}
+
+void GAEncoding::permutationInvert(Genome& gen, std::vector<int> indices)
+{
+	std::cout << "permutationInvert function not implemented." << std::endl;
+}
+
+void GAEncoding::permutationPointMutation(Genome& gen, unsigned int pos)
+{
+	std::cout << "permutationPointMutation function not implemented." << std::endl;
+}
+
+void GAEncoding::permutationCrossover(Genome& gen, const uint32_t pos1, const uint32_t pos2)
+{
+	std::cout << "permutationCrossover function not implemented." << std::endl;
 }
 
 Genome GAEncoding::getGenomeFromPopulation(const unsigned int gen_num)
@@ -212,12 +245,21 @@ GAEncoding_Ass1::~GAEncoding_Ass1()
 	// Destructor
 }
 
-
-
 void GAEncoding_Ass1::parentSelection()
 {
 
 }
+
+void GAEncoding_Ass1::parentSelectionFitnessProportionate(std::vector<Genome> population, std::vector<int> population_fitness)
+{
+
+}
+
+void GAEncoding_Ass1::parentSelectionTournament(std::vector<Genome> population, std::vector<int> population_fitness, uint32_t window_size, bool replacement)
+{
+
+}
+
 
 void GAEncoding_Ass1::recombination()
 {
@@ -229,13 +271,11 @@ void GAEncoding_Ass1::survivorSelection()
 
 }
 
-void GAEncoding_Ass1::permutationRandomSwap(Genome& gen, int num_of_swaps)
+void GAEncoding_Ass1::permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps)
 {
-	// Get vector from genome
-	std::vector<std::vector<int>> genome_enc = gen.genome_encoding_2b2_int;
-	
+
 	// Generate distribution
-	std::uniform_int_distribution<unsigned int> distribution(0, int(genome_enc.size() - 1));
+	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
 	std::mt19937 mt(rd());
 
 	// Pick from distribution
@@ -249,10 +289,8 @@ void GAEncoding_Ass1::permutationRandomSwap(Genome& gen, int num_of_swaps)
 	}
 	
 	// Perform an iterswap between the two positions
-	std::iter_swap(genome_enc.begin() + pos1, genome_enc.begin() + pos2);
+	std::iter_swap(gen.genome_encoding_2b2_int.begin() + pos1, gen.genome_encoding_2b2_int.begin() + pos2);
 	
-	// Store it back into the genome
-	gen.genome_encoding_2b2_int = genome_enc;
 }
 
 void GAEncoding_Ass1::permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2)
@@ -261,14 +299,74 @@ void GAEncoding_Ass1::permutationSwap(Genome& gen, const uint32_t pos1, const ui
 	if (pos1 == pos2)
 	{
 		std::cout << "Position 1 and Position 2 need to be different values." << std::endl;
+		return;
+	}
+
+	std::iter_swap(gen.genome_encoding_2b2_int.begin() + pos1, gen.genome_encoding_2b2_int.begin() + pos2);
+}
+
+void GAEncoding_Ass1::permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos)
+{
+	// Check pos1 and pos2 are not same
+	if (initial_pos == final_pos)
+	{
+		std::cout << "Position 1 and Position 2 need to be different values." << std::endl;
+		return;
+	}
+
+	unsigned int offset = 0;
+	if (initial_pos > final_pos)
+	{
+		offset = 1;
 	}
 
 	// Get vector from genome
 	std::vector<std::vector<int>> genome_enc = gen.genome_encoding_2b2_int;
 
-	std::iter_swap(genome_enc.begin() + pos1, genome_enc.begin() + pos2);
+	std::vector<int> initial = gen.genome_encoding_2b2_int[initial_pos];
 
-	gen.genome_encoding_2b2_int = genome_enc;
+	// Insert the initial vect into final position
+	gen.genome_encoding_2b2_int.insert(gen.genome_encoding_2b2_int.begin() + final_pos, initial);
+
+	// Erase the original entry
+	gen.genome_encoding_2b2_int.erase(gen.genome_encoding_2b2_int.begin() + initial_pos + offset);
+
+}
+
+void GAEncoding_Ass1::permutationScramble(Genome& gen, std::vector<int> indices)
+{
+	std::vector<int> shuffled_indices = shuffleVector(indices);
+
+	for (unsigned int i = 0; i < indices.size(); i++)
+	{
+		permutationSwap(gen, indices[i], shuffled_indices[i]);
+	}
+}
+
+
+void GAEncoding_Ass1::permutationInvert(Genome& gen, std::vector<int> indices)
+{
+	std::sort(indices.begin(), indices.end());
+	std::vector<int> shuffled_indices = indices;
+	std::sort(shuffled_indices.begin(), shuffled_indices.end(), std::greater<int>());
+
+	for (unsigned int i = 0; i < indices.size(); i++)
+	{
+		permutationSwap(gen, indices[i], shuffled_indices[i]);
+	}
+}
+
+void GAEncoding_Ass1::permutationPointMutation(Genome& gen, unsigned int pos)
+{
+	// Our point mutation will simply rotate the tile at the specified index
+	// We should also consider rotating more than just once at a time.
+	gen.genome_encoding_2b2_int[pos][1]++;
+}
+
+void GAEncoding_Ass1::permutationCrossover(Genome& gen, const uint32_t pos1, const uint32_t pos2)
+{
+	
+
 }
 
 Genome GAEncoding_Ass1::getGenomeFromPopulation(const unsigned int gen_num)
