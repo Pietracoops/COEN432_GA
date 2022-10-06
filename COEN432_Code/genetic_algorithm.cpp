@@ -27,9 +27,9 @@ void GeneticAlgorithm::parentSelection()
 }
 
 
-void GeneticAlgorithm::recombination()
+void GeneticAlgorithm::recombination(float crossoverProb)
 {
-	//m_encoding->recombination();
+	m_encoding->recombination(crossoverProb);
 }
 
 

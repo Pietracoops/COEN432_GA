@@ -2,7 +2,7 @@
 #include "encoding.h"
 
 
-size_t Genome::getSize()
+size_t Genome::getSize() const
 {
 	return this->genome_encoding_2b2_int.size();
 }
@@ -56,31 +56,32 @@ std::vector<std::vector<int>> GAEncoding_Ass1::returnGenome()
 	return m_original_genome;
 }
 
-int GAEncoding_Ass1::fitnessOfGenome(std::vector<std::vector<int>> genome)
+int GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
 {
 	// 8x8 box - meaning 
 
 	int mismatched = 0;
+	std::vector<std::vector<int>> genes = genome.getEncoding();
 
 	// Calculate rows
-	for (unsigned int i = 0; i < genome.size() - 1; i++)
+	for (unsigned int i = 0; i < genome.getSize() - 1; i++)
 	{
 		if (i % WIDTH == 0) 
 		{
 			continue;
 		}
 		
-		if (m_map_index[genome[i][0]].right != m_map_index[genome[i + 1][0]].left)
+		if (m_map_index[genes[i][0]].right != m_map_index[genes[i + 1][0]].left)
 		{
 			mismatched++;
 		}
 	}
 
 	// Calculate Columns
-	for (unsigned int i = 0; i < genome.size() - WIDTH; i++)
+	for (unsigned int i = 0; i < genome.getSize() - WIDTH; i++)
 	{
 
-		if (m_map_index[genome[i][0]].bottom != m_map_index[genome[i + WIDTH][0]].top)
+		if (m_map_index[genes[i][0]].bottom != m_map_index[genes[i + WIDTH][0]].top)
 		{
 			mismatched++;
 		}
@@ -111,8 +112,8 @@ void GAEncoding_Ass1::initializaPopulation(const unsigned int number_of_genomes)
 		Genome tmp_gen;
 		std::vector<std::vector<int>> randomized_genome = shuffleVector(m_original_genome);
 		tmp_gen.genome_encoding_2b2_int = randomized_genome;
+		tmp_gen.setFitness(fitnessOfGenome(tmp_gen));
 		m_population.push_back(tmp_gen);
-		m_population_fitness.push_back(fitnessOfGenome(randomized_genome));
 	}
 	
 }
@@ -225,6 +226,7 @@ void GAEncoding_Ass1::parentSelection(int strategy, uint32_t carry_over, float s
 
 	// Complete
 }
+
 
 std::vector<Genome> GAEncoding_Ass1::parentSelectionFitnessProportionate(std::vector<Genome> population, float selection_ratio)
 {

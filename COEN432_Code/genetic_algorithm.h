@@ -14,7 +14,7 @@ public:
 	~GeneticAlgorithm();
 
 	void parentSelection();		// Select Parents
-	void recombination();		// Crossover / Mutation to generate offspring
+	void recombination(float crossoverProb);		// Crossover 
 	void survivorSelection();	// Select Survivors
 
 
