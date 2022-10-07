@@ -30,7 +30,7 @@ public:
 	virtual void initializaPopulation(const unsigned int number_of_genomes) = 0;
 
 	// Core Functions
-	virtual void survivorSelection(int policy = 0, int survivorSize = 0) = 0;	// Select Survivors from the parents + offspring
+	virtual void survivorSelection(int policy = 0, int survivorSize = 0) = 0;		// Select Survivors from the parents + offspring
 	virtual void recombination(float crossoverProb, bool allowfailures) = 0;		// Crossover to generate offspring
 
 	// Parent Selection
@@ -59,6 +59,9 @@ public:
 
 	// Offspring that are generated from their parents
 	std::vector<Genome> m_offspring;
+
+	// Offspring that are generated from their parents
+	std::vector<Genome> m_elite;
 
 	// TODO: Create a champions vector that keeps the top n or x% highest performing parents
 

@@ -198,36 +198,33 @@ void GAEncoding_Ass1::parentSelection(int strategy, uint32_t carry_over, float s
 	// The process
 	// 1. clear parents
 	m_parents.clear();
+	m_elite.clear();
 
 	// 2. Sort according to fitness
 	std::sort(m_population.begin(), m_population.end(), [](const Genome& lhs, const Genome& rhs){return lhs.getFitness() > rhs.getFitness(); });
 
 	// 3. append the carry over to parents + remove them from original population list
-	std::vector<Genome> parents;
 	for (unsigned int i = 0; i < carry_over; i++)
 	{
-		parents.push_back(m_population[0]);			// Store the first element in parents
+		m_elite.push_back(m_population[0]);			// Store the first element in parents
 		m_population.erase(m_population.begin());		// Erase the first element in population
 	}
 
 	// 4. Call Fitness Proportionate if selected
-	std::vector<Genome> parents2;
+	std::vector<Genome> parents;
 	if (strategy == 0)
 	{
-		parents2 = parentSelectionFitnessProportionate(m_population, selection_ratio);
+		parents = parentSelectionFitnessProportionate(m_population, selection_ratio);
 	}
 	// 4b. Call Tournament if selected
 	else if (strategy == 1)
 	{
-		parents2 = parentSelectionTournament(m_population, selection_ratio, window_size, replacement);
+		parents = parentSelectionTournament(m_population, selection_ratio, window_size, replacement);
 	}
 	
-	// 5. Merge vectors together 
-	m_parents.reserve(parents.size() + parents2.size()); // preallocate memory
-	m_parents.insert(m_parents.end(), parents.begin(), parents.end());
-	m_parents.insert(m_parents.end(), parents2.begin(), parents2.end());
-
 	// Complete
+	m_parents = parents;
+	
 }
 
 
