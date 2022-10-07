@@ -13,9 +13,12 @@ public:
 	GeneticAlgorithm(GAEncoding *encoding, int population_size = 1);
 	~GeneticAlgorithm();
 
-	void parentSelection();		// Select Parents
+
+	void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement);		// Select Parents
 	void recombination(float crossoverProb);		// Crossover 
 	void survivorSelection();	// Select Survivors
+
+	
 
 
 private:
