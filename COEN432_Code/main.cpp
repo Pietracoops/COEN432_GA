@@ -5,25 +5,40 @@
 
 int main()
 {
-	
-
-
-	// PARAMETERS
-	unsigned int POPULATION_SIZE = 10;
-
-	//// Prof's C++ functions for validation
-	//ProfTest("Ass1/Ass1Input.txt");
-
-	// Initialize the Encoding based on the input file
+	// ############### Initialize the Encoding based on the input file
 	GAEncoding_Ass1 Encoding_Ass1("Ass1/Ass1Input.txt");
-
 	GAEncoding* Encoding = &Encoding_Ass1;
-	// INitialize the GA using the Encoding and parameters
+
+	// ############### Init Parameters
+	unsigned int POPULATION_SIZE = 5000;
+
+	// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
 
-	//GA.parentSelection(0, 2, 0.5, 3, false);
-	GA.parentSelection(1, 2, 0.5, 3, true);
+	// ############### SET GA PARAMETERS
+	// --- parent selection
+	GA.params.strategy = 1;
+	GA.params.carry_over = 1;
+	GA.params.selection_ratio = 0.5F;
+	GA.params.window_size = 3;
+	GA.params.replacement = false;
 
+	// --- Recombination parameters
+	GA.params.crossoverProb = 0.8F;
+	GA.params.allowFailures = false;
+
+	// --- Mutation parameters
+	GA.params.mutationProb = 0.1F;
+
+	// --- Termination Condition Parameters
+	GA.params.maxGeneration = 5;
+	GA.params.maxRuntime = 600; // seconds
+	GA.params.targetFitness = 10;
+
+	// Run the GA
+	GA.runGA();
+
+	// Collect outputs and analyze
 	
 
 	return 0;

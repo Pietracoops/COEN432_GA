@@ -51,7 +51,7 @@ void printVector(std::vector<std::vector<int>> vect);
 /**
 * Generate a vector of random floats between 0 and 1
 */
-std::vector<float> generateRandVecFloat(int n_elem, std::mt19937& engine)
+std::vector<float> generateRandVecFloat(int n_elem, std::mt19937& engine);
 
 //template<typename T>
 //inline std::vector<T> erase_indices(const std::vector<T>& data, std::vector<size_t>& indicesToDelete);
