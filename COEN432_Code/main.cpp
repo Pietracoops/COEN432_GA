@@ -7,7 +7,7 @@ int main()
 {
 	
 	// PARAMETERS
-	unsigned int POPULATION_SIZE = 10000;
+	unsigned int POPULATION_SIZE = 10;
 
 	//// Prof's C++ functions for validation
 	//ProfTest("Ass1/Ass1Input.txt");
@@ -18,6 +18,9 @@ int main()
 	GAEncoding* Encoding = &Encoding_Ass1;
 	// INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
+
+	//GA.parentSelection(0, 2, 0.5, 3, false);
+	GA.parentSelection(1, 2, 0.5, 3, true);
 
 	
 

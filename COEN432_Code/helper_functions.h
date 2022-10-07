@@ -20,6 +20,8 @@
 #include <random>
 #include "logging.h"
 
+
+
 // Read external files into memory and store in string vector
 /// \return: Vector containing file contents as strings
 std::vector<std::string> readFileIntoMemory(std::string file_path);
@@ -44,6 +46,43 @@ std::vector<int> shuffleVector(std::vector<int> vect);
 // Prints a two dimensional vector
 /// \return: None
 void printVector(std::vector<std::vector<int>> vect);
+
+//template<typename T>
+//inline std::vector<T> erase_indices(const std::vector<T>& data, std::vector<size_t>& indicesToDelete);
+template<typename T>
+inline std::vector<T> erase_indices(const std::vector<T>& data, std::vector<size_t>& indicesToDelete/* can't assume copy elision, don't pass-by-value */)
+{
+	if (indicesToDelete.empty())
+		return data;
+
+	std::vector<T> ret;
+	ret.reserve(data.size() - indicesToDelete.size());
+
+	std::sort(indicesToDelete.begin(), indicesToDelete.end());
+
+	// new we can assume there is at least 1 element to delete. copy blocks at a time.
+	auto itBlockBegin = data.begin();
+
+	for (std::vector<size_t>::const_iterator it = indicesToDelete.begin(); it != indicesToDelete.end(); ++it)
+	{
+		auto itBlockEnd = data.begin() + *it;
+		if (itBlockBegin != itBlockEnd)
+		{
+			std::copy(itBlockBegin, itBlockEnd, std::back_inserter(ret));
+		}
+		itBlockBegin = itBlockEnd + 1;
+	}
+
+	// copy last block.
+	if (itBlockBegin != data.end())
+	{
+		std::copy(itBlockBegin, data.end(), std::back_inserter(ret));
+	}
+
+
+	return ret;
+}
+
 
 
 #endif // HELPER_FUNCTIONS_H_
