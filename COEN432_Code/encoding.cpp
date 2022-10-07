@@ -107,6 +107,9 @@ std::vector<std::vector<std::vector<int>>> GAEncoding_Ass1::returnRandomizedGeno
 void GAEncoding_Ass1::initializaPopulation(const unsigned int number_of_genomes)
 {
 
+	// Set the population size attribute of the encoding
+	starting_pop_size = number_of_genomes;
+
 	for (unsigned int i = 0; i < number_of_genomes; i++)
 	{
 		Genome tmp_gen;
@@ -325,10 +328,83 @@ std::vector<Genome> GAEncoding_Ass1::parentSelectionTournament(std::vector<Genom
 
 }
 
-void GAEncoding_Ass1::survivorSelection()
+/**
+* 
+*/
+void GAEncoding_Ass1::survivorSelection(int policy = 0, int survivorSize=0)
 {
+	if (policy == 0)
+	{
+		m_population = uFromGammaPolicy(survivorSize);
+	}
+	else if (policy == 1)
+	{
+		m_population = uPlusGammaPolicy(survivorSize);
+	}
+}
+
+/**
+* (u, g) policy. Pick u survivors from g children. Children are ranked based on fitness and u survivors are chosen
+*/
+std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy(int survivorSize=0) 
+{
+	if (survivorSize == 0)
+	{
+		survivorSize = starting_pop_size;
+	}
+
+	// Sort the children based on decreasing fitness
+	std::sort(m_offspring.begin(), m_offspring.end());
+
+	// Choose the top u survivors
+	if (survivorSize >= m_offspring.size())
+	{
+		return m_offspring;
+	}
+
+	std::vector<Genome>::const_iterator first = m_offspring.begin();
+	std::vector<Genome>::const_iterator last = m_offspring.begin() + survivorSize;
+	std::vector<Genome> survivors(first, last);
+
+	return survivors;
+}
+
+/**
+* Pick u survivors from offspring + parents
+* 
+* (Not recommended by prof and textbook)
+*/
+std::vector<Genome> GAEncoding_Ass1::uPlusGammaPolicy(int survivorSize=0)
+{
+	if (survivorSize == 0)
+	{
+		survivorSize = starting_pop_size;
+	}
+
+	// Combine the two vectors
+	std::vector<Genome> newpop;
+	newpop.reserve(m_parents.size() + m_offspring.size());
+	newpop.insert(newpop.end(), m_parents.begin(), m_parents.end());
+	newpop.insert(newpop.end(), m_offspring.begin(), m_offspring.end());
+
+	// Sort
+	std::sort(newpop.begin(), newpop.end());
+
+	// Choose the top u survivors
+	if (survivorSize >= newpop.size())
+	{
+		return newpop;
+	}
+
+	std::vector<Genome>::const_iterator first = newpop.begin();
+	std::vector<Genome>::const_iterator last = newpop.begin() + survivorSize;
+	std::vector<Genome> survivors(first, last);
+
+	return survivors;
 
 }
+
+
 
 void GAEncoding_Ass1::permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps)
 {
@@ -422,12 +498,53 @@ void GAEncoding_Ass1::permutationPointMutation(Genome& gen, unsigned int pos)
 }
 
 /**
-* Acts on m_parents to create m_offspring
+* Acts on m_parents to create m_offspring.
+* 
+* TODO: add an argument that takes a crossover function so that it does not need to be changed manually
 */
-void GAEncoding_Ass1::recombination(float crossoverProb)
+void GAEncoding_Ass1::recombination(float crossoverProb, bool allowfailures)
 {
-	//
+	int parent1 = -1;
+	int parent2 = -1;
+	std::vector<Genome> babies;
 
+	// Generate a vector of random floats
+	std::vector<float> vec_randf = generateRandVecFloat(m_parents.size(), gen_mt);
+
+	//Iterate through pairs of parents to create offspring
+	for (int i = 0; i < vec_randf.size(); i++)
+	{
+		if (vec_randf[i] < crossoverProb)
+		{
+			if (parent1 == -1)
+			{
+				parent1 = i;
+			}
+			else if (parent2 == -1)
+			{
+				parent2 = i;
+
+				// Call a crossover function
+				babies = singlePointCrossover(m_parents[parent1], m_parents[parent2]);
+
+				// Reset parent 1 and parent 2
+				parent1 = -1;
+				parent2 = -1;
+
+				// Add the babies to the offspring pool
+				m_offspring.insert(m_offspring.end(), babies.begin(), babies.end());
+			}
+			else {
+				// This is an error case, something went wrong if were here
+				// TODO: Add this error to the log
+				std::cout << "Something went wrong in recombination.";
+			}
+		}
+		else if (allowfailures) {
+			// This parent does not reproduce and is instead added directly to the offspring pool
+			m_offspring.push_back(m_parents[i]);
+		}
+	}
 }
 
 /**
@@ -447,7 +564,14 @@ std::vector<Genome> GAEncoding_Ass1::singlePointCrossover(Genome& parent1, Genom
 	// Swap the vectors
 	std::swap_ranges(off1vec.begin(), off1vec.begin() + splitPoint, off2vec.end());
 
-	return std::vector<Genome> {Genome(off1vec), Genome(off2vec)};
+	// Set the fitness of the resulting offspring
+	Genome off1(off1vec);
+	off1.setFitness(fitnessOfGenome(off1));
+
+	Genome off2(off2vec);
+	off2.setFitness(fitnessOfGenome(off2));
+
+	return std::vector<Genome> {off1, off2};
 
 }
 

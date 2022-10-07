@@ -1,5 +1,23 @@
 #include "helper_functions.h"
 
+std::vector<float> generateRandVecFloat(int n_elem, std::mt19937& engine)
+{
+	// Create the distribution object
+	std::uniform_real_distribution<float> dist(0, 1);
+
+	// Bind the engine parameter to the dist function call
+	auto gen = std::bind(dist, engine);
+
+	// Create a vector to hold all the random floats
+	std::vector<float> vec(n_elem);
+
+	// Generate the values
+	std::generate(vec.begin(), vec.end(), gen);
+
+	return vec;
+
+}
+
 std::vector<std::string> readFileIntoMemory(std::string file_path)
 {
     std::ifstream infile;

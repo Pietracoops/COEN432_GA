@@ -47,6 +47,12 @@ std::vector<int> shuffleVector(std::vector<int> vect);
 /// \return: None
 void printVector(std::vector<std::vector<int>> vect);
 
+
+/**
+* Generate a vector of random floats between 0 and 1
+*/
+std::vector<float> generateRandVecFloat(int n_elem, std::mt19937& engine)
+
 //template<typename T>
 //inline std::vector<T> erase_indices(const std::vector<T>& data, std::vector<size_t>& indicesToDelete);
 template<typename T>
@@ -82,7 +88,6 @@ inline std::vector<T> erase_indices(const std::vector<T>& data, std::vector<size
 
 	return ret;
 }
-
 
 
 #endif // HELPER_FUNCTIONS_H_
