@@ -29,9 +29,9 @@ void GeneticAlgorithm::parentSelection(int strategy, uint32_t carry_over, float 
 }
 
 
-void GeneticAlgorithm::recombination()
+void GeneticAlgorithm::recombination(float crossoverProb)
 {
-	//m_encoding->recombination();
+	m_encoding->recombination(crossoverProb);
 }
 
 
