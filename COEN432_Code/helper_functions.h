@@ -45,5 +45,9 @@ std::vector<int> shuffleVector(std::vector<int> vect);
 /// \return: None
 void printVector(std::vector<std::vector<int>> vect);
 
+/**
+* Generate a vector of random floats between 0 and 1
+*/
+std::vector<float> generateRandVecFloat(int n_elem, std::mt19937& engine)
 
 #endif // HELPER_FUNCTIONS_H_

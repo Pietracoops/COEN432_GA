@@ -18,6 +18,7 @@ public:
 	void setFitness(int f) { fitness = f; }
 	int getFitness() const { return fitness; }
 	std::vector<std::vector<int>> getEncoding() const { return genome_encoding_2b2_int; }
+	bool operator< (const Genome& other) const { return fitness < other.fitness; }
 	
 };
 
@@ -29,8 +30,8 @@ public:
 	virtual void initializaPopulation(const unsigned int number_of_genomes) = 0;
 
 	// Core Functions
-	virtual void survivorSelection() = 0;	// Select Survivors from the parents + offspring
-	virtual void recombination(float crossoverProb) = 0;		// Crossover to generate offspring
+	virtual void survivorSelection(int policy = 0, int survivorSize = 0) = 0;	// Select Survivors from the parents + offspring
+	virtual void recombination(float crossoverProb, bool allowfailures) = 0;		// Crossover to generate offspring
 
 	// Parent Selection
 	virtual void parentSelection() = 0;
@@ -92,13 +93,17 @@ public:
 
 	// Core Functions
 	
-	virtual void recombination(float crossoverProb) override;			// Crossover 
-	virtual void survivorSelection() override;		// Select Survivors
+	virtual void recombination(float crossoverProb, bool allowfailures) override;			// Crossover 
+	virtual void survivorSelection(int policy = 0, int survivorSize = 0) override;		// Select Survivors
 
 	// Parent Selection
 	virtual void parentSelection();
 	virtual void parentSelectionFitnessProportionate(std::vector<Genome> population) override;
 	virtual void parentSelectionTournament(std::vector<Genome> population, uint32_t window_size, bool replacement) override;
+
+	// Survivor selection policies
+	std::vector<Genome> uFromGammaPolicy(int survivorSize=0);
+	std::vector<Genome> uPlusGammaPolicy(int survivorSize = 0);
 
 	// Mutation Functions
 	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) override;
@@ -123,6 +128,7 @@ private:
 
 	int WIDTH = 8;
 	int HEIGHT = 8;
+	int starting_pop_size;
 
 	// Map containing the indexes of each tile (1 - 64) and the corresponding Tile
 	// Tile object where each individual tile of the puzzle can be stored

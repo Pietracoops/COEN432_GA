@@ -6,6 +6,8 @@
 int main()
 {
 	
+
+
 	// PARAMETERS
 	unsigned int POPULATION_SIZE = 10000;
 
