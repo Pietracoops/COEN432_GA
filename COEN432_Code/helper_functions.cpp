@@ -48,7 +48,17 @@ std::vector<std::vector<int>> shuffleVector(std::vector<std::vector<int>> vect)
 
 std::vector<int> shuffleVector(std::vector<int> vect)
 {
-	std::vector<int>  vect_tmp = vect;
+	std::vector<int> vect_tmp = vect;
+	auto rd = std::random_device{};
+	auto rng = std::default_random_engine{ rd() };
+	std::shuffle(std::begin(vect_tmp), std::end(vect_tmp), rng);
+
+	return vect_tmp;
+}
+
+std::vector<Genome> shuffleVector(std::vector<Genome> vect)
+{
+	std::vector<Genome> vect_tmp = vect;
 	auto rd = std::random_device{};
 	auto rng = std::default_random_engine{ rd() };
 	std::shuffle(std::begin(vect_tmp), std::end(vect_tmp), rng);

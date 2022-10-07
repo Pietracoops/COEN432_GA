@@ -30,10 +30,10 @@ void GeneticAlgorithm::parentSelection(int strategy, uint32_t carry_over, float 
 }
 
 
-void GeneticAlgorithm::recombination(float crossoverProb, bool allowfailures)
+void GeneticAlgorithm::recombination(float crossoverProb, int goalOffspringSize, bool allowfailures)
 {
 	watch.Start();
-	m_encoding->recombination(crossoverProb, allowfailures);
+	m_encoding->recombination(crossoverProb, goalOffspringSize, allowfailures);
 	genetic_algo_log() << "Recombination time using crossover prob [" << crossoverProb << "]: " << watch.Stop() << std::endl;
 }
 
@@ -104,7 +104,7 @@ void GeneticAlgorithm::runGA()
 
 		// Apply variation operators in order to create offspring
 		genetic_algo_log() << "Starting recombination procedure..." << std::endl;
-		recombination(params.crossoverProb, params.allowFailures);
+		recombination(params.crossoverProb, params.goalOffspringSize, params.allowFailures);
 
 		genetic_algo_log() << "Starting mutation procedure... " << std::endl;
 		mutation(params.mutationProb);

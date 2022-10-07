@@ -18,8 +18,9 @@
 #include <map>
 #include <algorithm>
 #include <random>
-#include "logging.h"
 
+#include "logging.h"
+#include "Genome.h"
 
 
 // Read external files into memory and store in string vector
@@ -42,6 +43,7 @@ int CountRowMismatches(std::vector<std::string> first, std::vector<std::string> 
 /// \return: Shuffled input vector
 std::vector<std::vector<int>> shuffleVector(std::vector<std::vector<int>> vect);
 std::vector<int> shuffleVector(std::vector<int> vect);
+std::vector<Genome> shuffleVector(std::vector<Genome> vect);
 
 // Prints a two dimensional vector
 /// \return: None
