@@ -32,6 +32,7 @@ public:
 	// Core Functions
 	virtual void survivorSelection(int policy = 0, int survivorSize = 0) = 0;		// Select Survivors from the parents + offspring
 	virtual void recombination(float crossoverProb, bool allowfailures) = 0;		// Crossover to generate offspring
+	virtual void mutation(float mutationProb) = 0;
 
 	// Parent Selection
 	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement) = 0;
@@ -50,6 +51,8 @@ public:
 	// Utility Functions
 	virtual Genome getGenomeFromPopulation(const unsigned int gen_num) = 0;
 
+	// Termination Condition Functions
+	virtual bool terminationConditions(int currentGen, int maxGeneration, double currRuntime, double maxRuntime, int targetFitness) = 0;
 
 	// Population that is generated and manipulated
 	std::vector<Genome> m_population;
@@ -97,6 +100,7 @@ public:
 	// Core Functions
 	
 	virtual void recombination(float crossoverProb, bool allowfailures) override;			// Crossover 
+	virtual void mutation(float mutationProb) override;
 	virtual void survivorSelection(int policy = 0, int survivorSize = 0) override;		// Select Survivors
 
 	// Parent Selection
@@ -118,6 +122,9 @@ public:
 
 	// Crossover Functions
 	std::vector<Genome> singlePointCrossover(Genome& parent1, Genome& parent2);
+
+	// Termination Condition functions
+	virtual bool terminationConditions(int currentGen, int maxGeneration, double currRuntime, double maxRuntime, int targetFitness) override;
 
 	// Utility Functions
 	virtual Genome getGenomeFromPopulation(const unsigned int gen_num);

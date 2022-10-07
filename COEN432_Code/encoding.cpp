@@ -328,7 +328,7 @@ std::vector<Genome> GAEncoding_Ass1::parentSelectionTournament(std::vector<Genom
 /**
 * 
 */
-void GAEncoding_Ass1::survivorSelection(int policy = 0, int survivorSize=0)
+void GAEncoding_Ass1::survivorSelection(int policy, int survivorSize)
 {
 	if (policy == 0)
 	{
@@ -343,7 +343,7 @@ void GAEncoding_Ass1::survivorSelection(int policy = 0, int survivorSize=0)
 /**
 * (u, g) policy. Pick u survivors from g children. Children are ranked based on fitness and u survivors are chosen
 */
-std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy(int survivorSize=0) 
+std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy(int survivorSize) 
 {
 	if (survivorSize == 0)
 	{
@@ -371,7 +371,7 @@ std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy(int survivorSize=0)
 * 
 * (Not recommended by prof and textbook)
 */
-std::vector<Genome> GAEncoding_Ass1::uPlusGammaPolicy(int survivorSize=0)
+std::vector<Genome> GAEncoding_Ass1::uPlusGammaPolicy(int survivorSize)
 {
 	if (survivorSize == 0)
 	{
@@ -544,6 +544,11 @@ void GAEncoding_Ass1::recombination(float crossoverProb, bool allowfailures)
 	}
 }
 
+void GAEncoding_Ass1::mutation(float mutationProb)
+{
+	// Applies a random mutation to random offspring with a mutation probability mutationProb
+}
+
 /**
 * Takes two parents and produces a vector containing 2 offspring genomes
 * 
@@ -575,4 +580,25 @@ std::vector<Genome> GAEncoding_Ass1::singlePointCrossover(Genome& parent1, Genom
 Genome GAEncoding_Ass1::getGenomeFromPopulation(const unsigned int gen_num)
 {
 	return m_population[gen_num];
+}
+
+/**
+* If arguments are not specified then the termination condition linked to those arguments
+* will not execute.
+*/
+bool GAEncoding_Ass1::terminationConditions(int currentGen, int maxGeneration, double currRuntime, double maxRuntime, int targetFitness)
+{
+	
+	if (maxGeneration != -1 && (currentGen == maxGeneration))
+	{
+		return true;
+	}
+
+	if (maxRuntime < 0 && (currRuntime >= maxRuntime))
+	{
+		return true;
+	}
+
+	return false;
+
 }
