@@ -112,7 +112,7 @@ void GAEncoding_Ass1::initializaPopulation(const unsigned int number_of_genomes)
 		Genome tmp_gen;
 		std::vector<std::vector<int>> randomized_genome = shuffleVector(m_original_genome);
 		tmp_gen.genome_encoding_2b2_int = randomized_genome;
-		tmp_gen.setFitness(fitnessOfGenome(randomized_genome));
+		tmp_gen.setFitness(fitnessOfGenome(tmp_gen));
 		m_population.push_back(tmp_gen);
 	}
 	
