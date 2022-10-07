@@ -333,10 +333,12 @@ void GAEncoding_Ass1::survivorSelection(int policy, int survivorSize)
 	if (policy == 0)
 	{
 		m_population = uFromGammaPolicy(survivorSize);
+		m_offspring.clear();
 	}
 	else if (policy == 1)
 	{
 		m_population = uPlusGammaPolicy(survivorSize);
+		m_offspring.clear();
 	}
 }
 
@@ -499,49 +501,63 @@ void GAEncoding_Ass1::permutationPointMutation(Genome& gen, unsigned int pos)
 * 
 * TODO: add an argument that takes a crossover function so that it does not need to be changed manually
 */
-void GAEncoding_Ass1::recombination(float crossoverProb, bool allowfailures)
+void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, bool allowfailures)
 {
 	int parent1 = -1;
 	int parent2 = -1;
 	std::vector<Genome> babies;
 
-	// Generate a vector of random floats
-	std::vector<float> vec_randf = generateRandVecFloat(m_parents.size(), gen_mt);
+	std::cout << "offspring size" << m_offspring.size() << std::endl;
+	std::cout << "parent size" << m_parents.size() << std::endl;
 
-	//Iterate through pairs of parents to create offspring
-	for (int i = 0; i < vec_randf.size(); i++)
-	{
-		if (vec_randf[i] < crossoverProb)
+
+	// Add the elites back to the parent pool so that they have a chance to reproduce
+	m_parents.insert(m_parents.end(), m_elite.begin(), m_elite.end());
+
+	// Shuffle the parents
+	m_parents = shuffleVector(m_parents);
+
+	while (m_offspring.size() < goalOffspringSize) {
+		
+		// Generate a vector of random floats
+		std::vector<float> vec_randf = generateRandVecFloat(m_parents.size(), gen_mt);
+
+		//Iterate through pairs of parents to create offspring
+		for (int i = 0; i < vec_randf.size(); i++)
 		{
-			if (parent1 == -1)
+			if (vec_randf[i] < crossoverProb)
 			{
-				parent1 = i;
-			}
-			else if (parent2 == -1)
-			{
-				parent2 = i;
+				if (parent1 == -1)
+				{
+					parent1 = i;
+				}
+				else if (parent2 == -1)
+				{
+					parent2 = i;
 
-				// Call a crossover function
-				babies = singlePointCrossover(m_parents[parent1], m_parents[parent2]);
+					// Call a crossover function
+					babies = singlePointCrossover(m_parents[parent1], m_parents[parent2]);
 
-				// Reset parent 1 and parent 2
-				parent1 = -1;
-				parent2 = -1;
+					// Reset parent 1 and parent 2
+					parent1 = -1;
+					parent2 = -1;
 
-				// Add the babies to the offspring pool
-				m_offspring.insert(m_offspring.end(), babies.begin(), babies.end());
+					// Add the babies to the offspring pool
+					m_offspring.insert(m_offspring.end(), babies.begin(), babies.end());
+				}
+				else {
+					// This is an error case, something went wrong if were here
+					// TODO: Add this error to the log
+					std::cout << "Something went wrong in recombination.";
+				}
 			}
-			else {
-				// This is an error case, something went wrong if were here
-				// TODO: Add this error to the log
-				std::cout << "Something went wrong in recombination.";
+			else if (allowfailures) {
+				// This parent does not reproduce and is instead added directly to the offspring pool
+				m_offspring.push_back(m_parents[i]);
 			}
-		}
-		else if (allowfailures) {
-			// This parent does not reproduce and is instead added directly to the offspring pool
-			m_offspring.push_back(m_parents[i]);
 		}
 	}
+	std::cout << "final offspring size" << m_offspring.size() << std::endl;
 }
 
 void GAEncoding_Ass1::mutation(float mutationProb)

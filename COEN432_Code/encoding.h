@@ -5,23 +5,7 @@
 #define GAENCODING_H_
 
 #include "helper_functions.h"
-
-class Genome
-{
-private:
-	int fitness = 0;
-public:
-	Genome() {};
-	inline Genome(std::vector<std::vector<int>> vec) { this->genome_encoding_2b2_int = vec; }
-	std::vector<std::vector<int>> genome_encoding_2b2_int;
-	size_t getSize() const;
-	void setFitness(int f) { fitness = f; }
-	int getFitness() const { return fitness; }
-	std::vector<std::vector<int>> getEncoding() const { return genome_encoding_2b2_int; }
-	bool operator< (const Genome& other) const { return fitness < other.fitness; }
-	
-};
-
+#include "Genome.h"
 
 class GAEncoding
 {
@@ -31,7 +15,7 @@ public:
 
 	// Core Functions
 	virtual void survivorSelection(int policy = 0, int survivorSize = 0) = 0;		// Select Survivors from the parents + offspring
-	virtual void recombination(float crossoverProb, bool allowfailures) = 0;		// Crossover to generate offspring
+	virtual void recombination(float crossoverProb, int goalOffspringSize, bool allowfailures) = 0;		// Crossover to generate offspring
 	virtual void mutation(float mutationProb) = 0;
 
 	// Parent Selection
@@ -99,9 +83,9 @@ public:
 
 	// Core Functions
 	
-	virtual void recombination(float crossoverProb, bool allowfailures) override;			// Crossover 
+	virtual void recombination(float crossoverProb, int goalOffspringSize, bool allowfailures) override;	// Crossover 
 	virtual void mutation(float mutationProb) override;
-	virtual void survivorSelection(int policy = 0, int survivorSize = 0) override;		// Select Survivors
+	virtual void survivorSelection(int policy = 0, int survivorSize = 0) override;							// Select Survivors
 
 	// Parent Selection
 	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement);

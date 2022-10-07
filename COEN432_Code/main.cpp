@@ -10,7 +10,7 @@ int main()
 	GAEncoding* Encoding = &Encoding_Ass1;
 
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 5000;
+	unsigned int POPULATION_SIZE = 100;
 
 	// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
@@ -26,6 +26,7 @@ int main()
 	// --- Recombination parameters
 	GA.params.crossoverProb = 0.8F;
 	GA.params.allowFailures = false;
+	GA.params.goalOffspringSize = POPULATION_SIZE;
 
 	// --- Mutation parameters
 	GA.params.mutationProb = 0.1F;

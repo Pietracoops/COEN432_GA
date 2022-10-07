@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="encoding.h" />
     <ClInclude Include="genetic_algorithm.h" />
+    <ClInclude Include="Genome.h" />
     <ClInclude Include="helper_functions.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="timer.h" />
