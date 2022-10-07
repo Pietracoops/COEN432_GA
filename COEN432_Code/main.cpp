@@ -10,7 +10,7 @@ int main()
 	GAEncoding* Encoding = &Encoding_Ass1;
 
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 10;
+	unsigned int POPULATION_SIZE = 5000;
 
 	// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);

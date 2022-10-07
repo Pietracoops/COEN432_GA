@@ -564,7 +564,7 @@ std::vector<Genome> GAEncoding_Ass1::singlePointCrossover(Genome& parent1, Genom
 	int splitPoint = distr(gen_mt);
 
 	// Swap the vectors
-	std::swap_ranges(off1vec.begin(), off1vec.begin() + splitPoint, off2vec.end());
+	std::swap_ranges(off1vec.begin(), off1vec.begin() + splitPoint, off2vec.begin());
 
 	// Set the fitness of the resulting offspring
 	Genome off1(off1vec);

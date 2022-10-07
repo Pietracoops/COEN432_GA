@@ -32,22 +32,31 @@ void GeneticAlgorithm::parentSelection(int strategy, uint32_t carry_over, float 
 
 void GeneticAlgorithm::recombination(float crossoverProb, bool allowfailures)
 {
+	watch.Start();
 	m_encoding->recombination(crossoverProb, allowfailures);
+	genetic_algo_log() << "Recombination time using crossover prob [" << crossoverProb << "]: " << watch.Stop() << std::endl;
 }
 
 void GeneticAlgorithm::mutation(float mutationProb)
 {
+	watch.Start();
 	m_encoding->mutation(mutationProb);
+	genetic_algo_log() << "Mutation time using mutationProb [" << mutationProb << "]: " << watch.Stop() << std::endl;
 }
 
 void GeneticAlgorithm::survivorSelection()
 {
+	watch.Start();
 	m_encoding->survivorSelection();
+	genetic_algo_log() << "Survivor selection time " << watch.Stop() << std::endl;
 }
 
 bool GeneticAlgorithm::terminationConditions(int currentGen, int maxGeneration, double currRuntime, double maxRuntime, int targetFitness)
 {
-	return m_encoding->terminationConditions(currentGen, maxGeneration, currRuntime, maxRuntime, targetFitness);
+	watch.Start();
+	bool val = m_encoding->terminationConditions(currentGen, maxGeneration, currRuntime, maxRuntime, targetFitness);
+	genetic_algo_log() << "Termination calculation time " << watch.Stop() << std::endl;
+	return val;
 }
 
 void GeneticAlgorithm::printParameters()
@@ -86,6 +95,7 @@ void GeneticAlgorithm::runGA()
 	{
 
 		// Pick parents from the current population
+		genetic_algo_log() << "Starting parent selection for generation: " << generation << std::endl;
 		parentSelection(params.strategy,
 			params.carry_over,
 			params.selection_ratio,
@@ -93,12 +103,17 @@ void GeneticAlgorithm::runGA()
 			params.replacement);
 
 		// Apply variation operators in order to create offspring
+		genetic_algo_log() << "Starting recombination procedure..." << std::endl;
 		recombination(params.crossoverProb, params.allowFailures);
+
+		genetic_algo_log() << "Starting mutation procedure... " << std::endl;
 		mutation(params.mutationProb);
 
-		// Select the survivors 
+		// Select the survivors
+		genetic_algo_log() << "Starting survivor selection... " << std::endl;
 		survivorSelection();
 
+		std::cout << m_encoding->m_elite[0].getFitness() << std::endl;
 		// Increment the number of passed generations
 		generation++;
 	}
