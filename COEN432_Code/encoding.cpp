@@ -495,8 +495,6 @@ void GAEncoding_Ass1::permutationInsert(Genome& gen, const uint32_t initial_pos,
 
 	// Erase the original entry
 	gen.genome_encoding_2b2_int.erase(gen.genome_encoding_2b2_int.begin() + initial_pos + offset);
-
-	gen.setFitness(fitnessOfGenome(gen));
 }
 
 void GAEncoding_Ass1::permutationRandomInsert(Genome& gen)
@@ -540,8 +538,6 @@ void GAEncoding_Ass1::permutationScramble(Genome& gen, std::vector<int> indices)
 	{
 		permutationSwap(gen, indices[i], shuffled_indices[i]);
 	}
-	gen.setFitness(fitnessOfGenome(gen));
-
 }
 
 void GAEncoding_Ass1::permutationRandomScramble(Genome& gen)
@@ -570,7 +566,6 @@ void GAEncoding_Ass1::permutationRandomScramble(Genome& gen)
 	gen.setFitness(fitnessOfGenome(gen));
 }
 
-
 void GAEncoding_Ass1::permutationInvert(Genome& gen, std::vector<int> indices)
 {
 	std::sort(indices.begin(), indices.end());
@@ -581,7 +576,6 @@ void GAEncoding_Ass1::permutationInvert(Genome& gen, std::vector<int> indices)
 	{
 		permutationSwap(gen, indices[i], shuffled_indices[i]);
 	}
-	gen.setFitness(fitnessOfGenome(gen));
 }
 
 void GAEncoding_Ass1::permutationRandomInvert(Genome& gen)
@@ -612,12 +606,13 @@ void GAEncoding_Ass1::permutationRandomInvert(Genome& gen)
 	gen.setFitness(fitnessOfGenome(gen));
 }
 
-void GAEncoding_Ass1::permutationPointMutation(Genome& gen, unsigned int pos)
+void GAEncoding_Ass1::permutationPointMutation(Genome& gen, unsigned int pos, unsigned int rot)
 {
 	// Our point mutation will simply rotate the tile at the specified index
 	// We should also consider rotating more than just once at a time.
-	gen.genome_encoding_2b2_int[pos][1]++;
-	gen.setFitness(fitnessOfGenome(gen));
+	if (rot > 3) rot = 3;
+
+	gen.genome_encoding_2b2_int[pos][1] = rot;
 }
 
 void GAEncoding_Ass1::permutationRandomPointMutation(Genome& gen)

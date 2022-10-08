@@ -33,7 +33,7 @@ public:
 	virtual void permutationRandomScramble(Genome& gen) = 0;
 	virtual void permutationInvert(Genome& gen, std::vector<int> indices) = 0;
 	virtual void permutationRandomInvert(Genome& gen) = 0;
-	virtual void permutationPointMutation(Genome& gen, unsigned int pos) = 0;
+	virtual void permutationPointMutation(Genome& gen, unsigned int pos, unsigned int rot) = 0;
 	virtual void permutationRandomPointMutation(Genome& gen) = 0;
 
 
@@ -109,7 +109,7 @@ public:
 	virtual void permutationRandomScramble(Genome& gen) override;
 	virtual void permutationInvert(Genome& gen, std::vector<int> indices) override;
 	virtual void permutationRandomInvert(Genome& gen) override;
-	virtual void permutationPointMutation(Genome& gen, unsigned int pos) override;
+	virtual void permutationPointMutation(Genome& gen, unsigned int pos, unsigned int rot) override;
 	virtual void permutationRandomPointMutation(Genome& gen) override;
 
 	// Crossover Functions
