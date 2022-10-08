@@ -510,17 +510,16 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 	std::cout << "offspring size" << m_offspring.size() << std::endl;
 	std::cout << "parent size" << m_parents.size() << std::endl;
 
-
 	// Add the elites back to the parent pool so that they have a chance to reproduce
 	m_parents.insert(m_parents.end(), m_elite.begin(), m_elite.end());
-
-	// Shuffle the parents
-	m_parents = shuffleVector(m_parents);
 
 	while (m_offspring.size() < goalOffspringSize) {
 		
 		// Generate a vector of random floats
 		std::vector<float> vec_randf = generateRandVecFloat(m_parents.size(), gen_mt);
+
+		// Shuffle the parents
+		m_parents = shuffleVector(m_parents);
 
 		//Iterate through pairs of parents to create offspring
 		for (int i = 0; i < vec_randf.size(); i++)
@@ -552,17 +551,63 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 				}
 			}
 			else if (allowfailures) {
+
 				// This parent does not reproduce and is instead added directly to the offspring pool
-				m_offspring.push_back(m_parents[i]);
+				if (!(std::find(m_elite.begin(), m_elite.end(), m_parents[i]) != m_elite.end()))
+				{
+					m_offspring.push_back(m_parents[i]);
+				}				
 			}
 		}
 	}
+
 	std::cout << "final offspring size" << m_offspring.size() << std::endl;
 }
 
 void GAEncoding_Ass1::mutation(float mutationProb)
 {
 	// Applies a random mutation to random offspring with a mutation probability mutationProb
+
+	int total_mutations = 5;
+
+	// Generate a vector of random float probabilities
+	std::vector<float> vec_randf = generateRandVecFloat(m_offspring.size(), gen_mt);
+	std::uniform_real_distribution<> distr(0, 1);
+
+	// Iterate through the offspring to mutate
+	for (int i = 0; i < vec_randf.size(); i++)
+	{
+		// Corresponding individual will be mutated
+		if (vec_randf[i] < mutationProb)
+		{
+			// Generate a random float between 0 and 1
+			float prob = (float)distr(gen_mt);
+
+			if (prob < 1.0 / total_mutations)
+			{
+				permutationRandomSwap(m_offspring[i], 1);
+			}
+			else if (prob < 2.0 / total_mutations)
+			{
+				permutationRandomInsert(m_offspring[i]);
+			}
+			else if (prob < 3.0 / total_mutations)
+			{
+				permutationRandomScramble(m_offspring[i]);
+			}
+			else if (prob < 4.0 / total_mutations)
+			{
+				permutationRandomInvert(m_offspring[i]);
+			}
+			else if (prob < 5.0 / total_mutations)
+			{
+				permutationRandomPointMutation(m_offspring[i]);
+			}
+		}
+	}
+
+	// Add the elite to the offspring pool
+	m_offspring.insert(m_offspring.end(), m_elite.begin(), m_elite.end());
 }
 
 /**
