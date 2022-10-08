@@ -270,60 +270,92 @@ std::vector<Genome> GAEncoding_Ass1::parentSelectionFitnessProportionate(std::ve
 std::vector<Genome> GAEncoding_Ass1::parentSelectionTournament(std::vector<Genome> population, float selection_ratio, uint32_t window_size, bool replacement)
 {
 
-	std::vector<Genome> parents;
+	// Initialization
+	std::vector<Genome> parents;			// Vector to store resulting parents
+	std::vector<Genome> population_copy;	// Vector used to scramble parents
+	uint32_t genomes_to_pick = (uint32_t)(selection_ratio * population.size()); // Number of genomes to select from population
 
-	unsigned int genomes_to_pick = (unsigned int)(selection_ratio * population.size());
+	// Shuffle the population
+	population_copy = shuffleVector(population);
 
-	while (genomes_to_pick != 0)
+
+	// No Replacement
+	if (!replacement)
 	{
-		if (population.size() == 0)
+		unsigned int index = 0;
+		for (uint32_t i = 0; i < genomes_to_pick; i++)
 		{
-			break;
-		}
+			std::vector<Genome> local_tournament;
+			uint32_t number_to_select = std::min(window_size, (uint32_t)population_copy.size() - 1 - index);
 
-		std::uniform_int_distribution<unsigned int> distribution(0, int(population.size() - 1));
-
-		// Select the indeces
-		std::vector<size_t> indices;
-		std::vector<Genome> local_tournament;
-		uint32_t number_to_select = std::min(window_size, (uint32_t)population.size());
-		for (unsigned int i = 0; i < number_to_select; i++)
-		{
-			unsigned int index;
-			do {
-				index = distribution(gen_mt);
-			} 
-			while (std::find(indices.begin(), indices.end(), index) != indices.end());
-			indices.push_back(index);
-			local_tournament.push_back(population[indices.back()]);
-		}
-
-		auto max_it = std::max_element(local_tournament.begin(), local_tournament.end(),
-			[](const Genome& a, const Genome& b)
+			if (number_to_select == 0)
 			{
-				return a.getFitness() < b.getFitness();
-			});
-		
-		int value = max_it - local_tournament.begin();
-		parents.push_back(population[indices[max_it - local_tournament.begin()]]);
-		//indices.erase(indices.begin() + (max_it - local_tournament.begin()));
-		
+				break;
+			}
 
-		if (!replacement)
-		{
-			population = erase_indices(population, indices);
+			for (uint32_t j = index; j < index + number_to_select; j++)
+			{
+				local_tournament.push_back(population_copy[j]);
+			}
+
+			auto max_it = std::max_element(local_tournament.begin(), local_tournament.end(),
+				[](const Genome& a, const Genome& b)
+				{
+					return a.getFitness() < b.getFitness();
+				});
+
+			parents.push_back(local_tournament[max_it - local_tournament.begin()]);
+			index += number_to_select;
+
 		}
-		else
-		{
-			population.erase(population.begin() + indices[max_it - local_tournament.begin()]);
-		}
-		
-		genomes_to_pick--;
 	}
+	else
+	{
+		// Without replacement
+		std::uniform_int_distribution<unsigned int> distribution(0, int(population_copy.size() - 1));
+
+		std::set<int> used_indices;
+		std::set<int> selected_indices;
+		std::vector<Genome> local_tournament;
+
+		for (uint32_t i = 0; i < genomes_to_pick; i++)
+		{
+
+			local_tournament.clear();
+			selected_indices.clear();
+			while (selected_indices.size() != window_size)
+			{
+				int index = distribution(gen_mt);
+				if (used_indices.find(index) == used_indices.end())
+				{
+					selected_indices.insert(index);
+				}
+			}
+			// Convert Selected set into vector
+			std::vector<int> selected_indices_v(selected_indices.begin(), selected_indices.end());
+
+			for (uint32_t j = 0; j < selected_indices_v.size(); j++)
+			{
+				local_tournament.push_back(population_copy[selected_indices_v[j]]);
+			}
+
+			auto max_it = std::max_element(local_tournament.begin(), local_tournament.end(),
+				[](const Genome& a, const Genome& b)
+				{
+					return a.getFitness() < b.getFitness();
+				});
+
+			parents.push_back(local_tournament[max_it - local_tournament.begin()]);
+			used_indices.insert(selected_indices_v[max_it - local_tournament.begin()]);
+
+		}
+	}
+
 
 	return parents;
 
 }
+
 
 /**
 * 
@@ -431,7 +463,6 @@ void GAEncoding_Ass1::permutationSwap(Genome& gen, const uint32_t pos1, const ui
 	// Check pos1 and pos2 are not same
 	if (pos1 == pos2)
 	{
-		std::cout << "Position 1 and Position 2 need to be different values." << std::endl;
 		return;
 	}
 
@@ -443,9 +474,40 @@ void GAEncoding_Ass1::permutationInsert(Genome& gen, const uint32_t initial_pos,
 	// Check pos1 and pos2 are not same
 	if (initial_pos == final_pos)
 	{
-		std::cout << "Position 1 and Position 2 need to be different values." << std::endl;
 		return;
 	}
+
+	unsigned int offset = 0;
+	if (initial_pos > final_pos)
+	{
+		offset = 1;
+	}
+
+	// Get vector from genome
+	std::vector<std::vector<int>> genome_enc = gen.genome_encoding_2b2_int;
+
+	std::vector<int> initial = gen.genome_encoding_2b2_int[initial_pos];
+
+	// Insert the initial vect into final position
+	gen.genome_encoding_2b2_int.insert(gen.genome_encoding_2b2_int.begin() + final_pos, initial);
+
+	// Erase the original entry
+	gen.genome_encoding_2b2_int.erase(gen.genome_encoding_2b2_int.begin() + initial_pos + offset);
+
+}
+
+void GAEncoding_Ass1::permutationRandomInsert(Genome& gen)
+{
+	// Generate distribution
+	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
+
+	// Pick from distribution
+	unsigned int initial_pos = distribution(gen_mt);
+	unsigned int final_pos;
+
+	do {
+		final_pos = distribution(gen_mt);
+	} while (initial_pos == final_pos); // Check pos1 and pos2 are same
 
 	unsigned int offset = 0;
 	if (initial_pos > final_pos)
@@ -476,9 +538,60 @@ void GAEncoding_Ass1::permutationScramble(Genome& gen, std::vector<int> indices)
 	}
 }
 
+void GAEncoding_Ass1::permutationRandomScramble(Genome& gen)
+{
+	// Generate distribution
+	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
+
+	// Pick from distribution
+	unsigned int size_of_indices = distribution(gen_mt);
+
+	std::set<int> shuffled_indices;
+	while (shuffled_indices.size() != size_of_indices)
+	{
+		shuffled_indices.insert(distribution(gen_mt));
+	}
+
+	std::vector<int> indices(shuffled_indices.begin(), shuffled_indices.end());
+	std::sort(indices.begin(), indices.end());
+
+	unsigned int counter = 0;
+	for (auto& n : shuffled_indices)
+	{
+		permutationSwap(gen, indices[counter], n);
+		counter++;
+	}
+}
+
 
 void GAEncoding_Ass1::permutationInvert(Genome& gen, std::vector<int> indices)
 {
+	std::sort(indices.begin(), indices.end());
+	std::vector<int> shuffled_indices = indices;
+	std::sort(shuffled_indices.begin(), shuffled_indices.end(), std::greater<int>());
+
+	for (unsigned int i = 0; i < indices.size(); i++)
+	{
+		permutationSwap(gen, indices[i], shuffled_indices[i]);
+	}
+}
+
+void GAEncoding_Ass1::permutationRandomInvert(Genome& gen)
+{
+	// Generate distribution
+	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
+
+	// Pick from distribution
+	unsigned int size_of_indices = distribution(gen_mt);
+
+	std::set<int> shuffled_indices_set;
+	while (shuffled_indices_set.size() != size_of_indices)
+	{
+		shuffled_indices_set.insert(distribution(gen_mt));
+	}
+
+	std::vector<int> indices(shuffled_indices_set.begin(), shuffled_indices_set.end());
+
 	std::sort(indices.begin(), indices.end());
 	std::vector<int> shuffled_indices = indices;
 	std::sort(shuffled_indices.begin(), shuffled_indices.end(), std::greater<int>());
@@ -494,6 +607,18 @@ void GAEncoding_Ass1::permutationPointMutation(Genome& gen, unsigned int pos)
 	// Our point mutation will simply rotate the tile at the specified index
 	// We should also consider rotating more than just once at a time.
 	gen.genome_encoding_2b2_int[pos][1]++;
+}
+
+void GAEncoding_Ass1::permutationRandomPointMutation(Genome& gen)
+{
+	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
+	std::uniform_int_distribution<unsigned int> distribution_rot(1, 3);
+
+	// Pick from distribution
+	unsigned int index = distribution(gen_mt);
+	unsigned int rot = distribution_rot(gen_mt);
+
+	gen.genome_encoding_2b2_int[index][1] = rot; // Randomize the rotation
 }
 
 /**
@@ -516,7 +641,7 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 	while (m_offspring.size() < goalOffspringSize) {
 		
 		// Generate a vector of random floats
-		std::vector<float> vec_randf = generateRandVecFloat(m_parents.size(), gen_mt);
+		std::vector<float> vec_randf = generateRandVecFloat((int)m_parents.size(), gen_mt);
 
 		// Shuffle the parents
 		m_parents = shuffleVector(m_parents);
@@ -621,7 +746,7 @@ std::vector<Genome> GAEncoding_Ass1::singlePointCrossover(Genome& parent1, Genom
 		off2vec(parent2.genome_encoding_2b2_int);
 
 	// Get random integer between start + 1 and end - 1
-	std::uniform_int_distribution<> distr(1, parent1.getSize() - 1);
+	std::uniform_int_distribution<> distr(1, (int)(parent1.getSize() - 1));
 	int splitPoint = distr(gen_mt);
 
 	// Swap the vectors
