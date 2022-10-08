@@ -696,7 +696,7 @@ void GAEncoding_Ass1::mutation(float mutationProb)
 	int total_mutations = 5;
 
 	// Generate a vector of random float probabilities
-	std::vector<float> vec_randf = generateRandVecFloat(m_offspring.size(), gen_mt);
+	std::vector<float> vec_randf = generateRandVecFloat((int)m_offspring.size(), gen_mt);
 	std::uniform_real_distribution<> distr(0, 1);
 
 	// Iterate through the offspring to mutate

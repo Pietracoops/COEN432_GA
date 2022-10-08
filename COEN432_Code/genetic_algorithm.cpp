@@ -1,18 +1,24 @@
 #include "genetic_algorithm.h"
 
-GeneticAlgorithm::GeneticAlgorithm(GAEncoding *encoding, int population_size):
-	generation(1)
+GeneticAlgorithm::GeneticAlgorithm(GAEncoding *encoding, int population_size, std::string log_path):
+	m_generation(1)
 {
-	watch.Start();
-	// This is where we specify our initialization parameters
-	genetic_algo_log() << "Initializing Population with size [" << population_size << "]" << std::endl;
+	if (log_path.empty())
+	{
+		std::filesystem::path log_dir = std::filesystem::current_path() / "log";
+		log_path = log_dir.string();
+	}
 
-	// Initialize the population randomly and also collects their fitness
-	m_encoding = encoding;
-	m_encoding->initializaPopulation(population_size);
+	LOG_PATH = log_path + ("/log_" + getCurrentDateTime("date") + ".log");
+	std::filesystem::create_directories(log_path);
 
-	
-	genetic_algo_log() << "elapsed time: " << watch.Stop() << std::endl;
+	// Store encoding locally
+	m_encoding = encoding; 
+
+
+	// Init the population
+	initializePopulation(population_size);
+
 }
 
 
@@ -21,41 +27,53 @@ GeneticAlgorithm::~GeneticAlgorithm()
 
 }
 
+void GeneticAlgorithm::initializePopulation(int population_size)
+{
+	m_watch.Start();
+	// This is where we specify our initialization parameters
+	genetic_algo_log() << "Initializing Population with size [" << population_size << "]" << std::endl;
+
+	// Initialize the population randomly and also collects their fitness
+	m_encoding->initializaPopulation(population_size);
+
+	genetic_algo_log() << "elapsed time: " << m_watch.Stop() << std::endl;
+}
+
 
 void GeneticAlgorithm::parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement)
 {
-	watch.Start();
+	m_watch.Start();
 	m_encoding->parentSelection(strategy, carry_over, selection_ratio, window_size, replacement);
-	genetic_algo_log() << "Parent Selection time using strategy [" << strategy << "]: " << watch.Stop() << std::endl;
+	genetic_algo_log() << "Parent Selection time using strategy [" << strategy << "]: " << m_watch.Stop() << std::endl;
 }
 
 
 void GeneticAlgorithm::recombination(float crossoverProb, int goalOffspringSize, bool allowfailures)
 {
-	watch.Start();
+	m_watch.Start();
 	m_encoding->recombination(crossoverProb, goalOffspringSize, allowfailures);
-	genetic_algo_log() << "Recombination time using crossover prob [" << crossoverProb << "]: " << watch.Stop() << std::endl;
+	genetic_algo_log() << "Recombination time using crossover prob [" << crossoverProb << "]: " << m_watch.Stop() << std::endl;
 }
 
 void GeneticAlgorithm::mutation(float mutationProb)
 {
-	watch.Start();
+	m_watch.Start();
 	m_encoding->mutation(mutationProb);
-	genetic_algo_log() << "Mutation time using mutationProb [" << mutationProb << "]: " << watch.Stop() << std::endl;
+	genetic_algo_log() << "Mutation time using mutationProb [" << mutationProb << "]: " << m_watch.Stop() << std::endl;
 }
 
 void GeneticAlgorithm::survivorSelection()
 {
-	watch.Start();
+	m_watch.Start();
 	m_encoding->survivorSelection();
-	genetic_algo_log() << "Survivor selection time " << watch.Stop() << std::endl;
+	genetic_algo_log() << "Survivor selection time " << m_watch.Stop() << std::endl;
 }
 
 bool GeneticAlgorithm::terminationConditions(int currentGen, int maxGeneration, double currRuntime, double maxRuntime, int targetFitness)
 {
-	watch.Start();
+	m_watch.Start();
 	bool val = m_encoding->terminationConditions(currentGen, maxGeneration, currRuntime, maxRuntime, targetFitness);
-	genetic_algo_log() << "Termination calculation time " << watch.Stop() << std::endl;
+	genetic_algo_log() << "Termination calculation time " << m_watch.Stop() << std::endl;
 	return val;
 }
 
@@ -63,20 +81,20 @@ void GeneticAlgorithm::printParameters()
 {
 	genetic_algo_log() << "The GA algorithm has the following parameters: \n"
 		<< "### Parent Selection ### \n"
-		<< "strategy: " << params.strategy << std::endl
-		<< "carry_over: " << params.carry_over << std::endl
-		<< "selection_ration: " << params.selection_ratio << std::endl
-		<< "window_size: " << params.window_size << std::endl
-		<< "replacement: " << params.replacement << std::endl
+		<< "strategy: " << m_params.strategy << std::endl
+		<< "carry_over: " << m_params.carry_over << std::endl
+		<< "selection_ration: " << m_params.selection_ratio << std::endl
+		<< "window_size: " << m_params.window_size << std::endl
+		<< "replacement: " << m_params.replacement << std::endl
 		<< std::endl
 		<< "### Recombination Parameters ### \n"
-		<< "crossoverProb: " << params.crossoverProb << std::endl
-		<< "allowFailures: " << params.allowFailures << std::endl
+		<< "crossoverProb: " << m_params.crossoverProb << std::endl
+		<< "allowFailures: " << m_params.allowFailures << std::endl
 		<< std::endl
 		<< "### Termination Condition Parameters ###\n"
-		<< "maxGeneration: " << params.maxGeneration << std::endl
-		<< "maxRuntime: " << params.maxRuntime << std::endl
-		<< "targetFitness: " << params.targetFitness << std::endl
+		<< "maxGeneration: " << m_params.maxGeneration << std::endl
+		<< "maxRuntime: " << m_params.maxRuntime << std::endl
+		<< "targetFitness: " << m_params.targetFitness << std::endl
 		;
 }
 
@@ -84,30 +102,31 @@ void GeneticAlgorithm::runGA()
 {
 
 	printParameters();
-	timeElapsedTimer.Start();
+	m_time_elapsed_timer.Start();
 	
 	// Run the GA loop as long as the terminationCondition does not evaluate to true
-	while (!terminationConditions(generation,
-		params.maxGeneration,
-		timeElapsedTimer.Stop(),
-		params.maxRuntime,
-		params.targetFitness)) 
+	while (!terminationConditions(m_generation,
+		m_params.maxGeneration,
+		m_time_elapsed_timer.Stop(),
+		m_params.maxRuntime,
+		m_params.targetFitness)) 
 	{
 
 		// Pick parents from the current population
-		genetic_algo_log() << "Starting parent selection for generation: " << generation << std::endl;
-		parentSelection(params.strategy,
-			params.carry_over,
-			params.selection_ratio,
-			params.window_size,
-			params.replacement);
+		genetic_algo_log() << "Starting parent selection for generation: " << m_generation << std::endl;
+		parentSelection(m_params.strategy,
+			m_params.carry_over,
+			m_params.selection_ratio,
+			m_params.window_size,
+			m_params.replacement);
+		Logger("FITNESS;" + std::to_string(m_encoding->m_elite[0].getFitness()) + ";GENOME;" + m_encoding->m_elite[0].getGenomeString());
 
 		// Apply variation operators in order to create offspring
 		genetic_algo_log() << "Starting recombination procedure..." << std::endl;
-		recombination(params.crossoverProb, params.goalOffspringSize, params.allowFailures);
+		recombination(m_params.crossoverProb, m_params.goalOffspringSize, m_params.allowFailures);
 
 		genetic_algo_log() << "Starting mutation procedure... " << std::endl;
-		mutation(params.mutationProb);
+		mutation(m_params.mutationProb);
 
 		// Select the survivors
 		genetic_algo_log() << "Starting survivor selection... " << std::endl;
@@ -115,7 +134,7 @@ void GeneticAlgorithm::runGA()
 
 		std::cout << m_encoding->m_elite[0].getFitness() << std::endl;
 		// Increment the number of passed generations
-		generation++;
+		m_generation++;
 	}
 
 }
