@@ -4,8 +4,9 @@
 #ifndef GAENCODING_H_
 #define GAENCODING_H_
 
+
 #include "helper_functions.h"
-#include "Genome.h"
+
 
 class GAEncoding
 {
@@ -27,9 +28,13 @@ public:
 	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) = 0;
 	virtual void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2) = 0;
 	virtual void permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos) = 0;
+	virtual void permutationRandomInsert(Genome& gen) = 0;
 	virtual void permutationScramble(Genome& gen, std::vector<int> indices) = 0;
+	virtual void permutationRandomScramble(Genome& gen) = 0;
 	virtual void permutationInvert(Genome& gen, std::vector<int> indices) = 0;
+	virtual void permutationRandomInvert(Genome& gen) = 0;
 	virtual void permutationPointMutation(Genome& gen, unsigned int pos) = 0;
+	virtual void permutationRandomPointMutation(Genome& gen) = 0;
 
 
 	// Utility Functions
@@ -100,9 +105,13 @@ public:
 	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) override;
 	virtual void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2) override;
 	virtual void permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos) override;
+	virtual void permutationRandomInsert(Genome& gen) override;
 	virtual void permutationScramble(Genome& gen, std::vector<int> indices) override;
+	virtual void permutationRandomScramble(Genome& gen) override;
 	virtual void permutationInvert(Genome& gen, std::vector<int> indices) override;
+	virtual void permutationRandomInvert(Genome& gen) override;
 	virtual void permutationPointMutation(Genome& gen, unsigned int pos) override;
+	virtual void permutationRandomPointMutation(Genome& gen) override;
 
 	// Crossover Functions
 	std::vector<Genome> singlePointCrossover(Genome& parent1, Genome& parent2);

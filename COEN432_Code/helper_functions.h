@@ -15,6 +15,7 @@
 #include <xtensor/xview.hpp>
 
 #include <vector>
+#include <set>
 #include <map>
 #include <algorithm>
 #include <random>
