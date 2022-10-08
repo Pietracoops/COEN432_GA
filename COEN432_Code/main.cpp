@@ -10,31 +10,31 @@ int main()
 	GAEncoding* Encoding = &Encoding_Ass1;
 
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 10000;
+	unsigned int POPULATION_SIZE = 1000;
 
 	// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
 
 	// ############### SET GA PARAMETERS
 	// --- parent selection
-	GA.params.strategy = 1;
-	GA.params.carry_over = 1;
-	GA.params.selection_ratio = 0.5F;
-	GA.params.window_size = 3;
-	GA.params.replacement = true;
+	GA.m_params.strategy = 1;
+	GA.m_params.carry_over = 1;
+	GA.m_params.selection_ratio = 0.5F;
+	GA.m_params.window_size = 3;
+	GA.m_params.replacement = true;
 
 	// --- Recombination parameters
-	GA.params.crossoverProb = 0.8F;
-	GA.params.allowFailures = false;
-	GA.params.goalOffspringSize = POPULATION_SIZE;
+	GA.m_params.crossoverProb = 0.8F;
+	GA.m_params.allowFailures = false;
+	GA.m_params.goalOffspringSize = POPULATION_SIZE;
 
 	// --- Mutation parameters
-	GA.params.mutationProb = 0.1F;
+	GA.m_params.mutationProb = 0.1F;
 
 	// --- Termination Condition Parameters
-	GA.params.maxGeneration = 5;
-	GA.params.maxRuntime = 600; // seconds
-	GA.params.targetFitness = 10;
+	GA.m_params.maxGeneration = 5;
+	GA.m_params.maxRuntime = 600; // seconds
+	GA.m_params.targetFitness = 10;
 
 	// Run the GA
 	GA.runGA();

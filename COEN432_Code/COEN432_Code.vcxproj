@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="encoding.cpp" />
     <ClCompile Include="genetic_algorithm.cpp" />
+    <ClCompile Include="Genome.cpp" />
     <ClCompile Include="helper_functions.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="timer.cpp" />

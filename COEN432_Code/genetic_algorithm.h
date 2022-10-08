@@ -5,6 +5,7 @@
 
 #include "encoding.h"
 #include "timer.h"
+#include <filesystem>
 
 class GeneticAlgorithm
 {
@@ -32,28 +33,31 @@ private:
 	};
 
 	GAEncoding* m_encoding;
-	Stopwatch watch;
-	Stopwatch timeElapsedTimer;
-	int generation;
+	Stopwatch m_watch;
+	Stopwatch m_time_elapsed_timer;
+	int m_generation;
+
+	std::string m_log_path;
 
 public:
 
-	GeneticAlgorithm(GAEncoding *encoding, int population_size = 1);
+	GeneticAlgorithm(GAEncoding *encoding, int population_size = 1, std::string log_path = "");
 	~GeneticAlgorithm();
 
-
+	void initializePopulation(int population_size);																				// Initialize Pop
 	void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement);		// Select Parents
-	void recombination(float crossoverProb, int goalOffspringSize, bool allowfailures = false);		// Crossover 
-	void mutation(float mutationProb);											// Mutation
-	void survivorSelection();	// Select Survivors
+	void recombination(float crossoverProb, int goalOffspringSize, bool allowfailures = false);									// Crossover 
+	void mutation(float mutationProb);																							// Mutation
+	void survivorSelection();																									// Select Survivors
 
 	bool terminationConditions(int currentGen, int maxGeneration = -1, double currRuntime = -1, double maxRuntime = -1, int targetFitness = -1);
 
 	void runGA();
-
-	Parameters params;
-
 	void printParameters();
+
+	Parameters m_params;
+
+	
 };
 
 #endif // GENETIC_ALGORITHMS_H_
