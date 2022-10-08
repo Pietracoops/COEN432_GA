@@ -77,8 +77,27 @@ bool GeneticAlgorithm::terminationConditions(int currentGen, int maxGeneration, 
 	return val;
 }
 
-void GeneticAlgorithm::printParameters()
+std::string GeneticAlgorithm::printParameters()
 {
+	std::string output;
+
+	output = "\n===========================================================\n";
+	output += "The GA algorithm has the following parameters: \n";
+	output += "### Parent Selection ### \n";
+	output += "strategy: " + std::to_string(m_params.strategy) + '\n';
+	output += "carry_over: " + std::to_string(m_params.carry_over) + '\n';
+	output += "selection_ration: " + std::to_string(m_params.selection_ratio) + '\n';
+	output += "window_size: " + std::to_string(m_params.window_size) + '\n';
+	output += "replacement: " + std::to_string(m_params.replacement) + '\n';
+	output += "### Recombination Parameters ### \n";
+	output += "crossoverProb: " + std::to_string(m_params.crossoverProb) + '\n';
+	output += "allowFailures: " + std::to_string(m_params.allowFailures) + '\n';
+	output += "### Termination Condition Parameters ###\n";
+	output += "maxGeneration: " + std::to_string(m_params.maxGeneration) + '\n';
+	output += "maxRuntime: " + std::to_string(m_params.maxRuntime) + '\n';
+	output += "targetFitness: " + std::to_string(m_params.targetFitness) + '\n';
+	output += "===========================================================\n";
+
 	genetic_algo_log() << "The GA algorithm has the following parameters: \n"
 		<< "### Parent Selection ### \n"
 		<< "strategy: " << m_params.strategy << std::endl
@@ -94,14 +113,15 @@ void GeneticAlgorithm::printParameters()
 		<< "### Termination Condition Parameters ###\n"
 		<< "maxGeneration: " << m_params.maxGeneration << std::endl
 		<< "maxRuntime: " << m_params.maxRuntime << std::endl
-		<< "targetFitness: " << m_params.targetFitness << std::endl
-		;
+		<< "targetFitness: " << m_params.targetFitness << std::endl;
+
+	return output;
 }
 
 void GeneticAlgorithm::runGA()
 {
 
-	printParameters();
+	Logger(printParameters());
 	m_time_elapsed_timer.Start();
 	
 	// Run the GA loop as long as the terminationCondition does not evaluate to true
@@ -112,6 +132,8 @@ void GeneticAlgorithm::runGA()
 		m_params.targetFitness)) 
 	{
 
+		genetic_algo_log() << "======================== GENERATION "<< m_generation << " =============================== " << std::endl;
+
 		// Pick parents from the current population
 		genetic_algo_log() << "Starting parent selection for generation: " << m_generation << std::endl;
 		parentSelection(m_params.strategy,
@@ -119,7 +141,6 @@ void GeneticAlgorithm::runGA()
 			m_params.selection_ratio,
 			m_params.window_size,
 			m_params.replacement);
-		Logger("FITNESS;" + std::to_string(m_encoding->m_elite[0].getFitness()) + ";GENOME;" + m_encoding->m_elite[0].getGenomeString());
 
 		// Apply variation operators in order to create offspring
 		genetic_algo_log() << "Starting recombination procedure..." << std::endl;
@@ -132,7 +153,11 @@ void GeneticAlgorithm::runGA()
 		genetic_algo_log() << "Starting survivor selection... " << std::endl;
 		survivorSelection();
 
-		std::cout << m_encoding->m_elite[0].getFitness() << std::endl;
+		Logger("GENERATION: " + std::to_string(m_generation) + "; AVERAGE FITNESS POP: " + std::to_string(m_encoding->getAverageFitness(m_encoding->m_population)) + "; "
+			+ "FITNESS;" + std::to_string(m_encoding->m_elite[0].getFitness())
+			+ ";GENOME;" + m_encoding->m_elite[0].getGenomeString());
+
+		genetic_algo_log() << "========================== END OF GENERATION =============================== " << std::endl;
 		// Increment the number of passed generations
 		m_generation++;
 	}

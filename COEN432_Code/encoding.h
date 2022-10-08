@@ -39,6 +39,7 @@ public:
 
 	// Utility Functions
 	virtual Genome getGenomeFromPopulation(const unsigned int gen_num) = 0;
+	virtual float getAverageFitness(std::vector<Genome> population) = 0;
 
 	// Termination Condition Functions
 	virtual bool terminationConditions(int currentGen, int maxGeneration, double currRuntime, double maxRuntime, int targetFitness) = 0;
@@ -54,8 +55,6 @@ public:
 
 	// Offspring that are generated from their parents
 	std::vector<Genome> m_elite;
-
-	// TODO: Create a champions vector that keeps the top n or x% highest performing parents
 
 };
 
@@ -120,7 +119,8 @@ public:
 	virtual bool terminationConditions(int currentGen, int maxGeneration, double currRuntime, double maxRuntime, int targetFitness) override;
 
 	// Utility Functions
-	virtual Genome getGenomeFromPopulation(const unsigned int gen_num);
+	virtual Genome getGenomeFromPopulation(const unsigned int gen_num) override;
+	virtual float getAverageFitness(std::vector<Genome> population) override;
 
 private:
 

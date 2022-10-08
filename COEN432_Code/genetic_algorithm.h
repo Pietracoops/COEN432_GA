@@ -53,7 +53,7 @@ public:
 	bool terminationConditions(int currentGen, int maxGeneration = -1, double currRuntime = -1, double maxRuntime = -1, int targetFitness = -1);
 
 	void runGA();
-	void printParameters();
+	std::string printParameters();
 
 	Parameters m_params;
 
