@@ -809,6 +809,153 @@ std::vector<Genome> GAEncoding_Ass1::singlePointCrossover(Genome& parent1, Genom
 
 }
 
+std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, Genome& parent2)
+{
+	// Repeat this for each parent to generate 2 offspring
+
+	//// 1. Choose two random cutting points for the segment
+	std::uniform_int_distribution<> distr1(0, parent1.getSize() - 1);
+	int index1 = distr1(gen_mt);
+	
+	while ((index1 == (parent1.getSize() - 1))) // Make sure index1 isn't the last element in the vector
+	{
+		index1 = distr1(gen_mt);
+	}
+
+	std::uniform_int_distribution<> distr2(index1, parent1.getSize() - 1);
+	int index2 = distr2(gen_mt);
+
+	while (index1 == index2) // Make sure that the two indices aren't the same
+	{
+		index2 = distr2(gen_mt);
+	}
+
+	// testing purposes
+	//int index1 = 3;
+	//int index2 = 6;
+	//std::cout << index1 << std::endl << index2 << std::endl;
+	
+	// 2. Copy over the segment
+
+	// Into offspring 1
+	std::vector<std::vector<int>> offspring1(parent1.getSize(), std::vector<int>(parent1.getEncoding()[0].size(), -1)); // initialize the tile values to -1
+	std::copy(parent1.getEncoding().begin() + index1, parent1.getEncoding().begin() + index2 + 1,
+		offspring1.begin() + index1);
+
+	// Into offspring 2
+	std::vector<std::vector<int>> offspring2(parent2.getSize(), std::vector<int>(parent2.getEncoding()[0].size(), -1)); // initialize the tile values to -1
+	std::copy(parent2.getEncoding().begin() + index1, parent2.getEncoding().begin() + index2 + 1,
+		offspring2.begin() + index1);
+
+	std::unordered_map<int, int> p1map;
+	std::unordered_map<int, int> p2map;
+	std::unordered_map<int, int> off1map;
+	std::unordered_map<int, int> off2map;
+	// Create a map storing the locations of each of the tiles in the vectors
+	// Inserting and finding values in a map are in O(1) time, so this means that
+	// after 1 O(N) operation (the following loop), we do not have to keep searching
+	// the parents for the locations of the corresponding values
+	for (int i = 0; i < parent1.getSize(); i++)
+	{
+		// Key is the tile number, value is the location in the vector
+		p1map[parent1.genome_encoding_2b2_int[i][0]] = i;
+		p2map[parent2.genome_encoding_2b2_int[i][0]] = i;
+
+		if (i >= index1 && i <= index2) {
+			off1map[parent1.genome_encoding_2b2_int[i][0]] = i;
+			off2map[parent2.genome_encoding_2b2_int[i][0]] = i;
+		}
+	}
+
+	// Loop over the crossover points
+	int value1, temp1, value2, temp2;
+	int postempP1, postempP2;
+	bool found1 = false; 
+	bool found2 = false;
+	for (int i = index1; i < index2; i++)
+	{
+		// ------- Building offspring1 ------- //
+		value1 = parent2.getEncoding()[i][0];
+		if ((off1map.find(value1) == off1map.end())) // If the value1 from p2 was not copied over
+		{
+			found1 = false;
+			while (!found1)
+			{
+				temp1 = offspring1[p2map[value1]][0]; // element occupying the position in offspring 1
+				postempP2 = p2map[temp1]; // corresponding index of the element in p2
+
+				// Check if the corresponding position in offspring 1 is free
+				if (offspring1[postempP2][0] == -1)
+				{
+					// Perform the swap
+					//offspring1.insert(offspring1.begin() + postempP2, parent2.getEncoding()[i]);
+					offspring1[postempP2] = parent2.getEncoding()[i];
+					// Add the tile#, index pair to the off1map
+					off1map[parent2.getEncoding()[postempP2][0]] = postempP2;
+
+					found1 = true;
+				}
+				else {
+					value1 = temp1;
+				}
+			}
+		}
+
+
+		// ------- Building offspring1 ------- //
+		value2 = parent1.getEncoding()[i][0];
+		if ((off2map.find(value2) == off2map.end())) // If the value1 from p2 was not copied over
+		{
+			found2 = false;
+			while (!found2)
+			{
+				temp2 = offspring2[p1map[value2]][0]; // element occupying the position in offspring 1
+				postempP1 = p1map[temp2]; // corresponding index of the element in p2
+
+				// Check if the corresponding position in offspring 1 is free
+				if (offspring2[postempP1][0] == -1)
+				{
+					// Perform the swap
+					//offspring1.insert(offspring1.begin() + postempP2, parent2.getEncoding()[i]);
+					offspring2[postempP1] = parent1.getEncoding()[i];
+					// Add the tile#, index pair to the off1map
+					off2map[parent1.getEncoding()[postempP1][0]] = postempP1;
+
+					found2 = true;
+				}
+				else {
+					value2 = temp2;
+				}
+			}
+		}
+
+	
+	}
+
+	// Fill in the rest of the elements that don't deal with the crossover segment
+	for (int i = 0; i < offspring1.size(); i++)
+	{
+		if (offspring1[i][0] == -1)
+		{
+			offspring1[i] = parent2.getEncoding()[i];
+		}
+
+		if (offspring2[i][0] == -1)
+		{
+			offspring2[i] = parent1.getEncoding()[i];
+		}
+	}
+
+	// Set the fitness of the resulting offspring
+	Genome off1(offspring1);
+	off1.setFitness(fitnessOfGenome(off1));
+
+	Genome off2(offspring2);
+	off2.setFitness(fitnessOfGenome(off2));
+
+	return std::vector<Genome> {off1, off2};
+}
+
 Genome GAEncoding_Ass1::getGenomeFromPopulation(const unsigned int gen_num)
 {
 	return m_population[gen_num];

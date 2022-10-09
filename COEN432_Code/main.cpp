@@ -7,13 +7,13 @@ int main()
 {
 	// ############### Initialize the Encoding based on the input file
 	GAEncoding_Ass1 Encoding_Ass1("Ass1/Ass1Input.txt");
-	GAEncoding* Encoding = &Encoding_Ass1;
+	//GAEncoding* Encoding = &Encoding_Ass1;
 
 	// ############### Init Parameters
 	unsigned int POPULATION_SIZE = 10000;
 
-	// ############### INitialize the GA using the Encoding and parameters
-	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
+	//// ############### INitialize the GA using the Encoding and parameters
+	//GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
 
 	// ############### SET GA PARAMETERS
 	// --- parent selection
@@ -38,11 +38,6 @@ int main()
 	GA.m_params.maxRuntime = 600; // seconds
 	GA.m_params.targetFitness = 10;
 
-	// Run the GA
-	GA.runGA();
-
-	// Collect outputs and analyze
-	
 
 	return 0;
 }
