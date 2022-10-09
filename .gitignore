@@ -36,3 +36,6 @@
 *.user
 COEN432_Code/x64
 .vs/
+
+# Log files
+log/
