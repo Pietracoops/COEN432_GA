@@ -178,6 +178,10 @@ GAEncoding_Ass1::GAEncoding_Ass1(std::string file_name)
 			std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 	gen_mt.seed(seed);
 
+
+	// Initialize Fitness Trackers
+	m_max_fitness = 0;
+	m_min_fitness = 0;
 }
 
 
@@ -186,7 +190,7 @@ GAEncoding_Ass1::~GAEncoding_Ass1()
 	// Destructor
 }
 
-void GAEncoding_Ass1::parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement)
+void GAEncoding_Ass1::parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float diversity_ratio, float purge_ratio)
 {
 	// Two types of parent selection
 	// 1: Generational: Each individual survives for exactly one generation - set of parents completely replaced
@@ -202,6 +206,9 @@ void GAEncoding_Ass1::parentSelection(int strategy, uint32_t carry_over, float s
 
 	// 2. Sort according to fitness
 	std::sort(m_population.begin(), m_population.end(), [](const Genome& lhs, const Genome& rhs){return lhs.getFitness() > rhs.getFitness(); });
+
+	m_max_fitness = m_population[0].getFitness();
+	m_min_fitness = m_population[m_population.size() - 1].getFitness();
 
 	// 3. append the carry over to parents + remove them from original population list
 	for (unsigned int i = 0; i < carry_over; i++)
@@ -222,11 +229,17 @@ void GAEncoding_Ass1::parentSelection(int strategy, uint32_t carry_over, float s
 		parents = parentSelectionTournament(m_population, selection_ratio, window_size, replacement);
 	}
 	
+
+	if (((m_max_fitness - m_min_fitness) / m_max_fitness) < diversity_ratio)
+	{
+		permutationRandomDiversify(parents, purge_ratio);
+	}
+
+
 	// Complete
 	m_parents = parents;
 	
 }
-
 
 std::vector<Genome> GAEncoding_Ass1::parentSelectionFitnessProportionate(std::vector<Genome> population, float selection_ratio)
 {
@@ -265,7 +278,6 @@ std::vector<Genome> GAEncoding_Ass1::parentSelectionFitnessProportionate(std::ve
 
 	return parents;
 }
-
 
 std::vector<Genome> GAEncoding_Ass1::parentSelectionTournament(std::vector<Genome> population, float selection_ratio, uint32_t window_size, bool replacement)
 {
@@ -356,7 +368,6 @@ std::vector<Genome> GAEncoding_Ass1::parentSelectionTournament(std::vector<Genom
 
 }
 
-
 /**
 * 
 */
@@ -419,7 +430,7 @@ std::vector<Genome> GAEncoding_Ass1::uPlusGammaPolicy(int survivorSize)
 	newpop.insert(newpop.end(), m_offspring.begin(), m_offspring.end());
 
 	// Sort
-	std::sort(newpop.begin(), newpop.end());
+	std::sort(newpop.begin(), newpop.end(), [](const Genome& lhs, const Genome& rhs) {return lhs.getFitness() > rhs.getFitness(); });
 
 	// Choose the top u survivors
 	if (survivorSize >= newpop.size())
@@ -434,8 +445,6 @@ std::vector<Genome> GAEncoding_Ass1::uPlusGammaPolicy(int survivorSize)
 	return survivors;
 
 }
-
-
 
 void GAEncoding_Ass1::permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps)
 {
@@ -626,6 +635,34 @@ void GAEncoding_Ass1::permutationRandomPointMutation(Genome& gen)
 
 	gen.genome_encoding_2b2_int[index][1] = rot; // Randomize the rotation
 	gen.setFitness(fitnessOfGenome(gen));
+}
+
+void GAEncoding_Ass1::permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio)
+{
+	// Generate distribution
+	std::uniform_int_distribution<unsigned int> distribution(0, int(gen_v.size() - 1));
+
+	// Pick from distribution
+	unsigned int number_of_parents_to_pick = distribution(gen_mt);
+	std::set<unsigned int> selected_indices;
+
+	while (selected_indices.size() != (int)(purge_ratio * gen_v.size()))
+	{
+		int index = distribution(gen_mt);
+		selected_indices.insert(index);
+	}
+
+	// Convert the set to a vector
+	//std::vector<int> selected_indices_v(selected_indices.begin(), selected_indices.end());
+
+	for (auto index : selected_indices)
+	{
+		Genome tmp_gen;
+		std::vector<std::vector<int>> randomized_genome = shuffleVector(m_original_genome);
+		tmp_gen.genome_encoding_2b2_int = randomized_genome;
+		tmp_gen.setFitness(fitnessOfGenome(tmp_gen));
+		gen_v[index] = tmp_gen;
+	}
 }
 
 /**

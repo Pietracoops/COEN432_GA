@@ -22,6 +22,8 @@ int main()
 	GA.m_params.selection_ratio = 0.5F;
 	GA.m_params.window_size = 3;
 	GA.m_params.replacement = true;
+	GA.m_params.diversity_ratio = 0.5F;
+	GA.m_params.purge_ratio = 0.5f;
 
 	// --- Recombination parameters
 	GA.m_params.crossoverProb = 0.0F;

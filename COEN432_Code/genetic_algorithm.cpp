@@ -40,10 +40,10 @@ void GeneticAlgorithm::initializePopulation(int population_size)
 }
 
 
-void GeneticAlgorithm::parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement)
+void GeneticAlgorithm::parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float diversity_ratio, float purge_ratio)
 {
 	m_watch.Start();
-	m_encoding->parentSelection(strategy, carry_over, selection_ratio, window_size, replacement);
+	m_encoding->parentSelection(strategy, carry_over, selection_ratio, window_size, replacement, diversity_ratio, purge_ratio);
 	genetic_algo_log() << "Parent Selection time using strategy [" << strategy << "]: " << m_watch.Stop() << std::endl;
 }
 
@@ -140,7 +140,9 @@ void GeneticAlgorithm::runGA()
 			m_params.carry_over,
 			m_params.selection_ratio,
 			m_params.window_size,
-			m_params.replacement);
+			m_params.replacement,
+			m_params.diversity_ratio,
+			m_params.purge_ratio);
 
 		// Apply variation operators in order to create offspring
 		genetic_algo_log() << "Starting recombination procedure..." << std::endl;
@@ -153,8 +155,9 @@ void GeneticAlgorithm::runGA()
 		genetic_algo_log() << "Starting survivor selection... " << std::endl;
 		survivorSelection();
 
-		Logger("GENERATION: " + std::to_string(m_generation) + "; AVERAGE FITNESS POP: " + std::to_string(m_encoding->getAverageFitness(m_encoding->m_population)) + "; "
-			+ "FITNESS;" + std::to_string(m_encoding->m_elite[0].getFitness())
+		Logger("GENERATION: " + std::to_string(m_generation) + "; AVERAGE FITNESS POP: " + std::to_string(m_encoding->getAverageFitness(m_encoding->m_population)) + ";"
+			+ " MAX FITNESS;" + std::to_string(m_encoding->m_elite[0].getFitness())
+			+ " MIN FITNESS;" + std::to_string(m_encoding->m_min_fitness)
 			+ ";GENOME;" + m_encoding->m_elite[0].getGenomeString());
 
 		genetic_algo_log() << "========================== END OF GENERATION =============================== " << std::endl;

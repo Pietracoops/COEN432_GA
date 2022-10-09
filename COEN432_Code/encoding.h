@@ -20,7 +20,7 @@ public:
 	virtual void mutation(float mutationProb) = 0;
 
 	// Parent Selection
-	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement) = 0;
+	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float diversity_ratio, float purge_ratio) = 0;
 	virtual std::vector<Genome> parentSelectionFitnessProportionate(std::vector<Genome> population, float selection_ratio) = 0;
 	virtual std::vector<Genome> parentSelectionTournament(std::vector<Genome> population, float selection_ratio, uint32_t window_size, bool replacement) = 0;
 
@@ -35,6 +35,7 @@ public:
 	virtual void permutationRandomInvert(Genome& gen) = 0;
 	virtual void permutationPointMutation(Genome& gen, unsigned int pos, unsigned int rot) = 0;
 	virtual void permutationRandomPointMutation(Genome& gen) = 0;
+	virtual void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio) = 0;
 
 
 	// Utility Functions
@@ -55,6 +56,10 @@ public:
 
 	// Offspring that are generated from their parents
 	std::vector<Genome> m_elite;
+
+	// Parameters
+	int m_max_fitness;
+	int m_min_fitness;
 
 };
 
@@ -92,7 +97,7 @@ public:
 	virtual void survivorSelection(int policy = 0, int survivorSize = 0) override;							// Select Survivors
 
 	// Parent Selection
-	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement);
+	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float diversity_ratio, float purge_ratio);
 	virtual std::vector<Genome> parentSelectionFitnessProportionate(std::vector<Genome> population, float selection_ratio) override;
 	virtual std::vector<Genome> parentSelectionTournament(std::vector<Genome> population, float selection_ratio, uint32_t window_size, bool replacement) override;
 
@@ -111,6 +116,7 @@ public:
 	virtual void permutationRandomInvert(Genome& gen) override;
 	virtual void permutationPointMutation(Genome& gen, unsigned int pos, unsigned int rot) override;
 	virtual void permutationRandomPointMutation(Genome& gen) override;
+	virtual void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio) override;
 
 	// Crossover Functions
 	std::vector<Genome> singlePointCrossover(Genome& parent1, Genome& parent2);
