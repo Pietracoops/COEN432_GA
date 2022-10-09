@@ -12,11 +12,14 @@ class GeneticAlgorithm
 
 private:
 	struct Parameters { // Have this be initialized using a json file
+		// Parent Selection Params
 		int strategy;
 		uint32_t carry_over;
 		float selection_ratio;
 		uint32_t window_size;
 		bool replacement;
+		float diversity_ratio; // threshold of Max_fitness - Min_fitness / Max_fitness
+		float purge_ratio;	   // If diversity ratio is reached, purge_ratio is ratio of pop to re-initialize
 
 		// Recombination parameters
 		float crossoverProb;
@@ -45,7 +48,8 @@ public:
 	~GeneticAlgorithm();
 
 	void initializePopulation(int population_size);																				// Initialize Pop
-	void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement);		// Select Parents
+	void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement,
+						float diversity_ratio, float purge_ratio);																// Select Parents
 	void recombination(float crossoverProb, int goalOffspringSize, bool allowfailures = false);									// Crossover 
 	void mutation(float mutationProb);																							// Mutation
 	void survivorSelection();																									// Select Survivors
@@ -53,7 +57,7 @@ public:
 	bool terminationConditions(int currentGen, int maxGeneration = -1, double currRuntime = -1, double maxRuntime = -1, int targetFitness = -1);
 
 	void runGA();
-	void printParameters();
+	std::string printParameters();
 
 	Parameters m_params;
 
