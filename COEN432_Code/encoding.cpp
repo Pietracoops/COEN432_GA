@@ -707,7 +707,7 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 					parent2 = i;
 
 					// Call a crossover function
-					babies = singlePointCrossover(m_parents[parent1], m_parents[parent2]);
+					babies = partiallyMappedCrossover(m_parents[parent1], m_parents[parent2]);
 
 					// Reset parent 1 and parent 2
 					parent1 = -1;
@@ -809,12 +809,12 @@ std::vector<Genome> GAEncoding_Ass1::singlePointCrossover(Genome& parent1, Genom
 
 }
 
-std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, Genome& parent2)
+std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover2(Genome& parent1, Genome& parent2)
 {
 	// Repeat this for each parent to generate 2 offspring
 
 	//// 1. Choose two random cutting points for the segment
-	std::uniform_int_distribution<> distr1(0, parent1.getSize() - 1);
+	std::uniform_int_distribution<> distr1(0, (int)parent1.getSize() - 1);
 	int index1 = distr1(gen_mt);
 	
 	while ((index1 == (parent1.getSize() - 1))) // Make sure index1 isn't the last element in the vector
@@ -822,7 +822,7 @@ std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, G
 		index1 = distr1(gen_mt);
 	}
 
-	std::uniform_int_distribution<> distr2(index1, parent1.getSize() - 1);
+	std::uniform_int_distribution<> distr2(index1, (int)parent1.getSize() - 1);
 	int index2 = distr2(gen_mt);
 
 	while (index1 == index2) // Make sure that the two indices aren't the same
@@ -955,6 +955,61 @@ std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, G
 
 	return std::vector<Genome> {off1, off2};
 }
+
+
+std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, Genome& parent2)
+{
+
+	// Generate distribution
+	std::uniform_int_distribution<unsigned int> distribution(0, int(parent1.genome_encoding_2b2_int.size() - 1));
+	std::vector<int> cross_indices;
+
+	cross_indices.push_back(distribution(gen_mt));			// Get first index
+	cross_indices.push_back(distribution(gen_mt));			// Get second index
+	std::sort(cross_indices.begin(), cross_indices.end());	// Sort them in increasing order
+
+	Genome child1;
+	Genome child2;
+	child1.genome_encoding_2b2_int = parent2.genome_encoding_2b2_int;
+	child2.genome_encoding_2b2_int = parent1.genome_encoding_2b2_int;
+
+	//// TEMPORARY REMOVE AFTER
+	//cross_indices.push_back(3);			// Get first index
+	//cross_indices.push_back(6);			// Get second index
+
+
+	// These maps are used to store the indices of each value for the vectors
+	// For quick querry
+	std::map<int, int> map_parent1;
+	std::map<int, int> map_parent2;
+
+	// Initialize the maps
+	for (unsigned int i = 0; i < parent1.genome_encoding_2b2_int.size(); i++)
+	{
+		map_parent1[parent1.genome_encoding_2b2_int[i][0]] = i;
+		map_parent2[parent2.genome_encoding_2b2_int[i][0]] = i;
+	}
+
+	// We'll loop through the mapped intersecton each entry at a time
+	// For example, if 4 is being mapped to the 8 spot, we'll move the 8
+	// to the 4 spot because there is currently a hole there. If we keep doing
+	// these swaps down the crossed section, all the pieces will fall into place
+	for (unsigned int i = cross_indices[0]; i <= cross_indices[1]; i++)
+	{
+		permutationSwap(child1, i, map_parent2[parent1.genome_encoding_2b2_int[i][0]]);
+		permutationSwap(child2, i, map_parent1[parent2.genome_encoding_2b2_int[i][0]]);		
+	}
+
+	child1.setFitness(fitnessOfGenome(child1));
+	child2.setFitness(fitnessOfGenome(child2));
+
+	std::vector<Genome> output;
+	output.push_back(child1);
+	output.push_back(child2);
+
+	return output;
+}
+
 
 Genome GAEncoding_Ass1::getGenomeFromPopulation(const unsigned int gen_num)
 {

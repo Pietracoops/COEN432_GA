@@ -121,6 +121,7 @@ public:
 	// Crossover Functions
 	std::vector<Genome> singlePointCrossover(Genome& parent1, Genome& parent2);
 	std::vector<Genome> partiallyMappedCrossover(Genome& parent1, Genome& parent2);
+	std::vector<Genome> partiallyMappedCrossover2(Genome& parent1, Genome& parent2);
 
 	// Termination Condition functions
 	virtual bool terminationConditions(int currentGen, int maxGeneration, double currRuntime, double maxRuntime, int targetFitness) override;
