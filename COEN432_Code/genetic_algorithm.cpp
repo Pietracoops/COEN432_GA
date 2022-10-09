@@ -83,12 +83,15 @@ std::string GeneticAlgorithm::printParameters()
 
 	output = "\n===========================================================\n";
 	output += "The GA algorithm has the following parameters: \n";
+	output += "Population Size: " + std::to_string(m_encoding->m_population.size()) + '\n';
 	output += "### Parent Selection ### \n";
 	output += "strategy: " + std::to_string(m_params.strategy) + '\n';
 	output += "carry_over: " + std::to_string(m_params.carry_over) + '\n';
 	output += "selection_ration: " + std::to_string(m_params.selection_ratio) + '\n';
 	output += "window_size: " + std::to_string(m_params.window_size) + '\n';
 	output += "replacement: " + std::to_string(m_params.replacement) + '\n';
+	output += "diversity_ratio: " + std::to_string(m_params.diversity_ratio) + '\n';
+	output += "purge_ratio: " + std::to_string(m_params.purge_ratio) + '\n';
 	output += "### Recombination Parameters ### \n";
 	output += "crossoverProb: " + std::to_string(m_params.crossoverProb) + '\n';
 	output += "allowFailures: " + std::to_string(m_params.allowFailures) + '\n';
