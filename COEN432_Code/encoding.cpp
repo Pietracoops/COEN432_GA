@@ -767,22 +767,25 @@ std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, G
 {
 	// Repeat this for each parent to generate 2 offspring
 
-	// 1. Choose two random cutting points for the segment
-	std::uniform_int_distribution<> distr1(0, parent1.getSize() - 1);
-	int index1 = distr1(gen_mt);
-	
-	while ((index1 == (parent1.getSize() - 1))) // Make sure index1 isn't the last element in the vector
-	{
-		index1 = distr1(gen_mt);
-	}
+	//// 1. Choose two random cutting points for the segment
+	//std::uniform_int_distribution<> distr1(0, parent1.getSize() - 1);
+	//int index1 = distr1(gen_mt);
+	//
+	//while ((index1 == (parent1.getSize() - 1))) // Make sure index1 isn't the last element in the vector
+	//{
+	//	index1 = distr1(gen_mt);
+	//}
 
-	std::uniform_int_distribution<> distr2(index1, parent1.getSize() - 1);
-	int index2 = distr2(gen_mt);
+	//std::uniform_int_distribution<> distr2(index1, parent1.getSize() - 1);
+	//int index2 = distr2(gen_mt);
 
-	while (index1 == index2) // Make sure that the two indices aren't the same
-	{
-		index2 = distr2(gen_mt);
-	}
+	//while (index1 == index2) // Make sure that the two indices aren't the same
+	//{
+	//	index2 = distr2(gen_mt);
+	//}
+
+	int index1 = 3;
+	int index2 = 6;
 
 	// 2. Copy over the segment
 
@@ -810,7 +813,7 @@ std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, G
 		p1map[parent1.genome_encoding_2b2_int[i][0]] = i;
 		p2map[parent2.genome_encoding_2b2_int[i][0]] = i;
 
-		if (i >= index1 && i < index2) {
+		if (i >= index1 && i <= index2) {
 			off1map[parent1.genome_encoding_2b2_int[i][0]] = i;
 			off2map[parent2.genome_encoding_2b2_int[i][0]] = i;
 		}
@@ -859,7 +862,7 @@ std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, G
 				postempP1 = p1map[temp2]; // corresponding index of the element in p2
 
 				// Check if the corresponding position in offspring 1 is free
-				if (offspring1[postempP1][0] == -1)
+				if (offspring2[postempP1][0] == -1)
 				{
 					// Perform the swap
 					offspring2.insert(offspring2.begin() + postempP1, parent2.getEncoding()[postempP1]);
@@ -881,6 +884,11 @@ std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, G
 		if (offspring1[i][0] == -1)
 		{
 			offspring1[i] = parent2.getEncoding()[i];
+		}
+
+		if (offspring2[i][0] == -1)
+		{
+			offspring2[i] = parent1.getEncoding()[i];
 		}
 	}
 
