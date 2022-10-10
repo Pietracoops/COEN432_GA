@@ -16,7 +16,7 @@ int main()
 	//Encoding_Ass1.partiallyMappedCrossover2(m1, m2);
 
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 500;
+	unsigned int POPULATION_SIZE = 65;
 
 	//// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
@@ -25,26 +25,34 @@ int main()
 	// --- parent selection
 	GA.m_params.strategy = 1;
 	GA.m_params.carry_over = 1;
-	GA.m_params.selection_ratio = 0.5F;
+	GA.m_params.selection_ratio = 0.6F;
 	GA.m_params.window_size = 3;
-	GA.m_params.replacement = true;
-	GA.m_params.diversity_ratio = 0.2F;
-	GA.m_params.purge_ratio = 0.3f;
+	GA.m_params.replacement = false;
+	GA.m_params.randomness = 0.4f;
+	GA.m_params.diversity_ratio = 0.1F;
+	GA.m_params.purge_ratio = 0.25f;
 
 	// --- Recombination parameters
-	GA.m_params.crossoverProb = 0.7F;
+	GA.m_params.crossoverProb = 0.2F;
 	GA.m_params.allowFailures = false;
 	GA.m_params.goalOffspringSize = POPULATION_SIZE;
 
 	// --- Mutation parameters
-	GA.m_params.mutationProb = 0.7F; // we should have higher mutation if diversity is low
+	GA.m_params.mutationProb = 1.0F; // we should have higher mutation if diversity is low
 
 	// --- Termination Condition Parameters
-	GA.m_params.maxGeneration = 20000;
+	GA.m_params.maxGeneration = 3000;
 	GA.m_params.maxRuntime = 600; // seconds
 	GA.m_params.targetFitness = 10;
 
-	GA.runGA();
+	// --- Stats
+	GA.m_params.dynamic_hyper_parameters = true;
+	GA.m_params.stagnation_check = 18;
+	GA.m_params.stagnation_breath = 8;
+
+	GA.m_params.save_population = true;
+
+	GA.runGA("population_2022-10-09-19-51-32.txt");
 
 	return 0;
 }

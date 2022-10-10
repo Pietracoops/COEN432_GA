@@ -20,7 +20,7 @@ public:
 	virtual void mutation(float mutationProb) = 0;
 
 	// Parent Selection
-	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float diversity_ratio, float purge_ratio) = 0;
+	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness, float diversity_ratio, float purge_ratio) = 0;
 	virtual std::vector<Genome> parentSelectionFitnessProportionate(std::vector<Genome> population, float selection_ratio) = 0;
 	virtual std::vector<Genome> parentSelectionTournament(std::vector<Genome> population, float selection_ratio, uint32_t window_size, bool replacement) = 0;
 
@@ -37,6 +37,8 @@ public:
 	virtual void permutationRandomPointMutation(Genome& gen) = 0;
 	virtual void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio) = 0;
 
+	virtual void savePopulation() = 0;
+	virtual void loadPopulation(std::string file_name) = 0;
 
 	// Utility Functions
 	virtual Genome getGenomeFromPopulation(const unsigned int gen_num) = 0;
@@ -59,6 +61,7 @@ public:
 
 	// Parameters
 	int m_max_fitness;
+	int m_med_fitness;
 	int m_min_fitness;
 
 };
@@ -87,6 +90,7 @@ public:
 	// Utility functions
 	std::vector<std::vector<int>> returnGenome();
 	std::vector<std::vector<std::vector<int>>> returnRandomizedGenome(const unsigned int number_of_genomes);
+	Genome returnRandomlyInitializedGenome();
 	virtual void initializaPopulation(const unsigned int number_of_genomes) override;
 	int fitnessOfGenome(const Genome& genome);
 
@@ -97,7 +101,7 @@ public:
 	virtual void survivorSelection(int policy = 0, int survivorSize = 0) override;							// Select Survivors
 
 	// Parent Selection
-	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float diversity_ratio, float purge_ratio);
+	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness, float diversity_ratio, float purge_ratio);
 	virtual std::vector<Genome> parentSelectionFitnessProportionate(std::vector<Genome> population, float selection_ratio) override;
 	virtual std::vector<Genome> parentSelectionTournament(std::vector<Genome> population, float selection_ratio, uint32_t window_size, bool replacement) override;
 
@@ -121,7 +125,6 @@ public:
 	// Crossover Functions
 	std::vector<Genome> singlePointCrossover(Genome& parent1, Genome& parent2);
 	std::vector<Genome> partiallyMappedCrossover(Genome& parent1, Genome& parent2);
-	std::vector<Genome> partiallyMappedCrossover2(Genome& parent1, Genome& parent2);
 
 	// Termination Condition functions
 	virtual bool terminationConditions(int currentGen, int maxGeneration, double currRuntime, double maxRuntime, int targetFitness) override;
@@ -129,6 +132,9 @@ public:
 	// Utility Functions
 	virtual Genome getGenomeFromPopulation(const unsigned int gen_num) override;
 	virtual float getAverageFitness(std::vector<Genome> population) override;
+
+	void savePopulation() override;
+	void loadPopulation(std::string file_name) override;
 
 private:
 

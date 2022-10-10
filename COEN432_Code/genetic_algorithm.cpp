@@ -15,7 +15,6 @@ GeneticAlgorithm::GeneticAlgorithm(GAEncoding *encoding, int population_size, st
 	// Store encoding locally
 	m_encoding = encoding; 
 
-
 	// Init the population
 	initializePopulation(population_size);
 
@@ -40,10 +39,10 @@ void GeneticAlgorithm::initializePopulation(int population_size)
 }
 
 
-void GeneticAlgorithm::parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float diversity_ratio, float purge_ratio)
+void GeneticAlgorithm::parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness, float diversity_ratio, float purge_ratio)
 {
 	m_watch.Start();
-	m_encoding->parentSelection(strategy, carry_over, selection_ratio, window_size, replacement, diversity_ratio, purge_ratio);
+	m_encoding->parentSelection(strategy, carry_over, selection_ratio, window_size, replacement, randomness, diversity_ratio, purge_ratio);
 	genetic_algo_log() << "Parent Selection time using strategy [" << strategy << "]: " << m_watch.Stop() << std::endl;
 }
 
@@ -90,6 +89,7 @@ std::string GeneticAlgorithm::printParameters()
 	output += "selection_ration: " + std::to_string(m_params.selection_ratio) + '\n';
 	output += "window_size: " + std::to_string(m_params.window_size) + '\n';
 	output += "replacement: " + std::to_string(m_params.replacement) + '\n';
+	output += "randomness: " + std::to_string(m_params.randomness) + '\n';
 	output += "diversity_ratio: " + std::to_string(m_params.diversity_ratio) + '\n';
 	output += "purge_ratio: " + std::to_string(m_params.purge_ratio) + '\n';
 	output += "### Recombination Parameters ### \n";
@@ -121,8 +121,13 @@ std::string GeneticAlgorithm::printParameters()
 	return output;
 }
 
-void GeneticAlgorithm::runGA()
+void GeneticAlgorithm::runGA(std::string population_file)
 {
+
+	if (!population_file.empty())
+	{
+		m_encoding->loadPopulation(population_file);
+	}
 
 	Logger(printParameters());
 	m_time_elapsed_timer.Start();
@@ -144,6 +149,7 @@ void GeneticAlgorithm::runGA()
 			m_params.selection_ratio,
 			m_params.window_size,
 			m_params.replacement,
+			m_params.randomness,
 			m_params.diversity_ratio,
 			m_params.purge_ratio);
 
@@ -158,14 +164,91 @@ void GeneticAlgorithm::runGA()
 		genetic_algo_log() << "Starting survivor selection... " << std::endl;
 		survivorSelection();
 
-		Logger("GENERATION: " + std::to_string(m_generation) + "; AVERAGE FITNESS POP: " + std::to_string(m_encoding->getAverageFitness(m_encoding->m_population)) + ";"
-			+ " MAX FITNESS;" + std::to_string(m_encoding->m_elite[0].getFitness())
-			+ " MIN FITNESS;" + std::to_string(m_encoding->m_min_fitness)
-			+ ";GENOME;" + m_encoding->m_elite[0].getGenomeString());
+		Logger("GENERATION: " + std::to_string(m_generation) 
+			+ " ;AVERAGE_FITNESS: " + std::to_string(m_encoding->getAverageFitness(m_encoding->m_population))
+			+ " ;MAX_FITNESS " + std::to_string(m_encoding->m_max_fitness)
+			+ " ;MEDIAN_FITNESS " + std::to_string(m_encoding->m_med_fitness)
+			+ " ;MIN_FITNESS " + std::to_string(m_encoding->m_min_fitness)
+			+ " ;STAGNATION_DETECTED " + std::to_string(stats.stagnation_detected)
+			+ " ;MUTATION_PROB " + std::to_string(m_params.mutationProb)
+			+ " ;CROSSOVER_PROB " + std::to_string(m_params.crossoverProb)
+			+ " ;RANDOMNESS " + std::to_string(m_params.randomness)
+			+ ";GENOME " + m_encoding->m_elite[0].getGenomeString());
 
 		genetic_algo_log() << "========================== END OF GENERATION =============================== " << std::endl;
+
+		// ============================ STATS =================================
+		stats.m_max_fitness.push_back(m_encoding->m_max_fitness);
+		stats.m_min_fitness.push_back(m_encoding->m_min_fitness);
+
+		// Check for stagnation
+		if (m_params.dynamic_hyper_parameters)
+		{
+			if (stats.checkStagnation(m_params.stagnation_check, m_generation, m_params.stagnation_breath))
+			{
+				stats.tuneParameter(m_params.crossoverProb, 1.1f, 0.0f, 0.9f);
+				stats.tuneParameter(m_params.mutationProb, 0.8f, 0.2f, 1.0f);
+				stats.tuneParameter(m_params.randomness, 1.05f, 0.0f, 0.2f);
+				stats.m_stagnation_modified_countdown = stats.m_stagnation_countdown_val; // Note down the generation where we tuned
+			}
+		}
+
 		// Increment the number of passed generations
 		m_generation++;
 	}
 
+
+	if (m_params.save_population)
+	{
+		m_encoding->savePopulation();
+	}
+}
+
+
+bool NetworkStatistics::checkStagnation(int generation_range, int generation, int breath)
+{
+	
+	// Check Stagnation
+	if (generation_range > m_max_fitness.size())
+	{
+		stagnation_detected = false;
+		return false;
+	}
+
+	if (m_max_fitness[(m_max_fitness.size() - generation_range)] != m_max_fitness.back())
+	{
+		stagnation_detected = false;
+		m_stagnation_modified_countdown = -1;
+		return false;
+	}
+
+	if (m_stagnation_modified_countdown > 0)
+	{
+		return false;
+	}
+
+	stagnation_detected = true;
+	return true;
+	
+}
+
+void NetworkStatistics::tuneParameter(float& parameter, const float tune, const float clamp_min, const float clamp_max)
+{
+	if (parameter == 0.0f && tune > 1.0f)
+	{
+		parameter = 0.1;
+	}
+	if (parameter > 0.0f && tune > 1.0f)
+	{
+		parameter += 0.05;
+	}
+
+	parameter *= tune;
+	parameter = std::clamp(parameter, clamp_min, clamp_max);
+}
+
+NetworkStatistics::NetworkStatistics()
+{
+	stagnation_detected = false;
+	m_stagnation_modified_countdown = -1;
 }
