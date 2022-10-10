@@ -19,6 +19,7 @@
 #include <map>
 #include <algorithm>
 #include <random>
+#include <regex>
 
 #include "logging.h"
 #include "Genome.h"
@@ -45,6 +46,11 @@ int CountRowMismatches(std::vector<std::string> first, std::vector<std::string> 
 std::vector<std::vector<int>> shuffleVector(std::vector<std::vector<int>> vect);
 std::vector<int> shuffleVector(std::vector<int> vect);
 std::vector<Genome> shuffleVector(std::vector<Genome> vect);
+
+// Given a string, will return a vector containing all parts of string
+// split by given delimiter
+/// \return: strings split with delimiter
+std::vector<std::string> splitString(std::string str, std::string delimiter);
 
 // Prints a two dimensional vector
 /// \return: None

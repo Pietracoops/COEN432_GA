@@ -66,6 +66,20 @@ std::vector<Genome> shuffleVector(std::vector<Genome> vect)
 	return vect_tmp;
 }
 
+std::vector<std::string> splitString(std::string str, std::string delimiter)
+{
+	std::vector<std::string> output;
+	size_t pos = 0;
+	std::string token;
+	while ((pos = str.find(delimiter)) != std::string::npos) {
+		token = str.substr(0, pos);
+		output.push_back(token);
+		str.erase(0, pos + delimiter.length());
+	}
+	output.push_back(str);
+	return output;
+}
+
 void printVector(std::vector<std::vector<int>> vect)
 {
 	for (unsigned int i = 0; i < vect.size(); i++)

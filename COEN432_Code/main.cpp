@@ -9,12 +9,6 @@ int main()
 	GAEncoding_Ass1 Encoding_Ass1("Ass1/Ass1Input.txt");
 	GAEncoding* Encoding = &Encoding_Ass1;
 
-	//Genome m1;
-	//Genome m2;
-	//m1.genome_encoding_2b2_int = { {1,0}, {2,0},{3,0},{4,0},{5,0},{6,0},{7,0},{8,0},{9,0} };
-	//m2.genome_encoding_2b2_int = { {9,0}, {3,0},{7,0},{8,0},{2,0},{6,0},{5,0},{1,0},{4,0} };
-	//Encoding_Ass1.partiallyMappedCrossover2(m1, m2);
-
 	// ############### Init Parameters
 	unsigned int POPULATION_SIZE = 100;
 
@@ -28,7 +22,11 @@ int main()
 	GA.m_params.selection_ratio = 0.6F;
 	GA.m_params.window_size = 3;
 	GA.m_params.replacement = false;
+<<<<<<< Updated upstream
 	GA.m_params.randomness = 0.0f;
+=======
+	GA.m_params.randomness = 0.2f;
+>>>>>>> Stashed changes
 	GA.m_params.diversity_ratio = 0.1F;
 	GA.m_params.purge_ratio = 0.25f;
 
@@ -52,7 +50,11 @@ int main()
 
 	GA.m_params.save_population = true;
 
+<<<<<<< Updated upstream
 	GA.runGA();
+=======
+	GA.runGA("population_2022-10-10-12-08-35.txt");
+>>>>>>> Stashed changes
 
 	return 0;
 }

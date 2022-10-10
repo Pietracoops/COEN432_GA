@@ -186,6 +186,8 @@ void GeneticAlgorithm::runGA(std::string population_file)
 		{
 			if (stats.checkStagnation(m_params.stagnation_check, m_generation, m_params.stagnation_breath))
 			{
+				//stats.tuneParameter(m_params.crossoverProb, 0.8f, 0.0f, 0.9f);
+				//stats.tuneParameter(m_params.mutationProb, 1.1f, 0.2f, 1.0f);
 				stats.tuneParameter(m_params.crossoverProb, 1.1f, 0.0f, 0.9f);
 				stats.tuneParameter(m_params.mutationProb, 0.8f, 0.2f, 1.0f);
 				stats.tuneParameter(m_params.randomness, 1.05f, 0.0f, 0.2f);

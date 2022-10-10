@@ -56,14 +56,15 @@ std::vector<std::vector<int>> GAEncoding_Ass1::returnGenome()
 	return m_original_genome;
 }
 
-int GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
+std::vector<int> GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
 {
 	// 8x8 box - meaning 
 
-	int mismatched = 0;
 	std::vector<std::vector<int>> genes = genome.getEncoding();
+	std::vector<int> output; // [0] fitness [1] row mismatches [2] col mismatches
 
 	// Calculate rows
+	int row_mismatches = 0;
 	for (unsigned int i = 0; i < genome.getSize() - 1; i++)
 	{
 		if (i % WIDTH == 0) 
@@ -73,21 +74,25 @@ int GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
 		
 		if (m_map_index[genes[i][0]].right != m_map_index[genes[i + 1][0]].left)
 		{
-			mismatched++;
+			row_mismatches++;
 		}
 	}
 
 	// Calculate Columns
+	int col_mismatches = 0;
 	for (unsigned int i = 0; i < genome.getSize() - WIDTH; i++)
 	{
 
 		if (m_map_index[genes[i][0]].bottom != m_map_index[genes[i + WIDTH][0]].top)
 		{
-			mismatched++;
+			col_mismatches++;
 		}
 	}
 
-	return MAX_MISMATCHES - mismatched;
+	output.push_back(MAX_MISMATCHES - (col_mismatches + row_mismatches));
+	output.push_back(row_mismatches);
+	output.push_back(col_mismatches);
+	return output;
 }
 
 
@@ -100,7 +105,6 @@ std::vector<std::vector<std::vector<int>>> GAEncoding_Ass1::returnRandomizedGeno
 		std::vector<std::vector<int>> randomized_genome = shuffleVector(m_original_genome);
 		output.push_back(randomized_genome);
 	}
-
 	return output;
 }
 
@@ -973,6 +977,11 @@ void GAEncoding_Ass1::savePopulation()
 
 	for (unsigned int i = 0; i < m_population.size(); i++)
 	{
+
+		fout << "FITNESS = " << std::to_string(m_population[i].getFitness())
+			<< std::to_string(m_population[i].getRowMismatches())
+			<< std::to_string(m_population[i].getColMismatches()) << "|";
+
 		for (unsigned int j = 0; j < m_population[i].genome_encoding_2b2_int.size(); j++)
 		{
 			fout << m_population[i].genome_encoding_2b2_int[j][0] << "," << m_population[i].genome_encoding_2b2_int[j][1] << ";";
@@ -980,20 +989,6 @@ void GAEncoding_Ass1::savePopulation()
 		fout << "\n";
 	}
 
-}
-
-std::vector<std::string> splitString(std::string str, std::string delimiter)
-{
-	std::vector<std::string> output;
-	size_t pos = 0;
-	std::string token;
-	while ((pos = str.find(delimiter)) != std::string::npos) {
-		token = str.substr(0, pos);
-		output.push_back(token);
-		str.erase(0, pos + delimiter.length());
-	}
-	output.push_back(str);
-	return output;
 }
 
 void GAEncoding_Ass1::loadPopulation(std::string file_name)
@@ -1014,6 +1009,14 @@ void GAEncoding_Ass1::loadPopulation(std::string file_name)
 			std::string token;
 			std::vector<std::string> gene;
 			std::vector<int> couple;
+
+			if (line.find("|") != std::string::npos)
+			{
+				std::vector<std::string> data;
+				data = splitString(line, "|");
+				line = data[1];
+			}
+
 			while ((pos = line.find(delimiter)) != std::string::npos) 
 			{
 				token = line.substr(0, pos);

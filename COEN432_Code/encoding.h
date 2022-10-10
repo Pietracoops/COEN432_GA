@@ -92,7 +92,7 @@ public:
 	std::vector<std::vector<std::vector<int>>> returnRandomizedGenome(const unsigned int number_of_genomes);
 	Genome returnRandomlyInitializedGenome();
 	virtual void initializaPopulation(const unsigned int number_of_genomes) override;
-	int fitnessOfGenome(const Genome& genome);
+	std::vector<int> fitnessOfGenome(const Genome& genome);
 
 	// Core Functions
 	
