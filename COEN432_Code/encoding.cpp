@@ -697,9 +697,6 @@ Genome GAEncoding_Ass1::returnRandomlyInitializedGenome()
 */
 void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, bool allowfailures)
 {
-	int parent1 = -1;
-	int parent2 = -1;
-	std::vector<Genome> babies;
 
 	// Add the elites back to the parent pool so that they have a chance to reproduce
 	for (auto elite : m_elite)
@@ -710,53 +707,94 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 		}
 	}
 
-	while (m_offspring.size() < goalOffspringSize) {
-		
-		// Generate a vector of random floats
-		std::vector<float> vec_randf = generateRandVecFloat((int)m_parents.size(), gen_mt);
+	int breedingsize = m_parents.size() * crossoverProb;
 
-		// Shuffle the parents
-		m_parents = shuffleVector(m_parents);
+	std::uniform_int_distribution distr(0, (int)(breedingsize));
+	std::vector<Genome> pair, babies;
 
-		//Iterate through pairs of parents to create offspring
-		for (int i = 0; i < vec_randf.size(); i++)
+	if (breedingsize < 2)
+	{
+		genetic_algo_log() << "Trying to enter recombination with less than 2 parents. No offspring created.";
+		return;
+	}
+
+	while (m_offspring.size() < goalOffspringSize)
+	{
+		int starting_parent = distr(gen_mt);
+
+		for (int i = starting_parent; i != ((starting_parent + breedingsize + -1) % breedingsize); i = ++i % breedingsize)
 		{
-			if (vec_randf[i] < crossoverProb)
+
+			if (pair.size() < 2)
 			{
-				if (parent1 == -1)
-				{
-					parent1 = i;
-				}
-				else if (parent2 == -1)
-				{
-					parent2 = i;
-
-					// Call a crossover function
-					babies = partiallyMappedCrossover(m_parents[parent1], m_parents[parent2]);
-
-					// Reset parent 1 and parent 2
-					parent1 = -1;
-					parent2 = -1;
-
-					// Add the babies to the offspring pool
-					m_offspring.insert(m_offspring.end(), babies.begin(), babies.end());
-				}
-				else {
-					// This is an error case, something went wrong if were here
-					// TODO: Add this error to the log
-					std::cout << "Something went wrong in recombination.";
-				}
+				pair.push_back(m_parents[i]);
 			}
-			else if (allowfailures) {
+			else {
+				babies = partiallyMappedCrossover(pair[0], pair[1]);
+				m_offspring.insert(m_offspring.end(), babies.begin(), babies.end());
 
-				// This parent does not reproduce and is instead added directly to the offspring pool
-				if (!(std::find(m_elite.begin(), m_elite.end(), m_parents[i]) != m_elite.end()))
-				{
-					m_offspring.push_back(m_parents[i]);
-				}				
+				// Clear the breeding pair
+				pair.clear();
+			}
+
+			if (m_offspring.size() >= goalOffspringSize)
+			{
+				break;
 			}
 		}
 	}
+	 
+	
+
+
+
+	//while (m_offspring.size() < goalOffspringSize) {
+	//	
+	//	// Generate a vector of random floats
+	//	std::vector<float> vec_randf = generateRandVecFloat((int)m_parents.size(), gen_mt);
+
+	//	// Shuffle the parents
+	//	m_parents = shuffleVector(m_parents);
+
+	//	//Iterate through pairs of parents to create offspring
+	//	for (int i = 0; i < vec_randf.size(); i++)
+	//	{
+	//		if (vec_randf[i] < crossoverProb)
+	//		{
+	//			if (parent1 == -1)
+	//			{
+	//				parent1 = i;
+	//			}
+	//			else if (parent2 == -1)
+	//			{
+	//				parent2 = i;
+
+	//				// Call a crossover function
+	//				babies = partiallyMappedCrossover(m_parents[parent1], m_parents[parent2]);
+
+	//				// Reset parent 1 and parent 2
+	//				parent1 = -1;
+	//				parent2 = -1;
+
+	//				// Add the babies to the offspring pool
+	//				m_offspring.insert(m_offspring.end(), babies.begin(), babies.end());
+	//			}
+	//			else {
+	//				// This is an error case, something went wrong if were here
+	//				// TODO: Add this error to the log
+	//				std::cout << "Something went wrong in recombination.";
+	//			}
+	//		}
+	//		else if (allowfailures) {
+
+	//			// This parent does not reproduce and is instead added directly to the offspring pool
+	//			if (!(std::find(m_elite.begin(), m_elite.end(), m_parents[i]) != m_elite.end()))
+	//			{
+	//				m_offspring.push_back(m_parents[i]);
+	//			}				
+	//		}
+	//	}
+	//}
 
 }
 
