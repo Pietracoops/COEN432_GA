@@ -238,11 +238,11 @@ void NetworkStatistics::tuneParameter(float& parameter, const float tune, const 
 {
 	if (parameter == 0.0f && tune > 1.0f)
 	{
-		parameter = 0.1;
+		parameter = 0.1f;
 	}
 	if (parameter > 0.0f && tune > 1.0f)
 	{
-		parameter += 0.05;
+		parameter += 0.05f;
 	}
 
 	parameter *= tune;
