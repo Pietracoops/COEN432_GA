@@ -96,7 +96,7 @@ public:
 
 	// Core Functions
 	
-	virtual void recombination(float crossoverProb, int goalOffspringSize, bool allowfailures) override;	// Crossover 
+	virtual void recombination(float crossoverProb, int goalOffspringSize, bool allowfailures = false) override;	// Crossover 
 	virtual void mutation(float mutationProb) override;
 	virtual void survivorSelection(int policy = 0, int survivorSize = 0) override;							// Select Survivors
 
