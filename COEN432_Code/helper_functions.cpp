@@ -66,6 +66,20 @@ std::vector<Genome> shuffleVector(std::vector<Genome> vect)
 	return vect_tmp;
 }
 
+
+std::vector<std::string> splitString(std::string str, std::string delimiter)
+{
+	std::vector<std::string> output;
+	size_t pos = 0;
+	std::string token;
+	while ((pos = str.find(delimiter)) != std::string::npos) {
+		token = str.substr(0, pos);
+		output.push_back(token);
+		str.erase(0, pos + delimiter.length());
+	}
+	output.push_back(str);
+	return output;
+
 std::vector<int> getBoundingBox(int col_dim, int row_dim, std::mt19937 engine, int index1, int index2, int max_area)
 {
 	
@@ -107,6 +121,7 @@ std::vector<int> getBoundingBox(int col_dim, int row_dim, std::mt19937 engine, i
 	}
 
 	return indices;
+
 }
 
 void printVector(std::vector<std::vector<int>> vect)

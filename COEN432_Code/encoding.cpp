@@ -56,14 +56,15 @@ std::vector<std::vector<int>> GAEncoding_Ass1::returnGenome()
 	return m_original_genome;
 }
 
-int GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
+std::vector<int> GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
 {
 	// 8x8 box - meaning 
 
-	int mismatched = 0;
 	std::vector<std::vector<int>> genes = genome.getEncoding();
+	std::vector<int> output; // [0] fitness [1] row mismatches [2] col mismatches
 
 	// Calculate rows
+	int row_mismatches = 0;
 	for (unsigned int i = 0; i < genome.getSize() - 1; i++)
 	{
 		if (i % WIDTH == 0) 
@@ -73,21 +74,25 @@ int GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
 		
 		if (m_map_index[genes[i][0]].right != m_map_index[genes[i + 1][0]].left)
 		{
-			mismatched++;
+			row_mismatches++;
 		}
 	}
 
 	// Calculate Columns
+	int col_mismatches = 0;
 	for (unsigned int i = 0; i < genome.getSize() - WIDTH; i++)
 	{
 
 		if (m_map_index[genes[i][0]].bottom != m_map_index[genes[i + WIDTH][0]].top)
 		{
-			mismatched++;
+			col_mismatches++;
 		}
 	}
 
-	return MAX_MISMATCHES - mismatched;
+	output.push_back(MAX_MISMATCHES - (col_mismatches + row_mismatches));
+	output.push_back(row_mismatches);
+	output.push_back(col_mismatches);
+	return output;
 }
 
 
@@ -100,7 +105,6 @@ std::vector<std::vector<std::vector<int>>> GAEncoding_Ass1::returnRandomizedGeno
 		std::vector<std::vector<int>> randomized_genome = shuffleVector(m_original_genome);
 		output.push_back(randomized_genome);
 	}
-
 	return output;
 }
 
@@ -563,13 +567,17 @@ void GAEncoding_Ass1::permutationScramble(Genome& gen, std::vector<int> indices)
 	}
 }
 
-void GAEncoding_Ass1::permutationRandomScramble(Genome& gen)
+void GAEncoding_Ass1::permutationRandomScramble(Genome& gen, float mutation_ratio)
 {
 	// Generate distribution
 	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
 
 	// Pick from distribution
-	unsigned int size_of_indices = distribution(gen_mt);
+	unsigned int size_of_indices = (unsigned int)(mutation_ratio * gen.genome_encoding_2b2_int.size());
+	if (size_of_indices == 0)
+	{
+		return;
+	}
 
 	std::set<int> shuffled_indices;
 	while (shuffled_indices.size() != size_of_indices)
@@ -601,13 +609,17 @@ void GAEncoding_Ass1::permutationInvert(Genome& gen, std::vector<int> indices)
 	}
 }
 
-void GAEncoding_Ass1::permutationRandomInvert(Genome& gen)
+void GAEncoding_Ass1::permutationRandomInvert(Genome& gen, float mutation_ratio)
 {
 	// Generate distribution
 	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
 
 	// Pick from distribution
-	unsigned int size_of_indices = distribution(gen_mt);
+	unsigned int size_of_indices = (unsigned int)(mutation_ratio * gen.genome_encoding_2b2_int.size());
+	if (size_of_indices == 0)
+	{
+		return;
+	}
 
 	std::set<int> shuffled_indices_set;
 	while (shuffled_indices_set.size() != size_of_indices)
@@ -638,16 +650,37 @@ void GAEncoding_Ass1::permutationPointMutation(Genome& gen, unsigned int pos, un
 	gen.genome_encoding_2b2_int[pos][1] = rot;
 }
 
-void GAEncoding_Ass1::permutationRandomPointMutation(Genome& gen)
+void GAEncoding_Ass1::permutationRandomPointMutation(Genome& gen, float mutation_ratio)
 {
 	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
-	std::uniform_int_distribution<unsigned int> distribution_rot(1, 3);
 
 	// Pick from distribution
-	unsigned int index = distribution(gen_mt);
-	unsigned int rot = distribution_rot(gen_mt);
+	unsigned int size_of_indices = (unsigned int)(mutation_ratio * gen.genome_encoding_2b2_int.size());
+	if (size_of_indices == 0)
+	{
+		return;
+	}
 
-	gen.genome_encoding_2b2_int[index][1] = rot; // Randomize the rotation
+	std::set<int> shuffled_indices_set;
+	while (shuffled_indices_set.size() != size_of_indices)
+	{
+		shuffled_indices_set.insert(distribution(gen_mt));
+	}
+
+	std::vector<int> indices(shuffled_indices_set.begin(), shuffled_indices_set.end());
+
+	std::sort(indices.begin(), indices.end());
+	std::vector<int> shuffled_indices = indices;
+	std::sort(shuffled_indices.begin(), shuffled_indices.end(), std::greater<int>());
+
+	std::uniform_int_distribution<unsigned int> distribution_rot(1, 3);
+	unsigned int rot; 
+	for (unsigned int i = 0; i < indices.size(); i++)
+	{
+		rot = distribution_rot(gen_mt);
+		permutationPointMutation(gen, indices[i], rot);
+	}
+
 	gen.setFitness(fitnessOfGenome(gen));
 }
 
@@ -707,12 +740,14 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 		}
 	}
 
+
 	if (skipCrossover)
 	{
 		m_offspring = m_parents;
 	}
 
 	int breedingsize = m_parents.size() * crossoverProb;
+
 
 	std::uniform_int_distribution distr(0, (int)(breedingsize));
 	std::vector<Genome> pair, babies;
@@ -725,81 +760,28 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 
 	while (m_offspring.size() < goalOffspringSize)
 	{
-		int starting_parent = distr(gen_mt);
-
-		for (int i = starting_parent; i != ((starting_parent + breedingsize + -1) % breedingsize); i = ++i % breedingsize)
+		int mating_parent = 0;
+		for (int i = 0; i < breedingsize; i++)								// Loop through parents designated for mating
 		{
-
-			if (pair.size() < 2)
+			pair.push_back(m_parents[i]);
+			while (mating_parent != i)
 			{
-				pair.push_back(m_parents[i]);
-			}
-			else {
-				babies = partiallyMappedCrossover(pair[0], pair[1]);
-				m_offspring.insert(m_offspring.end(), babies.begin(), babies.end());
+				mating_parent = distr(gen_mt);										// Select another parent that isn't the same parent
+			} 
+			pair.push_back(m_parents[mating_parent]);
 
-				// Clear the breeding pair
-				pair.clear();
-			}
+			// UNCOMMENT THIS
+			//babies = partiallyMappedCrossover(pair[0], pair[1], bounding_box);					// Crossover
+			m_offspring.insert(m_offspring.end(), babies.begin(), babies.end());	// Store in offspring
+			pair.clear();															// Reset
 
-			if (m_offspring.size() >= goalOffspringSize)
+			if (m_offspring.size() >= goalOffspringSize)							// Break if desired size achieved
 			{
 				break;
 			}
 		}
+		
 	}
-	 
-	
-
-
-
-	//while (m_offspring.size() < goalOffspringSize) {
-	//	
-	//	// Generate a vector of random floats
-	//	std::vector<float> vec_randf = generateRandVecFloat((int)m_parents.size(), gen_mt);
-
-	//	// Shuffle the parents
-	//	m_parents = shuffleVector(m_parents);
-
-	//	//Iterate through pairs of parents to create offspring
-	//	for (int i = 0; i < vec_randf.size(); i++)
-	//	{
-	//		if (vec_randf[i] < crossoverProb)
-	//		{
-	//			if (parent1 == -1)
-	//			{
-	//				parent1 = i;
-	//			}
-	//			else if (parent2 == -1)
-	//			{
-	//				parent2 = i;
-
-	//				// Call a crossover function
-	//				babies = partiallyMappedCrossover(m_parents[parent1], m_parents[parent2]);
-
-	//				// Reset parent 1 and parent 2
-	//				parent1 = -1;
-	//				parent2 = -1;
-
-	//				// Add the babies to the offspring pool
-	//				m_offspring.insert(m_offspring.end(), babies.begin(), babies.end());
-	//			}
-	//			else {
-	//				// This is an error case, something went wrong if were here
-	//				// TODO: Add this error to the log
-	//				std::cout << "Something went wrong in recombination.";
-	//			}
-	//		}
-	//		else if (skipCrossover) {
-
-	//			// This parent does not reproduce and is instead added directly to the offspring pool
-	//			if (!(std::find(m_elite.begin(), m_elite.end(), m_parents[i]) != m_elite.end()))
-	//			{
-	//				m_offspring.push_back(m_parents[i]);
-	//			}				
-	//		}
-	//	}
-	//}
 
 }
 
@@ -807,41 +789,27 @@ void GAEncoding_Ass1::mutation(float mutationProb)
 {
 	// Applies a random mutation to random offspring with a mutation probability mutationProb
 
-	int total_mutations = 5;
+	// Generate distribution
+	std::uniform_int_distribution<unsigned int> distribution(0, 2);
 
-	// Generate a vector of random float probabilities
-	std::vector<float> vec_randf = generateRandVecFloat((int)m_offspring.size(), gen_mt);
-	std::uniform_real_distribution<> distr(0, 1);
+	// Pick from distribution to select mutation to use
+	unsigned int mutation_to_use; 
 
-	// Iterate through the offspring to mutate
-	for (int i = 0; i < vec_randf.size(); i++)
+	for (unsigned int i = 0; i < m_offspring.size(); i++)
 	{
-		// Corresponding individual will be mutated
-		if (vec_randf[i] < mutationProb)
-		{
-			// Generate a random float between 0 and 1
-			float prob = (float)distr(gen_mt);
+		mutation_to_use = distribution(gen_mt);
 
-			if (prob < 1.0 / total_mutations)
-			{
-				permutationRandomSwap(m_offspring[i], 1);
-			}
-			else if (prob < 2.0 / total_mutations)
-			{
-				permutationRandomInsert(m_offspring[i]);
-			}
-			else if (prob < 3.0 / total_mutations)
-			{
-				permutationRandomScramble(m_offspring[i]);
-			}
-			else if (prob < 4.0 / total_mutations)
-			{
-				permutationRandomInvert(m_offspring[i]);
-			}
-			else if (prob < 5.0 / total_mutations)
-			{
-				permutationRandomPointMutation(m_offspring[i]);
-			}
+		if (mutation_to_use == 0)
+		{
+			permutationRandomScramble(m_offspring[i], mutationProb);
+		}
+		else if (mutation_to_use == 1)
+		{
+			permutationRandomInvert(m_offspring[i], mutationProb);
+		}
+		else if (mutation_to_use == 2)
+		{
+			permutationRandomPointMutation(m_offspring[i], mutationProb);
 		}
 	}
 
@@ -877,25 +845,15 @@ std::vector<Genome> GAEncoding_Ass1::singlePointCrossover(Genome& parent1, Genom
 
 }
 
-std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, Genome& parent2)
+std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, Genome& parent2, std::vector<unsigned int> cross_indices)
 {
 
-	// Generate distribution
-	std::uniform_int_distribution<unsigned int> distribution(0, int(parent1.genome_encoding_2b2_int.size() - 1));
-	std::vector<int> cross_indices;
-
-	cross_indices.push_back(distribution(gen_mt));			// Get first index
-	cross_indices.push_back(distribution(gen_mt));			// Get second index
 	std::sort(cross_indices.begin(), cross_indices.end());	// Sort them in increasing order
 
 	Genome child1;
 	Genome child2;
 	child1.genome_encoding_2b2_int = parent2.genome_encoding_2b2_int;
 	child2.genome_encoding_2b2_int = parent1.genome_encoding_2b2_int;
-
-	//// TEMPORARY REMOVE AFTER
-	//cross_indices.push_back(3);			// Get first index
-	//cross_indices.push_back(6);			// Get second index
 
 
 	// These maps are used to store the indices of each value for the vectors
@@ -978,6 +936,11 @@ void GAEncoding_Ass1::savePopulation()
 
 	for (unsigned int i = 0; i < m_population.size(); i++)
 	{
+
+		fout << "FITNESS = " << std::to_string(m_population[i].getFitness())
+			<< ": ROW_MISMATCHES = " << std::to_string(m_population[i].getRowMismatches())
+			<< ": COL_MISMATCHES = " << std::to_string(m_population[i].getColMismatches()) << "|";
+
 		for (unsigned int j = 0; j < m_population[i].genome_encoding_2b2_int.size(); j++)
 		{
 			fout << m_population[i].genome_encoding_2b2_int[j][0] << "," << m_population[i].genome_encoding_2b2_int[j][1] << ";";
@@ -985,20 +948,6 @@ void GAEncoding_Ass1::savePopulation()
 		fout << "\n";
 	}
 
-}
-
-std::vector<std::string> splitString(std::string str, std::string delimiter)
-{
-	std::vector<std::string> output;
-	size_t pos = 0;
-	std::string token;
-	while ((pos = str.find(delimiter)) != std::string::npos) {
-		token = str.substr(0, pos);
-		output.push_back(token);
-		str.erase(0, pos + delimiter.length());
-	}
-	output.push_back(str);
-	return output;
 }
 
 void GAEncoding_Ass1::loadPopulation(std::string file_name)
@@ -1019,6 +968,14 @@ void GAEncoding_Ass1::loadPopulation(std::string file_name)
 			std::string token;
 			std::vector<std::string> gene;
 			std::vector<int> couple;
+
+			if (line.find("|") != std::string::npos)
+			{
+				std::vector<std::string> data;
+				data = splitString(line, "|");
+				line = data[1];
+			}
+
 			while ((pos = line.find(delimiter)) != std::string::npos) 
 			{
 				token = line.substr(0, pos);
