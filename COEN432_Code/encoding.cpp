@@ -112,11 +112,7 @@ void GAEncoding_Ass1::initializaPopulation(const unsigned int number_of_genomes)
 
 	for (unsigned int i = 0; i < number_of_genomes; i++)
 	{
-		Genome tmp_gen;
-		std::vector<std::vector<int>> randomized_genome = shuffleVector(m_original_genome);
-		tmp_gen.genome_encoding_2b2_int = randomized_genome;
-		tmp_gen.setFitness(fitnessOfGenome(tmp_gen));
-		m_population.push_back(tmp_gen);
+		m_population.push_back(returnRandomlyInitializedGenome());
 	}
 	
 }
@@ -190,7 +186,14 @@ GAEncoding_Ass1::~GAEncoding_Ass1()
 	// Destructor
 }
 
-void GAEncoding_Ass1::parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float diversity_ratio, float purge_ratio)
+void GAEncoding_Ass1::parentSelection(int strategy,
+									  uint32_t carry_over,
+									  float selection_ratio,
+									  uint32_t window_size,
+									  bool replacement,
+									  float randomness,
+									  float diversity_ratio,
+									  float purge_ratio)
 {
 	// Two types of parent selection
 	// 1: Generational: Each individual survives for exactly one generation - set of parents completely replaced
@@ -208,13 +211,14 @@ void GAEncoding_Ass1::parentSelection(int strategy, uint32_t carry_over, float s
 	std::sort(m_population.begin(), m_population.end(), [](const Genome& lhs, const Genome& rhs){return lhs.getFitness() > rhs.getFitness(); });
 
 	m_max_fitness = m_population[0].getFitness();
+	m_med_fitness = m_population[m_population.size()/2].getFitness();
 	m_min_fitness = m_population[m_population.size() - 1].getFitness();
 
 	// 3. append the carry over to parents + remove them from original population list
 	for (unsigned int i = 0; i < carry_over; i++)
 	{
 		m_elite.push_back(m_population[0]);			// Store the first element in parents
-		m_population.erase(m_population.begin());		// Erase the first element in population
+		m_population.erase(m_population.begin());	// Erase the first element in population
 	}
 
 	// 4. Call Fitness Proportionate if selected
@@ -229,7 +233,17 @@ void GAEncoding_Ass1::parentSelection(int strategy, uint32_t carry_over, float s
 		parents = parentSelectionTournament(m_population, selection_ratio, window_size, replacement);
 	}
 	
+	// Apply Randomness to the new parents
+	unsigned int num_random_gen = (int)(parents.size() * randomness);
+	// Parents is a shuffled array so we'll just pop out the last ones in array
+	// and replace them with random initializations of the genome
+	parents.erase(parents.end() - num_random_gen, parents.end());
+	for (unsigned int i = 0; i < num_random_gen; i++)
+	{
+		parents.push_back(returnRandomlyInitializedGenome());
+	}
 
+	// If we are struggling to achieve desired diversity, soft reset
 	if (((m_max_fitness - m_min_fitness) / m_max_fitness) < diversity_ratio)
 	{
 		permutationRandomDiversify(parents, purge_ratio);
@@ -657,12 +671,23 @@ void GAEncoding_Ass1::permutationRandomDiversify(std::vector<Genome>& gen_v, con
 
 	for (auto index : selected_indices)
 	{
-		Genome tmp_gen;
-		std::vector<std::vector<int>> randomized_genome = shuffleVector(m_original_genome);
-		tmp_gen.genome_encoding_2b2_int = randomized_genome;
-		tmp_gen.setFitness(fitnessOfGenome(tmp_gen));
-		gen_v[index] = tmp_gen;
+		gen_v[index] = returnRandomlyInitializedGenome();
 	}
+}
+
+Genome GAEncoding_Ass1::returnRandomlyInitializedGenome()
+{
+	Genome tmp_gen;
+	std::vector<std::vector<int>> randomized_genome = shuffleVector(m_original_genome);
+	// Add random rotations
+	std::uniform_int_distribution<unsigned int> distribution_rot(0, 3);
+	for (unsigned int i = 0; i < randomized_genome.size(); i++)
+	{
+		randomized_genome[i][1] = distribution_rot(gen_mt);
+	}
+	tmp_gen.genome_encoding_2b2_int = randomized_genome;
+	tmp_gen.setFitness(fitnessOfGenome(tmp_gen));
+	return tmp_gen;
 }
 
 /**
@@ -707,7 +732,7 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 					parent2 = i;
 
 					// Call a crossover function
-					babies = singlePointCrossover(m_parents[parent1], m_parents[parent2]);
+					babies = partiallyMappedCrossover(m_parents[parent1], m_parents[parent2]);
 
 					// Reset parent 1 and parent 2
 					parent1 = -1;
@@ -811,150 +836,57 @@ std::vector<Genome> GAEncoding_Ass1::singlePointCrossover(Genome& parent1, Genom
 
 std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, Genome& parent2)
 {
-	// Repeat this for each parent to generate 2 offspring
 
-	//// 1. Choose two random cutting points for the segment
-	std::uniform_int_distribution<> distr1(0, parent1.getSize() - 1);
-	int index1 = distr1(gen_mt);
-	
-	while ((index1 == (parent1.getSize() - 1))) // Make sure index1 isn't the last element in the vector
+	// Generate distribution
+	std::uniform_int_distribution<unsigned int> distribution(0, int(parent1.genome_encoding_2b2_int.size() - 1));
+	std::vector<int> cross_indices;
+
+	cross_indices.push_back(distribution(gen_mt));			// Get first index
+	cross_indices.push_back(distribution(gen_mt));			// Get second index
+	std::sort(cross_indices.begin(), cross_indices.end());	// Sort them in increasing order
+
+	Genome child1;
+	Genome child2;
+	child1.genome_encoding_2b2_int = parent2.genome_encoding_2b2_int;
+	child2.genome_encoding_2b2_int = parent1.genome_encoding_2b2_int;
+
+	//// TEMPORARY REMOVE AFTER
+	//cross_indices.push_back(3);			// Get first index
+	//cross_indices.push_back(6);			// Get second index
+
+
+	// These maps are used to store the indices of each value for the vectors
+	// For quick querry
+	std::map<int, int> map_parent1;
+	std::map<int, int> map_parent2;
+
+	// Initialize the maps
+	for (unsigned int i = 0; i < parent1.genome_encoding_2b2_int.size(); i++)
 	{
-		index1 = distr1(gen_mt);
+		map_parent1[parent1.genome_encoding_2b2_int[i][0]] = i;
+		map_parent2[parent2.genome_encoding_2b2_int[i][0]] = i;
 	}
 
-	std::uniform_int_distribution<> distr2(index1, parent1.getSize() - 1);
-	int index2 = distr2(gen_mt);
-
-	while (index1 == index2) // Make sure that the two indices aren't the same
+	// We'll loop through the mapped intersecton each entry at a time
+	// For example, if 4 is being mapped to the 8 spot, we'll move the 8
+	// to the 4 spot because there is currently a hole there. If we keep doing
+	// these swaps down the crossed section, all the pieces will fall into place
+	for (unsigned int i = cross_indices[0]; i <= cross_indices[1]; i++)
 	{
-		index2 = distr2(gen_mt);
+		permutationSwap(child1, i, map_parent2[parent1.genome_encoding_2b2_int[i][0]]);
+		permutationSwap(child2, i, map_parent1[parent2.genome_encoding_2b2_int[i][0]]);		
 	}
 
-	// testing purposes
-	//int index1 = 3;
-	//int index2 = 6;
-	//std::cout << index1 << std::endl << index2 << std::endl;
-	
-	// 2. Copy over the segment
+	child1.setFitness(fitnessOfGenome(child1));
+	child2.setFitness(fitnessOfGenome(child2));
 
-	// Into offspring 1
-	std::vector<std::vector<int>> offspring1(parent1.getSize(), std::vector<int>(parent1.getEncoding()[0].size(), -1)); // initialize the tile values to -1
-	std::copy(parent1.getEncoding().begin() + index1, parent1.getEncoding().begin() + index2 + 1,
-		offspring1.begin() + index1);
+	std::vector<Genome> output;
+	output.push_back(child1);
+	output.push_back(child2);
 
-	// Into offspring 2
-	std::vector<std::vector<int>> offspring2(parent2.getSize(), std::vector<int>(parent2.getEncoding()[0].size(), -1)); // initialize the tile values to -1
-	std::copy(parent2.getEncoding().begin() + index1, parent2.getEncoding().begin() + index2 + 1,
-		offspring2.begin() + index1);
-
-	std::unordered_map<int, int> p1map;
-	std::unordered_map<int, int> p2map;
-	std::unordered_map<int, int> off1map;
-	std::unordered_map<int, int> off2map;
-	// Create a map storing the locations of each of the tiles in the vectors
-	// Inserting and finding values in a map are in O(1) time, so this means that
-	// after 1 O(N) operation (the following loop), we do not have to keep searching
-	// the parents for the locations of the corresponding values
-	for (int i = 0; i < parent1.getSize(); i++)
-	{
-		// Key is the tile number, value is the location in the vector
-		p1map[parent1.genome_encoding_2b2_int[i][0]] = i;
-		p2map[parent2.genome_encoding_2b2_int[i][0]] = i;
-
-		if (i >= index1 && i <= index2) {
-			off1map[parent1.genome_encoding_2b2_int[i][0]] = i;
-			off2map[parent2.genome_encoding_2b2_int[i][0]] = i;
-		}
-	}
-
-	// Loop over the crossover points
-	int value1, temp1, value2, temp2;
-	int postempP1, postempP2;
-	bool found1 = false; 
-	bool found2 = false;
-	for (int i = index1; i < index2; i++)
-	{
-		// ------- Building offspring1 ------- //
-		value1 = parent2.getEncoding()[i][0];
-		if ((off1map.find(value1) == off1map.end())) // If the value1 from p2 was not copied over
-		{
-			found1 = false;
-			while (!found1)
-			{
-				temp1 = offspring1[p2map[value1]][0]; // element occupying the position in offspring 1
-				postempP2 = p2map[temp1]; // corresponding index of the element in p2
-
-				// Check if the corresponding position in offspring 1 is free
-				if (offspring1[postempP2][0] == -1)
-				{
-					// Perform the swap
-					//offspring1.insert(offspring1.begin() + postempP2, parent2.getEncoding()[i]);
-					offspring1[postempP2] = parent2.getEncoding()[i];
-					// Add the tile#, index pair to the off1map
-					off1map[parent2.getEncoding()[postempP2][0]] = postempP2;
-
-					found1 = true;
-				}
-				else {
-					value1 = temp1;
-				}
-			}
-		}
-
-
-		// ------- Building offspring1 ------- //
-		value2 = parent1.getEncoding()[i][0];
-		if ((off2map.find(value2) == off2map.end())) // If the value1 from p2 was not copied over
-		{
-			found2 = false;
-			while (!found2)
-			{
-				temp2 = offspring2[p1map[value2]][0]; // element occupying the position in offspring 1
-				postempP1 = p1map[temp2]; // corresponding index of the element in p2
-
-				// Check if the corresponding position in offspring 1 is free
-				if (offspring2[postempP1][0] == -1)
-				{
-					// Perform the swap
-					//offspring1.insert(offspring1.begin() + postempP2, parent2.getEncoding()[i]);
-					offspring2[postempP1] = parent1.getEncoding()[i];
-					// Add the tile#, index pair to the off1map
-					off2map[parent1.getEncoding()[postempP1][0]] = postempP1;
-
-					found2 = true;
-				}
-				else {
-					value2 = temp2;
-				}
-			}
-		}
-
-	
-	}
-
-	// Fill in the rest of the elements that don't deal with the crossover segment
-	for (int i = 0; i < offspring1.size(); i++)
-	{
-		if (offspring1[i][0] == -1)
-		{
-			offspring1[i] = parent2.getEncoding()[i];
-		}
-
-		if (offspring2[i][0] == -1)
-		{
-			offspring2[i] = parent1.getEncoding()[i];
-		}
-	}
-
-	// Set the fitness of the resulting offspring
-	Genome off1(offspring1);
-	off1.setFitness(fitnessOfGenome(off1));
-
-	Genome off2(offspring2);
-	off2.setFitness(fitnessOfGenome(off2));
-
-	return std::vector<Genome> {off1, off2};
+	return output;
 }
+
 
 Genome GAEncoding_Ass1::getGenomeFromPopulation(const unsigned int gen_num)
 {
@@ -990,5 +922,77 @@ bool GAEncoding_Ass1::terminationConditions(int currentGen, int maxGeneration, d
 	}
 
 	return false;
+
+}
+
+
+void GAEncoding_Ass1::savePopulation()
+{
+
+	std::string date = getCurrentDateTime("date");
+	std::ofstream fout;
+	fout.open("population_" + date + ".txt");
+
+	for (unsigned int i = 0; i < m_population.size(); i++)
+	{
+		for (unsigned int j = 0; j < m_population[i].genome_encoding_2b2_int.size(); j++)
+		{
+			fout << m_population[i].genome_encoding_2b2_int[j][0] << "," << m_population[i].genome_encoding_2b2_int[j][1] << ";";
+		}
+		fout << "\n";
+	}
+
+}
+
+std::vector<std::string> splitString(std::string str, std::string delimiter)
+{
+	std::vector<std::string> output;
+	size_t pos = 0;
+	std::string token;
+	while ((pos = str.find(delimiter)) != std::string::npos) {
+		token = str.substr(0, pos);
+		output.push_back(token);
+		str.erase(0, pos + delimiter.length());
+	}
+	output.push_back(str);
+	return output;
+}
+
+void GAEncoding_Ass1::loadPopulation(std::string file_name)
+{
+
+	m_population.clear();
+
+	std::ifstream fin(file_name);
+	std::string line;
+	std::string delimiter = ";";
+
+	if (fin.is_open())
+	{
+		while (std::getline(fin, line))
+		{
+			Genome genome;
+			size_t pos = 0;
+			std::string token;
+			std::vector<std::string> gene;
+			std::vector<int> couple;
+			while ((pos = line.find(delimiter)) != std::string::npos) 
+			{
+				token = line.substr(0, pos);
+				gene = splitString(token, ",");
+				line.erase(0, pos + delimiter.length());
+				couple.push_back(std::stoi(gene[0]));
+				couple.push_back(std::stoi(gene[1]));
+				genome.genome_encoding_2b2_int.push_back(couple);
+				couple.clear();
+				gene.clear();
+			}
+
+			genome.setFitness(fitnessOfGenome(genome));
+			m_population.push_back(genome);
+			genome.genome_encoding_2b2_int.clear();
+		}
+		fin.close();
+	}
 
 }

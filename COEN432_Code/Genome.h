@@ -9,9 +9,10 @@ class Genome
 private:
 	int fitness = 0;
 public:
+	std::vector<std::vector<int>> genome_encoding_2b2_int;
+
 	Genome() {};
 	inline Genome(std::vector<std::vector<int>> vec) { this->genome_encoding_2b2_int = vec; }
-	std::vector<std::vector<int>> genome_encoding_2b2_int;
 	size_t getSize() const;
 	void setFitness(int f) { fitness = f; }
 	int getFitness() const { return fitness; }
