@@ -47,10 +47,10 @@ void GeneticAlgorithm::parentSelection(int strategy, uint32_t carry_over, float 
 }
 
 
-void GeneticAlgorithm::recombination(float crossoverProb, int goalOffspringSize, bool allowfailures)
+void GeneticAlgorithm::recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover)
 {
 	m_watch.Start();
-	m_encoding->recombination(crossoverProb, goalOffspringSize, allowfailures);
+	m_encoding->recombination(crossoverProb, goalOffspringSize, skipCrossover);
 	genetic_algo_log() << "Recombination time using crossover prob [" << crossoverProb << "]: " << m_watch.Stop() << std::endl;
 }
 
@@ -94,7 +94,7 @@ std::string GeneticAlgorithm::printParameters()
 	output += "purge_ratio: " + std::to_string(m_params.purge_ratio) + '\n';
 	output += "### Recombination Parameters ### \n";
 	output += "crossoverProb: " + std::to_string(m_params.crossoverProb) + '\n';
-	output += "allowFailures: " + std::to_string(m_params.allowFailures) + '\n';
+	output += "skipCrossover: " + std::to_string(m_params.skipCrossover) + '\n';
 	output += "### Termination Condition Parameters ###\n";
 	output += "maxGeneration: " + std::to_string(m_params.maxGeneration) + '\n';
 	output += "maxRuntime: " + std::to_string(m_params.maxRuntime) + '\n';
@@ -111,7 +111,7 @@ std::string GeneticAlgorithm::printParameters()
 		<< std::endl
 		<< "### Recombination Parameters ### \n"
 		<< "crossoverProb: " << m_params.crossoverProb << std::endl
-		<< "allowFailures: " << m_params.allowFailures << std::endl
+		<< "skipCrossover: " << m_params.skipCrossover << std::endl
 		<< std::endl
 		<< "### Termination Condition Parameters ###\n"
 		<< "maxGeneration: " << m_params.maxGeneration << std::endl
@@ -155,7 +155,7 @@ void GeneticAlgorithm::runGA(std::string population_file)
 
 		// Apply variation operators in order to create offspring
 		genetic_algo_log() << "Starting recombination procedure..." << std::endl;
-		recombination(m_params.crossoverProb, m_params.goalOffspringSize, m_params.allowFailures);
+		recombination(m_params.crossoverProb, m_params.goalOffspringSize, m_params.skipCrossover);
 
 		genetic_algo_log() << "Starting mutation procedure... " << std::endl;
 		mutation(m_params.mutationProb);

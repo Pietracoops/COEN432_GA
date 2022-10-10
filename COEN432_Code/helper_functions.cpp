@@ -66,6 +66,49 @@ std::vector<Genome> shuffleVector(std::vector<Genome> vect)
 	return vect_tmp;
 }
 
+std::vector<int> getBoundingBox(int col_dim, int row_dim, std::mt19937 engine, int index1, int index2, int max_area)
+{
+	
+	// If indices are not given
+	std::uniform_int_distribution distr(0, col_dim * row_dim);
+	if (index1 == -1)
+	{
+		index1 = distr(engine);
+	}
+	if (index2 == -1)
+	{
+		index2 = distr(engine);
+	}
+
+	// Sort indices in increasing value
+	std::vector<int> temp = { index1, index2 };
+	std::sort(temp.begin(), temp.end());
+	index1 = temp[0];
+	index2 = temp[1];
+
+	// Get number of rows and columns separating the two indices
+	int num_cols = (index2 % col_dim - index1 % col_dim);
+	int num_rows = index2 / col_dim - index1 / col_dim;
+
+	std::vector<int> indices{};
+
+
+	for (int i = 0; i <= num_rows; i++)
+	{
+		for (int j = 0; j <= num_cols; j++)
+		{
+			indices.push_back(col_dim * i + j + index1);
+
+			if ((max_area != -1) && indices.size() == max_area)
+			{
+				return indices;
+			}
+		}
+	}
+
+	return indices;
+}
+
 void printVector(std::vector<std::vector<int>> vect)
 {
 	for (unsigned int i = 0; i < vect.size(); i++)

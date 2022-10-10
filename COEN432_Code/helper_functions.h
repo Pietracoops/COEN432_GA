@@ -46,6 +46,10 @@ std::vector<std::vector<int>> shuffleVector(std::vector<std::vector<int>> vect);
 std::vector<int> shuffleVector(std::vector<int> vect);
 std::vector<Genome> shuffleVector(std::vector<Genome> vect);
 
+// Generates the indices for a random bounding box in a 2D vector
+std::vector<int> getBoundingBox(int col_dim, int row_dim, std::mt19937 engine, int index1 = -1, int index2 = -1, int max_area = -1);
+
+
 // Prints a two dimensional vector
 /// \return: None
 void printVector(std::vector<std::vector<int>> vect);
