@@ -728,7 +728,7 @@ Genome GAEncoding_Ass1::returnRandomlyInitializedGenome()
 * 
 * TODO: add an argument that takes a crossover function so that it does not need to be changed manually
 */
-void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, bool allowfailures)
+void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover)
 {
 
 	// Add the elites back to the parent pool so that they have a chance to reproduce
@@ -740,7 +740,14 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 		}
 	}
 
-	int breedingsize = (int)(m_parents.size() * crossoverProb);
+
+	if (skipCrossover)
+	{
+		m_offspring = m_parents;
+	}
+
+	int breedingsize = m_parents.size() * crossoverProb;
+
 
 	std::uniform_int_distribution distr(0, (int)(breedingsize));
 	std::vector<Genome> pair, babies;

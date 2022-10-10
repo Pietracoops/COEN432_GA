@@ -6,6 +6,7 @@
 int main()
 {
 	// ############### Initialize the Encoding based on the input file
+
 	GAEncoding_Ass1 Encoding_Ass1("Ass1/Ass1Input.txt");
 	GAEncoding* Encoding = &Encoding_Ass1;
 
@@ -47,6 +48,7 @@ int main()
 	GA.m_params.save_population = true;
 
 	GA.runGA("population_2022-10-09-19-51-32.txt");
+
 
 	return 0;
 }
