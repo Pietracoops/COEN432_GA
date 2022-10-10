@@ -40,7 +40,7 @@ private:
 
 		// Recombination parameters
 		float crossoverProb;
-		bool allowFailures;
+		bool skipCrossover;
 		int goalOffspringSize;
 
 		// Mutation parameters
@@ -79,7 +79,7 @@ public:
 	void initializePopulation(int population_size);																				// Initialize Pop
 	void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement,
 						float randomness, float diversity_ratio, float purge_ratio);											// Select Parents
-	void recombination(float crossoverProb, int goalOffspringSize, bool allowfailures = false);									// Crossover 
+	void recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover = false);									// Crossover 
 	void mutation(float mutationProb);																							// Mutation
 	void survivorSelection();																									// Select Survivors
 
