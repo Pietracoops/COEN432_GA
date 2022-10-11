@@ -1057,7 +1057,7 @@ void GAEncoding_Ass1::savePopulation()
 
 }
 
-void GAEncoding_Ass1::loadPopulation(std::string file_name)
+void GAEncoding_Ass1::loadPopulation(std::string file_name, unsigned int starting_pop_size)
 {
 
 	m_population.clear();
@@ -1101,5 +1101,13 @@ void GAEncoding_Ass1::loadPopulation(std::string file_name)
 		}
 		fin.close();
 	}
+
+	// Set the population size attribute of the encoding
+	unsigned int remaining_genomes = starting_pop_size - m_population.size();
+	for (unsigned int i = 0; i < remaining_genomes; i++)
+	{
+		m_population.push_back(returnRandomlyInitializedGenome());
+	}
+
 
 }

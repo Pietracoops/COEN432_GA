@@ -38,7 +38,7 @@ public:
 	virtual void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio) = 0;
 
 	virtual void savePopulation() = 0;
-	virtual void loadPopulation(std::string file_name) = 0;
+	virtual void loadPopulation(std::string file_name, unsigned int starting_pop_size) = 0;
 
 	// Utility Functions
 	virtual Genome getGenomeFromPopulation(const unsigned int gen_num) = 0;
@@ -139,7 +139,7 @@ public:
 	virtual float getAverageFitness(std::vector<Genome> population) override;
 
 	void savePopulation() override;
-	void loadPopulation(std::string file_name) override;
+	void loadPopulation(std::string file_name, unsigned int starting_pop_size) override;
 
 	// The original genome that was extracted from the input file
 	std::vector<std::vector<int>> m_original_genome;

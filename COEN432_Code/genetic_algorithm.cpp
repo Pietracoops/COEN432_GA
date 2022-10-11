@@ -126,7 +126,7 @@ void GeneticAlgorithm::runGA(std::string population_file)
 
 	if (!population_file.empty())
 	{
-		m_encoding->loadPopulation(population_file);
+		m_encoding->loadPopulation(population_file, m_params.population_size);
 	}
 
 	Logger(printParameters());

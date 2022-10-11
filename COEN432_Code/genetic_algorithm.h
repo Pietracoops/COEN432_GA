@@ -29,14 +29,15 @@ class GeneticAlgorithm
 private:
 	struct Parameters { // Have this be initialized using a json file
 		// Parent Selection Params
-		int strategy;			// 0 for fitness proportionate (roulette), 1 for tournament
-		uint32_t carry_over;	// Elitism, number of genomes to carry over
-		float selection_ratio;	// Number of genomes to select from parents
-		uint32_t window_size;	// Specific to tournament selection, number of genomes in local tournament
-		bool replacement;		// Specific to tournament selection - if replacement should be used
-		float randomness;		// The ratio of randomly initialized new parents that should be added to the pool
-		float diversity_ratio;	// threshold of Max_fitness - Min_fitness / Max_fitness
-		float purge_ratio;		// If diversity ratio is reached, purge_ratio is ratio of pop to re-initialize
+		unsigned int population_size;	// Size of population
+		int strategy;					// 0 for fitness proportionate (roulette), 1 for tournament
+		uint32_t carry_over;			// Elitism, number of genomes to carry over
+		float selection_ratio;			// Number of genomes to select from parents
+		uint32_t window_size;			// Specific to tournament selection, number of genomes in local tournament
+		bool replacement;				// Specific to tournament selection - if replacement should be used
+		float randomness;				// The ratio of randomly initialized new parents that should be added to the pool
+		float diversity_ratio;			// threshold of Max_fitness - Min_fitness / Max_fitness
+		float purge_ratio;				// If diversity ratio is reached, purge_ratio is ratio of pop to re-initialize
 
 		// Recombination parameters
 		float crossoverProb;
