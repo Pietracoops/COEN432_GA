@@ -85,7 +85,7 @@ std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937 
 {
 	
 	// If indices are not given
-	std::uniform_int_distribution distr(0, col_dim * row_dim);
+	std::uniform_int_distribution distr(0, col_dim * row_dim - 1);
 	if (index1 == -1)
 	{
 		index1 = distr(engine);

@@ -247,11 +247,11 @@ void GAEncoding_Ass1::parentSelection(int strategy,
 		parents.push_back(returnRandomlyInitializedGenome());
 	}
 
-	// If we are struggling to achieve desired diversity, soft reset
-	if (((m_max_fitness - m_min_fitness) / m_max_fitness) < diversity_ratio)
-	{
-		permutationRandomDiversify(parents, purge_ratio);
-	}
+	//// If we are struggling to achieve desired diversity, soft reset
+	//if (((m_max_fitness - m_min_fitness) / m_max_fitness) < diversity_ratio)
+	//{
+	//	permutationRandomDiversify(parents, purge_ratio);
+	//}
 
 
 	// Complete
@@ -765,7 +765,7 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 		for (int i = 0; i < breedingsize; i++)								// Loop through parents designated for mating
 		{
 			pair.push_back(m_parents[i]);
-			while (mating_parent != i)
+			while (mating_parent == i)
 			{
 				mating_parent = distr(gen_mt);								// Select another parent that isn't the same parent
 			} 
