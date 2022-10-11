@@ -29,14 +29,15 @@ class GeneticAlgorithm
 private:
 	struct Parameters { // Have this be initialized using a json file
 		// Parent Selection Params
-		int strategy;			// 0 for fitness proportionate (roulette), 1 for tournament
-		uint32_t carry_over;	// Elitism, number of genomes to carry over
-		float selection_ratio;	// Number of genomes to select from parents
-		uint32_t window_size;	// Specific to tournament selection, number of genomes in local tournament
-		bool replacement;		// Specific to tournament selection - if replacement should be used
-		float randomness;		// The ratio of randomly initialized new parents that should be added to the pool
-		float diversity_ratio;	// threshold of Max_fitness - Min_fitness / Max_fitness
-		float purge_ratio;		// If diversity ratio is reached, purge_ratio is ratio of pop to re-initialize
+		unsigned int population_size;	// Size of population
+		int strategy;					// 0 for fitness proportionate (roulette), 1 for tournament
+		uint32_t carry_over;			// Elitism, number of genomes to carry over
+		float selection_ratio;			// Number of genomes to select from parents
+		uint32_t window_size;			// Specific to tournament selection, number of genomes in local tournament
+		bool replacement;				// Specific to tournament selection - if replacement should be used
+		float randomness;				// The ratio of randomly initialized new parents that should be added to the pool
+		float diversity_ratio;			// threshold of Max_fitness - Min_fitness / Max_fitness
+		float purge_ratio;				// If diversity ratio is reached, purge_ratio is ratio of pop to re-initialize
 
 		// Recombination parameters
 		float crossoverProb;
@@ -45,6 +46,7 @@ private:
 
 		// Mutation parameters
 		float mutationProb;
+		bool accelerated;
 
 		// Survivor selection parameters
 		int survivorpolicy;
@@ -62,6 +64,8 @@ private:
 
 		// Misc
 		bool save_population;
+		bool save_every_x_generation = true;
+		int save_every_x_generation_val = 500;
 
 	};
 
@@ -84,7 +88,7 @@ public:
 	void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement,
 						float randomness, float diversity_ratio, float purge_ratio);											// Select Parents
 	void recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover = false);									// Crossover 
-	void mutation(float mutationProb);																							// Mutation
+	void mutation(float mutationProb, bool accelerated);																							// Mutation
 	void survivorSelection(int policy, int survivorSize);																									// Select Survivors
 
 	bool terminationConditions(int currentGen, int maxGeneration = -1, double currRuntime = -1, double maxRuntime = -1, int targetFitness = -1);

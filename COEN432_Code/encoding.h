@@ -17,7 +17,7 @@ public:
 	// Core Functions
 	virtual void survivorSelection(int policy = 0, int survivorSize = 0) = 0;		// Select Survivors from the parents + offspring
 	virtual void recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover) = 0;		// Crossover to generate offspring
-	virtual void mutation(float mutationProb) = 0;
+	virtual void mutation(float mutationProb, bool accelerated) = 0;
 
 	// Parent Selection
 	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness, float diversity_ratio, float purge_ratio) = 0;
@@ -38,7 +38,7 @@ public:
 	virtual void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio) = 0;
 
 	virtual void savePopulation() = 0;
-	virtual void loadPopulation(std::string file_name) = 0;
+	virtual void loadPopulation(std::string file_name, unsigned int starting_pop_size) = 0;
 
 	// Utility Functions
 	virtual Genome getGenomeFromPopulation(const unsigned int gen_num) = 0;
@@ -97,7 +97,7 @@ public:
 	// Core Functions
 	
 	virtual void recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover = false) override;	// Crossover 
-	virtual void mutation(float mutationProb) override;
+	virtual void mutation(float mutationProb, bool accelerated) override;
 	virtual void survivorSelection(int policy = 0, int survivorSize = 0) override;							// Select Survivors
 
 	// Parent Selection
@@ -122,6 +122,11 @@ public:
 	void permutationRandomPointMutation(Genome& gen, float mutation_ratio) override;
 	void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio) override;
 
+	void permutationRandomScrambleOld(Genome& gen);
+	void permutationRandomInvertOld(Genome& gen);
+	void permutationRandomPointMutationOld(Genome& gen);
+
+
 	// Crossover Functions
 	std::vector<Genome> singlePointCrossover(Genome& parent1, Genome& parent2);
 	std::vector<Genome> partiallyMappedCrossover(Genome& parent1, Genome& parent2, std::vector<unsigned int> cross_indices);
@@ -134,7 +139,10 @@ public:
 	virtual float getAverageFitness(std::vector<Genome> population) override;
 
 	void savePopulation() override;
-	void loadPopulation(std::string file_name) override;
+	void loadPopulation(std::string file_name, unsigned int starting_pop_size) override;
+
+	// The original genome that was extracted from the input file
+	std::vector<std::vector<int>> m_original_genome;
 
 private:
 
@@ -154,9 +162,6 @@ private:
 	// Map containing the indexes of each tile (1 - 64) and the corresponding Tile
 	// Tile object where each individual tile of the puzzle can be stored
 	std::map<int, Tile> m_map_index;
-
-	// The original genome that was extracted from the input file
-	std::vector<std::vector<int>> m_original_genome;
 
 	// Encode the input from file to the m_map_index variable
 	void encodeToMap(std::vector<std::vector<std::string>> input);
