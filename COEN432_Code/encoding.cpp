@@ -1085,16 +1085,25 @@ void GAEncoding_Ass1::loadPopulation(std::string file_name, unsigned int startin
 			genome.setFitness(fitnessOfGenome(genome));
 			m_population.push_back(genome);
 			genome.genome_encoding_2b2_int.clear();
+
+			if (m_population.size() == starting_pop_size)
+			{
+				break;
+			}
 		}
 		fin.close();
 	}
 
 	// Set the population size attribute of the encoding
 	unsigned int remaining_genomes = starting_pop_size - m_population.size();
-	for (unsigned int i = 0; i < remaining_genomes; i++)
+	if (remaining_genomes > 0)
 	{
-		m_population.push_back(returnRandomlyInitializedGenome());
+		for (unsigned int i = 0; i < remaining_genomes; i++)
+		{
+			m_population.push_back(returnRandomlyInitializedGenome());
+		}
 	}
+
 
 
 }

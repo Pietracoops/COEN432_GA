@@ -20,7 +20,7 @@ int main()
 
 
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 500;
+	unsigned int POPULATION_SIZE = 65;
 
 	//// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
@@ -45,7 +45,7 @@ int main()
 
 	// --- Mutation parameters
 	GA.m_params.mutationProb = 0.05F; // we should have higher mutation if diversity is low
-	GA.m_params.accelerated = false;
+	GA.m_params.accelerated = true;
 
 	// Survivor selection parameters
 	GA.m_params.survivorpolicy = 0; // 0 is ufromgamma, 1 is uplusgamma
@@ -63,10 +63,10 @@ int main()
 
 	GA.m_params.save_population = true;
 	GA.m_params.save_every_x_generation = true;
-	GA.m_params.save_every_x_generation_val = 500;
+	GA.m_params.save_every_x_generation_val = 100;
 
-	GA.runGA("population_2022-10-11-01-13-30.txt");
-	
+	GA.runGA("population_2022-10-11-12-47-35.txt");
+
 
 	return 0;
 }

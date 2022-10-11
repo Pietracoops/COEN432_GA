@@ -95,6 +95,8 @@ std::string GeneticAlgorithm::printParameters()
 	output += "### Recombination Parameters ### \n";
 	output += "crossoverProb: " + std::to_string(m_params.crossoverProb) + '\n';
 	output += "skipCrossover: " + std::to_string(m_params.skipCrossover) + '\n';
+	output += "mutationProb: " + std::to_string(m_params.mutationProb) + '\n';
+	output += "accelerated: " + std::to_string(m_params.accelerated) + '\n';
 	output += "### Termination Condition Parameters ###\n";
 	output += "maxGeneration: " + std::to_string(m_params.maxGeneration) + '\n';
 	output += "maxRuntime: " + std::to_string(m_params.maxRuntime) + '\n';
@@ -164,7 +166,8 @@ void GeneticAlgorithm::runGA(std::string population_file)
 		genetic_algo_log() << "Starting survivor selection... " << std::endl;
 		survivorSelection(m_params.survivorpolicy, m_params.survivorsize);
 
-		Logger("GENERATION: " + std::to_string(m_generation)
+
+		std::string logger_str = "GENERATION: " + std::to_string(m_generation)
 			+ " ;AVERAGE_FITNESS: " + std::to_string(m_encoding->getAverageFitness(m_encoding->m_population))
 			+ " ;MAX_FITNESS " + std::to_string(m_encoding->m_max_fitness)
 			+ " ;MEDIAN_FITNESS " + std::to_string(m_encoding->m_med_fitness)
@@ -172,7 +175,13 @@ void GeneticAlgorithm::runGA(std::string population_file)
 			+ " ;STAGNATION_DETECTED " + std::to_string(stats.stagnation_detected)
 			+ " ;MUTATION_PROB " + std::to_string(m_params.mutationProb)
 			+ " ;CROSSOVER_PROB " + std::to_string(m_params.crossoverProb)
-			+ " ;RANDOMNESS " + std::to_string(m_params.randomness));
+			+ " ;RANDOMNESS " + std::to_string(m_params.randomness);
+
+		if (m_encoding->m_elite.size() != 0)
+		{
+			logger_str += " ;ELITE GENOME " + m_encoding->m_elite[0].getGenomeString();
+		}
+		Logger(logger_str);
 
 
 		genetic_algo_log() << "========================== END OF GENERATION =============================== " << std::endl;
