@@ -54,7 +54,7 @@ std::vector<Genome> shuffleVector(std::vector<Genome> vect);
 std::vector<std::string> splitString(std::string str, std::string delimiter);
 
 // Generates the indices for a random bounding box in a 2D vector
-std::vector<int> getBoundingBox(int col_dim, int row_dim, std::mt19937 engine, int index1 = -1, int index2 = -1, int max_area = -1);
+std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937 engine, int index1 = -1, int index2 = -1, int max_area = -1);
 
 
 

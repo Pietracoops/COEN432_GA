@@ -758,6 +758,7 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 		return;
 	}
 
+	std::vector<unsigned int> bounding_box;
 	while (m_offspring.size() < goalOffspringSize)
 	{
 		int mating_parent = 0;
@@ -770,8 +771,8 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 			} 
 			pair.push_back(m_parents[mating_parent]);
 
-			// UNCOMMENT THIS
-			//babies = partiallyMappedCrossover(pair[0], pair[1], bounding_box);					// Crossover
+			bounding_box = getBoundingBox(WIDTH, HEIGHT, gen_mt);
+			babies = partiallyMappedCrossover(pair[0], pair[1], bounding_box);					// Crossover
 			m_offspring.insert(m_offspring.end(), babies.begin(), babies.end());	// Store in offspring
 			pair.clear();															// Reset
 

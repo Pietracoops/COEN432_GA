@@ -79,8 +79,9 @@ std::vector<std::string> splitString(std::string str, std::string delimiter)
 	}
 	output.push_back(str);
 	return output;
+}
 
-std::vector<int> getBoundingBox(int col_dim, int row_dim, std::mt19937 engine, int index1, int index2, int max_area)
+std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937 engine, int index1, int index2, int max_area)
 {
 	
 	// If indices are not given

@@ -29,7 +29,7 @@ int main()
 
 	// --- Recombination parameters
 	GA.m_params.crossoverProb = 0.6F;
-	GA.m_params.allowFailures = false;
+	GA.m_params.skipCrossover = false;
 	GA.m_params.goalOffspringSize = POPULATION_SIZE;
 
 	// --- Mutation parameters
