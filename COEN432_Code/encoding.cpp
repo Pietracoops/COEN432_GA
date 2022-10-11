@@ -848,6 +848,11 @@ std::vector<Genome> GAEncoding_Ass1::singlePointCrossover(Genome& parent1, Genom
 
 std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, Genome& parent2, std::vector<unsigned int> cross_indices)
 {
+	std::vector<Genome> output;
+	if (cross_indices.size() == 0)
+	{
+		return output;
+	}
 
 	std::sort(cross_indices.begin(), cross_indices.end());	// Sort them in increasing order
 
@@ -873,16 +878,17 @@ std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, G
 	// For example, if 4 is being mapped to the 8 spot, we'll move the 8
 	// to the 4 spot because there is currently a hole there. If we keep doing
 	// these swaps down the crossed section, all the pieces will fall into place
-	for (unsigned int i = cross_indices[0]; i <= cross_indices[1]; i++)
+	for (unsigned int i = 0; i < cross_indices.size(); i++)
 	{
-		permutationSwap(child1, i, map_parent2[parent1.genome_encoding_2b2_int[i][0]]);
-		permutationSwap(child2, i, map_parent1[parent2.genome_encoding_2b2_int[i][0]]);		
+		
+		permutationSwap(child1, cross_indices[0], map_parent2[parent1.genome_encoding_2b2_int[cross_indices[0]][0]]);
+		permutationSwap(child2, cross_indices[0], map_parent1[parent2.genome_encoding_2b2_int[cross_indices[0]][0]]);
 	}
 
 	child1.setFitness(fitnessOfGenome(child1));
 	child2.setFitness(fitnessOfGenome(child2));
 
-	std::vector<Genome> output;
+	
 	output.push_back(child1);
 	output.push_back(child2);
 

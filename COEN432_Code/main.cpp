@@ -28,6 +28,7 @@ int main()
 	GA.m_params.purge_ratio = 0.25f;
 
 	// --- Recombination parameters
+
 	GA.m_params.crossoverProb = 0.7F;
 	GA.m_params.skipCrossover = false;
 	GA.m_params.goalOffspringSize = POPULATION_SIZE;
