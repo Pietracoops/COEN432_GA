@@ -15,6 +15,7 @@
 #include <xtensor/xview.hpp>
 
 #include <vector>
+#include <array>
 #include <set>
 #include <map>
 #include <algorithm>
