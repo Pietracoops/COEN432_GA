@@ -105,7 +105,7 @@ std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937 
 	int num_cols = (index2 % col_dim - index1 % col_dim);
 	int num_rows = index2 / col_dim - index1 / col_dim;
 
-	std::vector<int> indices{};
+	std::vector<unsigned int> indices{};
 
 
 	for (int i = 0; i <= num_rows; i++)

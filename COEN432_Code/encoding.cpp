@@ -767,12 +767,12 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 			pair.push_back(m_parents[i]);
 			while (mating_parent != i)
 			{
-				mating_parent = distr(gen_mt);										// Select another parent that isn't the same parent
+				mating_parent = distr(gen_mt);								// Select another parent that isn't the same parent
 			} 
 			pair.push_back(m_parents[mating_parent]);
 
 			bounding_box = getBoundingBox(WIDTH, HEIGHT, gen_mt);
-			babies = partiallyMappedCrossover(pair[0], pair[1], bounding_box);					// Crossover
+			babies = partiallyMappedCrossover(pair[0], pair[1], bounding_box);		// Crossover
 			m_offspring.insert(m_offspring.end(), babies.begin(), babies.end());	// Store in offspring
 			pair.clear();															// Reset
 

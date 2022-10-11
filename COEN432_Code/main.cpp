@@ -11,7 +11,7 @@ int main()
 	GAEncoding* Encoding = &Encoding_Ass1;
 
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 65;
+	unsigned int POPULATION_SIZE = 100;
 
 	//// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
@@ -28,15 +28,15 @@ int main()
 	GA.m_params.purge_ratio = 0.25f;
 
 	// --- Recombination parameters
-	GA.m_params.crossoverProb = 0.6F;
+	GA.m_params.crossoverProb = 0.7F;
 	GA.m_params.skipCrossover = false;
 	GA.m_params.goalOffspringSize = POPULATION_SIZE;
 
 	// --- Mutation parameters
-	GA.m_params.mutationProb = 1.0F; // we should have higher mutation if diversity is low
+	GA.m_params.mutationProb = 0.05F; // we should have higher mutation if diversity is low
 
 	// --- Termination Condition Parameters
-	GA.m_params.maxGeneration = 100;
+	GA.m_params.maxGeneration = 3000;
 	GA.m_params.maxRuntime = 600; // seconds
 	GA.m_params.targetFitness = 10;
 
@@ -47,7 +47,7 @@ int main()
 
 	GA.m_params.save_population = true;
 
-	GA.runGA("population_2022-10-09-19-51-32.txt");
+	GA.runGA();
 
 
 	return 0;
