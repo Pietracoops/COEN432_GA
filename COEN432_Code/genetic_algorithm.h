@@ -46,6 +46,10 @@ private:
 		// Mutation parameters
 		float mutationProb;
 
+		// Survivor selection parameters
+		int survivorpolicy;
+		int survivorsize;
+
 		// Termination Condition Parameters
 		int maxGeneration;
 		double maxRuntime;
@@ -81,7 +85,7 @@ public:
 						float randomness, float diversity_ratio, float purge_ratio);											// Select Parents
 	void recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover = false);									// Crossover 
 	void mutation(float mutationProb);																							// Mutation
-	void survivorSelection();																									// Select Survivors
+	void survivorSelection(int policy, int survivorSize);																									// Select Survivors
 
 	bool terminationConditions(int currentGen, int maxGeneration = -1, double currRuntime = -1, double maxRuntime = -1, int targetFitness = -1);
 

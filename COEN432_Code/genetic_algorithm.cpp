@@ -61,10 +61,10 @@ void GeneticAlgorithm::mutation(float mutationProb)
 	genetic_algo_log() << "Mutation time using mutationProb [" << mutationProb << "]: " << m_watch.Stop() << std::endl;
 }
 
-void GeneticAlgorithm::survivorSelection()
+void GeneticAlgorithm::survivorSelection(int policy, int survivorSize)
 {
 	m_watch.Start();
-	m_encoding->survivorSelection();
+	m_encoding->survivorSelection(policy, survivorSize);
 	genetic_algo_log() << "Survivor selection time " << m_watch.Stop() << std::endl;
 }
 
@@ -162,7 +162,7 @@ void GeneticAlgorithm::runGA(std::string population_file)
 
 		// Select the survivors
 		genetic_algo_log() << "Starting survivor selection... " << std::endl;
-		survivorSelection();
+		survivorSelection(m_params.survivorpolicy, m_params.survivorsize);
 
 		Logger("GENERATION: " + std::to_string(m_generation)
 			+ " ;AVERAGE_FITNESS: " + std::to_string(m_encoding->getAverageFitness(m_encoding->m_population))
