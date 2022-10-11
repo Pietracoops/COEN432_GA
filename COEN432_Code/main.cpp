@@ -11,7 +11,7 @@ int main()
 	GAEncoding* Encoding = &Encoding_Ass1;
 
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 65;
+	unsigned int POPULATION_SIZE = 1000;
 
 	//// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
@@ -20,7 +20,7 @@ int main()
 	// --- parent selection
 	GA.m_params.strategy = 1;
 	GA.m_params.carry_over = 1;
-	GA.m_params.selection_ratio = 0.6F;
+	GA.m_params.selection_ratio = 0.6F; // Selection ratio has no effect on resulting parent size
 	GA.m_params.window_size = 3;
 	GA.m_params.replacement = false;
 	GA.m_params.randomness = 0.0f;
@@ -31,13 +31,17 @@ int main()
 
 	GA.m_params.crossoverProb = 0.3F;
 	GA.m_params.skipCrossover = false;
-	GA.m_params.goalOffspringSize = POPULATION_SIZE;
+	GA.m_params.goalOffspringSize = 2 * POPULATION_SIZE;
 
 	// --- Mutation parameters
 	GA.m_params.mutationProb = 1.0F; // we should have higher mutation if diversity is low
 
+	// Survivor selection parameters
+	GA.m_params.survivorpolicy = 0; // 0 is ufromgamma, 1 is uplusgamma
+	GA.m_params.survivorsize = POPULATION_SIZE;
+
 	// --- Termination Condition Parameters
-	GA.m_params.maxGeneration = 1000;
+	GA.m_params.maxGeneration = 100;
 	GA.m_params.maxRuntime = 600; // seconds
 	GA.m_params.targetFitness = 10;
 
