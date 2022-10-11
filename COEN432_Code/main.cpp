@@ -11,7 +11,7 @@ int main()
 	GAEncoding* Encoding = &Encoding_Ass1;
 
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 1000;
+	unsigned int POPULATION_SIZE = 10;
 
 	//// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
@@ -22,7 +22,7 @@ int main()
 	GA.m_params.carry_over = 1;
 	GA.m_params.selection_ratio = 0.6F; // Selection ratio has no effect on resulting parent size
 	GA.m_params.window_size = 3;
-	GA.m_params.replacement = false;
+	GA.m_params.replacement = true;
 	GA.m_params.randomness = 0.0f;
 	GA.m_params.diversity_ratio = 0.1F;
 	GA.m_params.purge_ratio = 0.25f;

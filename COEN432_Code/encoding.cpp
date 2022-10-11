@@ -341,7 +341,7 @@ std::vector<Genome> GAEncoding_Ass1::parentSelectionTournament(std::vector<Genom
 	}
 	else
 	{
-		// Without replacement
+		// With replacement
 		std::uniform_int_distribution<unsigned int> distribution(0, int(population_copy.size() - 1));
 
 		std::set<int> used_indices;
@@ -355,6 +355,11 @@ std::vector<Genome> GAEncoding_Ass1::parentSelectionTournament(std::vector<Genom
 			selected_indices.clear();
 			while (selected_indices.size() != window_size)
 			{
+				if (selected_indices.size() + used_indices.size() == population_copy.size())
+				{
+					break;
+				}
+
 				int index = distribution(gen_mt);
 				if (used_indices.find(index) == used_indices.end())
 				{
