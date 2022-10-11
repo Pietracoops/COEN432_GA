@@ -33,9 +33,9 @@ int main()
 	GA.m_params.selection_ratio = 0.6F; // Selection ratio has no effect on resulting parent size
 	GA.m_params.window_size = 3;
 	GA.m_params.replacement = false;
-	GA.m_params.randomness = 0.3f;
-	GA.m_params.diversity_ratio = 0.1F;
-	GA.m_params.purge_ratio = 0.25f;
+	GA.m_params.randomness = 0.0F;
+	GA.m_params.diversity_ratio = 0.0F;
+	GA.m_params.purge_ratio = 0.0f;
 
 	// --- Recombination parameters
 
@@ -48,7 +48,7 @@ int main()
 	GA.m_params.accelerated = false;
 
 	// Survivor selection parameters
-	GA.m_params.survivorpolicy = 0; // 0 is ufromgamma, 1 is uplusgamma
+	GA.m_params.survivorpolicy = 0; // 0 is ufromgamma, 1 is uplusgamma, 2 is uplusgamma fuds
 	GA.m_params.survivorsize = POPULATION_SIZE;
 
 	// --- Termination Condition Parameters
@@ -65,7 +65,7 @@ int main()
 	GA.m_params.save_every_x_generation = true;
 	GA.m_params.save_every_x_generation_val = 500;
 
-	GA.runGA("population_2022-10-11-01-13-30.txt");
+	GA.runGA();
 	
 
 	return 0;
