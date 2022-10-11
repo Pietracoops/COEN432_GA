@@ -20,7 +20,7 @@ int main()
 
 
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 500;
+	unsigned int POPULATION_SIZE = 65;
 
 	//// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
@@ -31,15 +31,15 @@ int main()
 	GA.m_params.strategy = 1;
 	GA.m_params.carry_over = 1;
 	GA.m_params.selection_ratio = 0.6F; // Selection ratio has no effect on resulting parent size
-	GA.m_params.window_size = 3;
+	GA.m_params.window_size = 5;
 	GA.m_params.replacement = false;
-	GA.m_params.randomness = 0.3f;
+	GA.m_params.randomness = 0.0f;
 	GA.m_params.diversity_ratio = 0.1F;
 	GA.m_params.purge_ratio = 0.25f;
 
 	// --- Recombination parameters
 
-	GA.m_params.crossoverProb = 0.9F;
+	GA.m_params.crossoverProb = 0.2F;
 	GA.m_params.skipCrossover = false;
 	GA.m_params.goalOffspringSize = 2 * POPULATION_SIZE;
 
@@ -63,10 +63,10 @@ int main()
 
 	GA.m_params.save_population = true;
 	GA.m_params.save_every_x_generation = true;
-	GA.m_params.save_every_x_generation_val = 500;
+	GA.m_params.save_every_x_generation_val = 250;
 
-	GA.runGA("population_2022-10-11-01-13-30.txt");
-	
+	GA.runGA("population_2022-10-11-13-18-00.txt");
+
 
 	return 0;
 }

@@ -584,10 +584,12 @@ void GAEncoding_Ass1::permutationRandomScramble(Genome& gen, float mutation_rati
 	}
 
 	std::vector<int> indices(shuffled_indices.begin(), shuffled_indices.end());
+	std::vector<int> shuffled_indices_v(shuffled_indices.begin(), shuffled_indices.end());
 	std::sort(indices.begin(), indices.end());
+	shuffled_indices_v = shuffleVector(shuffled_indices_v);
 
 	unsigned int counter = 0;
-	for (auto& n : shuffled_indices)
+	for (auto& n : shuffled_indices_v)
 	{
 		permutationSwap(gen, indices[counter], n);
 		counter++;
@@ -738,10 +740,12 @@ void GAEncoding_Ass1::permutationRandomScrambleOld(Genome& gen)
 	}
 
 	std::vector<int> indices(shuffled_indices.begin(), shuffled_indices.end());
+	std::vector<int> shuffled_indices_v(shuffled_indices.begin(), shuffled_indices.end());
 	std::sort(indices.begin(), indices.end());
+	shuffled_indices_v = shuffleVector(shuffled_indices_v);
 
 	unsigned int counter = 0;
-	for (auto& n : shuffled_indices)
+	for (auto& n : shuffled_indices_v)
 	{
 		permutationSwap(gen, indices[counter], n);
 		counter++;
@@ -856,7 +860,7 @@ void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated)
 	// Applies a random mutation to random offspring with a mutation probability mutationProb
 
 	// Generate distribution
-	std::uniform_int_distribution<unsigned int> distribution(0, 2);
+	std::uniform_int_distribution<unsigned int> distribution(0, 1);
 
 	// Pick from distribution to select mutation to use
 	unsigned int mutation_to_use; 
@@ -881,25 +885,26 @@ void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated)
 		{
 			if (accelerated)
 			{
-				permutationRandomInvertOld(m_offspring[i]);
-			}
-			else
-			{
-				permutationRandomInvert(m_offspring[i], mutationProb);
-			}
-		}
-		else if (mutation_to_use == 2)
-		{
-			if (accelerated)
-			{
 				permutationRandomPointMutationOld(m_offspring[i]);
 			}
 			else
 			{
 				permutationRandomPointMutation(m_offspring[i], mutationProb);
 			}
-			
 		}
+		//else if (mutation_to_use == 2)
+		//{
+		//
+		//	if (accelerated)
+		//	{
+		//		permutationRandomInvertOld(m_offspring[i]);
+		//	}
+		//	else
+		//	{
+		//		permutationRandomInvert(m_offspring[i], mutationProb);
+		//	}
+		//	
+		//}
 	}
 	// Add the elite to the offspring pool
 	m_offspring.insert(m_offspring.end(), m_elite.begin(), m_elite.end());
@@ -1085,16 +1090,25 @@ void GAEncoding_Ass1::loadPopulation(std::string file_name, unsigned int startin
 			genome.setFitness(fitnessOfGenome(genome));
 			m_population.push_back(genome);
 			genome.genome_encoding_2b2_int.clear();
+
+			if (m_population.size() == starting_pop_size)
+			{
+				break;
+			}
 		}
 		fin.close();
 	}
 
 	// Set the population size attribute of the encoding
 	unsigned int remaining_genomes = starting_pop_size - m_population.size();
-	for (unsigned int i = 0; i < remaining_genomes; i++)
+	if (remaining_genomes > 0)
 	{
-		m_population.push_back(returnRandomlyInitializedGenome());
+		for (unsigned int i = 0; i < remaining_genomes; i++)
+		{
+			m_population.push_back(returnRandomlyInitializedGenome());
+		}
 	}
+
 
 
 }
