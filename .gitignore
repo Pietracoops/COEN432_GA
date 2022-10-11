@@ -39,4 +39,5 @@ COEN432_Code/x64
 
 # Log files
 log/
-population_*
+
+COEN432_Code/populations

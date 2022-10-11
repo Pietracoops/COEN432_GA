@@ -54,10 +54,10 @@ void GeneticAlgorithm::recombination(float crossoverProb, int goalOffspringSize,
 	genetic_algo_log() << "Recombination time using crossover prob [" << crossoverProb << "]: " << m_watch.Stop() << std::endl;
 }
 
-void GeneticAlgorithm::mutation(float mutationProb)
+void GeneticAlgorithm::mutation(float mutationProb, bool accelerated)
 {
 	m_watch.Start();
-	m_encoding->mutation(mutationProb);
+	m_encoding->mutation(mutationProb, accelerated);
 	genetic_algo_log() << "Mutation time using mutationProb [" << mutationProb << "]: " << m_watch.Stop() << std::endl;
 }
 
@@ -158,7 +158,7 @@ void GeneticAlgorithm::runGA(std::string population_file)
 		recombination(m_params.crossoverProb, m_params.goalOffspringSize, m_params.skipCrossover);
 
 		genetic_algo_log() << "Starting mutation procedure... " << std::endl;
-		mutation(m_params.mutationProb);
+		mutation(m_params.mutationProb, m_params.accelerated);
 
 		// Select the survivors
 		genetic_algo_log() << "Starting survivor selection... " << std::endl;
@@ -192,6 +192,16 @@ void GeneticAlgorithm::runGA(std::string population_file)
 				stats.tuneParameter(m_params.mutationProb, 0.8f, 0.2f, 1.0f);
 				stats.tuneParameter(m_params.randomness, 1.05f, 0.0f, 0.2f);
 				stats.m_stagnation_modified_countdown = stats.m_stagnation_countdown_val; // Note down the generation where we tuned
+			}
+		}
+
+
+		// Save network every number of generations
+		if (m_params.save_every_x_generation)
+		{
+			if (m_generation % m_params.save_every_x_generation_val == 0)
+			{
+				m_encoding->savePopulation();
 			}
 		}
 

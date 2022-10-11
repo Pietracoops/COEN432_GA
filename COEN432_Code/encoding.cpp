@@ -71,8 +71,11 @@ std::vector<int> GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
 		{
 			continue;
 		}
-		
-		if (m_map_index[genes[i][0]].right != m_map_index[genes[i + 1][0]].left)
+		Tile T1 = m_map_index[genes[i][0]];
+		T1.rotate(genes[i][1]);
+		Tile T2 = m_map_index[genes[i + 1][0]];
+		T2.rotate(genes[i + 1][1]);
+		if (T1.right != T2.left)
 		{
 			row_mismatches++;
 		}
@@ -82,8 +85,11 @@ std::vector<int> GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
 	int col_mismatches = 0;
 	for (unsigned int i = 0; i < genome.getSize() - WIDTH; i++)
 	{
-
-		if (m_map_index[genes[i][0]].bottom != m_map_index[genes[i + WIDTH][0]].top)
+		Tile T1 = m_map_index[genes[i][0]];
+		T1.rotate(genes[i][1]);
+		Tile T2 = m_map_index[genes[i + WIDTH][0]];
+		T2.rotate(genes[i + WIDTH][1]);
+		if (T1.bottom != T2.top)
 		{
 			col_mismatches++;
 		}
@@ -689,6 +695,74 @@ void GAEncoding_Ass1::permutationRandomPointMutation(Genome& gen, float mutation
 	gen.setFitness(fitnessOfGenome(gen));
 }
 
+void GAEncoding_Ass1::permutationRandomPointMutationOld(Genome& gen)
+{
+	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
+	std::uniform_int_distribution<unsigned int> distribution_rot(1, 3);
+
+	// Pick from distribution
+	unsigned int index = distribution(gen_mt);
+	unsigned int rot = distribution_rot(gen_mt);
+
+	gen.genome_encoding_2b2_int[index][1] = rot; // Randomize the rotation
+	gen.setFitness(fitnessOfGenome(gen));
+}
+
+void GAEncoding_Ass1::permutationRandomInvertOld(Genome& gen)
+{
+	// Generate distribution
+	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
+
+	// Pick from distribution
+	unsigned int size_of_indices = distribution(gen_mt);
+
+	std::set<int> shuffled_indices_set;
+	while (shuffled_indices_set.size() != size_of_indices)
+	{
+		shuffled_indices_set.insert(distribution(gen_mt));
+	}
+
+	std::vector<int> indices(shuffled_indices_set.begin(), shuffled_indices_set.end());
+
+	std::sort(indices.begin(), indices.end());
+	std::vector<int> shuffled_indices = indices;
+	std::sort(shuffled_indices.begin(), shuffled_indices.end(), std::greater<int>());
+
+	for (unsigned int i = 0; i < indices.size(); i++)
+	{
+		permutationSwap(gen, indices[i], shuffled_indices[i]);
+	}
+
+	gen.setFitness(fitnessOfGenome(gen));
+}
+
+void GAEncoding_Ass1::permutationRandomScrambleOld(Genome& gen)
+{
+	// Generate distribution
+	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
+
+	// Pick from distribution
+	unsigned int size_of_indices = distribution(gen_mt);
+
+	std::set<int> shuffled_indices;
+	while (shuffled_indices.size() != size_of_indices)
+	{
+		shuffled_indices.insert(distribution(gen_mt));
+	}
+
+	std::vector<int> indices(shuffled_indices.begin(), shuffled_indices.end());
+	std::sort(indices.begin(), indices.end());
+
+	unsigned int counter = 0;
+	for (auto& n : shuffled_indices)
+	{
+		permutationSwap(gen, indices[counter], n);
+		counter++;
+	}
+	gen.setFitness(fitnessOfGenome(gen));
+}
+
+
 void GAEncoding_Ass1::permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio)
 {
 	// Generate distribution
@@ -790,7 +864,7 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 
 }
 
-void GAEncoding_Ass1::mutation(float mutationProb)
+void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated)
 {
 	// Applies a random mutation to random offspring with a mutation probability mutationProb
 
@@ -806,18 +880,40 @@ void GAEncoding_Ass1::mutation(float mutationProb)
 
 		if (mutation_to_use == 0)
 		{
-			permutationRandomScramble(m_offspring[i], mutationProb);
+			if (accelerated)
+			{
+				permutationRandomScrambleOld(m_offspring[i]);
+			}
+			else
+			{
+				permutationRandomScramble(m_offspring[i], mutationProb);
+			}
+			
 		}
 		else if (mutation_to_use == 1)
 		{
-			permutationRandomInvert(m_offspring[i], mutationProb);
+			if (accelerated)
+			{
+				permutationRandomInvertOld(m_offspring[i]);
+			}
+			else
+			{
+				permutationRandomInvert(m_offspring[i], mutationProb);
+			}
 		}
 		else if (mutation_to_use == 2)
 		{
-			permutationRandomPointMutation(m_offspring[i], mutationProb);
+			if (accelerated)
+			{
+				permutationRandomPointMutationOld(m_offspring[i]);
+			}
+			else
+			{
+				permutationRandomPointMutation(m_offspring[i], mutationProb);
+			}
+			
 		}
 	}
-
 	// Add the elite to the offspring pool
 	m_offspring.insert(m_offspring.end(), m_elite.begin(), m_elite.end());
 }

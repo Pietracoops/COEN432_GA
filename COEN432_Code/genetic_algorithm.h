@@ -45,6 +45,7 @@ private:
 
 		// Mutation parameters
 		float mutationProb;
+		bool accelerated;
 
 		// Survivor selection parameters
 		int survivorpolicy;
@@ -62,6 +63,8 @@ private:
 
 		// Misc
 		bool save_population;
+		bool save_every_x_generation = true;
+		int save_every_x_generation_val = 500;
 
 	};
 
@@ -84,7 +87,7 @@ public:
 	void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement,
 						float randomness, float diversity_ratio, float purge_ratio);											// Select Parents
 	void recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover = false);									// Crossover 
-	void mutation(float mutationProb);																							// Mutation
+	void mutation(float mutationProb, bool accelerated);																							// Mutation
 	void survivorSelection(int policy, int survivorSize);																									// Select Survivors
 
 	bool terminationConditions(int currentGen, int maxGeneration = -1, double currRuntime = -1, double maxRuntime = -1, int targetFitness = -1);
