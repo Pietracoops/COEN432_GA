@@ -66,7 +66,7 @@ int main()
 	GA.m_params.save_every_x_generation_val = 500;
 
 	GA.runGA("population_2022-10-11-01-13-30.txt");
-
+	
 
 	return 0;
 }

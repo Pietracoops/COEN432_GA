@@ -21,25 +21,12 @@ GAEncoding_Ass1::Tile::Tile(std::string constructor)
 
 void GAEncoding_Ass1::Tile::rotate(unsigned int rot_value)
 {
-	if (rot_value > 3) rot_value = 3;
+	std::string current[4] = { top, right, bottom, left };
 
-	std::vector<std::string> arr{ top, right, bottom, left };
-	std::vector<std::string> tmp;
-
-	for (unsigned int i = rot_value; i < arr.size(); i++)
-	{
-		tmp.push_back(arr[i]);
-	}
-
-	for (unsigned int i = 0; i < rot_value; i++)
-	{
-		tmp.push_back(arr[i]);
-	}
-
-	top		= tmp[0];
-	right	= tmp[1];
-	bottom	= tmp[2];
-	left	= tmp[3];
+	top		= current[(0 + rot_value) % 4];
+	right	= current[(1 + rot_value) % 4];
+	bottom	= current[(2 + rot_value) % 4];
+	left	= current[(3 + rot_value) % 4];
 }
 
 void GAEncoding_Ass1::Tile::printTile()
@@ -698,7 +685,7 @@ void GAEncoding_Ass1::permutationRandomPointMutation(Genome& gen, float mutation
 void GAEncoding_Ass1::permutationRandomPointMutationOld(Genome& gen)
 {
 	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
-	std::uniform_int_distribution<unsigned int> distribution_rot(1, 3);
+	std::uniform_int_distribution<unsigned int> distribution_rot(0, 3);
 
 	// Pick from distribution
 	unsigned int index = distribution(gen_mt);
