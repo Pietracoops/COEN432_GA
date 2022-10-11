@@ -20,7 +20,7 @@ int main()
 
 
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 10000;
+	unsigned int POPULATION_SIZE = 500;
 
 	//// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
@@ -52,7 +52,7 @@ int main()
 	GA.m_params.survivorsize = POPULATION_SIZE;
 
 	// --- Termination Condition Parameters
-	GA.m_params.maxGeneration = 2;
+	GA.m_params.maxGeneration = 1000000;
 	GA.m_params.maxRuntime = 600; // seconds
 	GA.m_params.targetFitness = 10;
 
