@@ -10,3 +10,11 @@ std::string Genome::getGenomeString()
 
 	return output;
 }
+
+void Genome::setFitness(std::vector<int> f)
+{ 
+	fitness = f[0];
+	row_mismatches = f[1];
+	col_mismatches = f[2]; 
+
+}

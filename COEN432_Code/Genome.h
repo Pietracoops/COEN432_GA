@@ -25,7 +25,7 @@ public:
 	const std::vector<std::vector<int>>&  getEncoding() const { return genome_encoding_2b2_int; }
 
 	// Setters
-	void setFitness(std::vector<int> f) { fitness = f[0]; row_mismatches = f[1]; col_mismatches = f[2]; }
+	void setFitness(std::vector<int> f);
 
 	bool operator< (const Genome& other) const { return fitness < other.fitness; }
 	bool operator== (const Genome& rhs) { return (fitness == rhs.fitness) && (genome_encoding_2b2_int == rhs.genome_encoding_2b2_int); }

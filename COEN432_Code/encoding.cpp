@@ -880,8 +880,8 @@ std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, G
 	for (unsigned int i = 0; i < cross_indices.size(); i++)
 	{
 		
-		permutationSwap(child1, cross_indices[0], map_parent2[parent1.genome_encoding_2b2_int[cross_indices[0]][0]]);
-		permutationSwap(child2, cross_indices[0], map_parent1[parent2.genome_encoding_2b2_int[cross_indices[0]][0]]);
+		permutationSwap(child1, cross_indices[0], map_parent1[parent2.genome_encoding_2b2_int[cross_indices[0]][0]]);
+		permutationSwap(child2, cross_indices[0], map_parent2[parent1.genome_encoding_2b2_int[cross_indices[0]][0]]);
 	}
 
 	child1.setFitness(fitnessOfGenome(child1));

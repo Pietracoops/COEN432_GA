@@ -24,6 +24,19 @@ public:
 	virtual std::vector<Genome> parentSelectionFitnessProportionate(std::vector<Genome> population, float selection_ratio) = 0;
 	virtual std::vector<Genome> parentSelectionTournament(std::vector<Genome> population, float selection_ratio, uint32_t window_size, bool replacement) = 0;
 
+	// Mutation Functions
+	virtual void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) = 0;
+	virtual void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2) = 0;
+	virtual void permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos) = 0;
+	virtual void permutationRandomInsert(Genome& gen) = 0;
+	virtual void permutationScramble(Genome& gen, std::vector<int> indices) = 0;
+	virtual void permutationRandomScramble(Genome& gen, float mutation_ratio) = 0;
+	virtual void permutationInvert(Genome& gen, std::vector<int> indices) = 0;
+	virtual void permutationRandomInvert(Genome& gen, float mutation_ratio) = 0;
+	virtual void permutationPointMutation(Genome& gen, unsigned int pos, unsigned int rot) = 0;
+	virtual void permutationRandomPointMutation(Genome& gen, float mutation_ratio) = 0;
+	virtual void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio) = 0;
+
 	virtual void savePopulation() = 0;
 	virtual void loadPopulation(std::string file_name) = 0;
 
@@ -97,17 +110,17 @@ public:
 	std::vector<Genome> uPlusGammaPolicy(int survivorSize = 0);
 
 	// Mutation Functions
-	void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps);
-	void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2);
-	void permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos);
-	void permutationRandomInsert(Genome& gen);
-	void permutationScramble(Genome& gen, std::vector<int> indices);
-	void permutationRandomScramble(Genome& gen, float mutation_ratio);
-	void permutationInvert(Genome& gen, std::vector<int> indices);
-	void permutationRandomInvert(Genome& gen, float mutation_ratio);
-	void permutationPointMutation(Genome& gen, unsigned int pos, unsigned int rot);
-	void permutationRandomPointMutation(Genome& gen, float mutation_ratio);
-	void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio);
+	void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) override;
+	void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2) override;
+	void permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos) override;
+	void permutationRandomInsert(Genome& gen) override;
+	void permutationScramble(Genome& gen, std::vector<int> indices) override;
+	void permutationRandomScramble(Genome& gen, float mutation_ratio) override;
+	void permutationInvert(Genome& gen, std::vector<int> indices) override;
+	void permutationRandomInvert(Genome& gen, float mutation_ratio) override;
+	void permutationPointMutation(Genome& gen, unsigned int pos, unsigned int rot) override;
+	void permutationRandomPointMutation(Genome& gen, float mutation_ratio) override;
+	void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio) override;
 
 	// Crossover Functions
 	std::vector<Genome> singlePointCrossover(Genome& parent1, Genome& parent2);
