@@ -247,7 +247,7 @@ void GAEncoding_Ass1::parentSelection(int strategy,
 		parents.push_back(returnRandomlyInitializedGenome());
 	}
 
-	//// If we are struggling to achieve desired diversity, soft reset
+	// If we are struggling to achieve desired diversity, soft reset
 	//if (((m_max_fitness - m_min_fitness) / m_max_fitness) < diversity_ratio)
 	//{
 	//	permutationRandomDiversify(parents, purge_ratio);
@@ -731,6 +731,11 @@ Genome GAEncoding_Ass1::returnRandomlyInitializedGenome()
 void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover)
 {
 
+	if (skipCrossover)
+	{
+		m_offspring = m_parents;
+	}
+
 	// Add the elites back to the parent pool so that they have a chance to reproduce
 	for (auto elite : m_elite)
 	{
@@ -738,12 +743,6 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 		{
 			m_parents.push_back(elite);
 		}
-	}
-
-
-	if (skipCrossover)
-	{
-		m_offspring = m_parents;
 	}
 
 	int breedingsize = m_parents.size() * crossoverProb;

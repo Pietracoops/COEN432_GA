@@ -103,6 +103,14 @@ std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937 
 
 	// Get number of rows and columns separating the two indices
 	int num_cols = (index2 % col_dim - index1 % col_dim);
+	if (num_cols < 0)
+	{
+		// Case where column num of index 1 is greater than index 2
+		num_cols = abs(num_cols);
+		index1 = index1 - num_cols;
+		index2 = index2 + num_cols;
+	}
+
 	int num_rows = index2 / col_dim - index1 / col_dim;
 
 	std::vector<unsigned int> indices{};

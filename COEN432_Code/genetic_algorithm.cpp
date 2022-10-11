@@ -164,7 +164,7 @@ void GeneticAlgorithm::runGA(std::string population_file)
 		genetic_algo_log() << "Starting survivor selection... " << std::endl;
 		survivorSelection();
 
-		Logger("GENERATION: " + std::to_string(m_generation) 
+		Logger("GENERATION: " + std::to_string(m_generation)
 			+ " ;AVERAGE_FITNESS: " + std::to_string(m_encoding->getAverageFitness(m_encoding->m_population))
 			+ " ;MAX_FITNESS " + std::to_string(m_encoding->m_max_fitness)
 			+ " ;MEDIAN_FITNESS " + std::to_string(m_encoding->m_med_fitness)
@@ -172,8 +172,8 @@ void GeneticAlgorithm::runGA(std::string population_file)
 			+ " ;STAGNATION_DETECTED " + std::to_string(stats.stagnation_detected)
 			+ " ;MUTATION_PROB " + std::to_string(m_params.mutationProb)
 			+ " ;CROSSOVER_PROB " + std::to_string(m_params.crossoverProb)
-			+ " ;RANDOMNESS " + std::to_string(m_params.randomness)
-			+ ";GENOME " + m_encoding->m_elite[0].getGenomeString());
+			+ " ;RANDOMNESS " + std::to_string(m_params.randomness));
+
 
 		genetic_algo_log() << "========================== END OF GENERATION =============================== " << std::endl;
 
