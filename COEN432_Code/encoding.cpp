@@ -900,9 +900,9 @@ void GAEncoding_Ass1::permutationSlide(Genome& gen)
 	// Get a random bounding box in a genome
 	std::vector<unsigned int> bbox1 = getBoundingBox(WIDTH, HEIGHT, gen_mt);
 
-	//// Get bounding box dimensions
-	unsigned int bbrows = bbox1.back() / WIDTH - bbox1.front() / WIDTH;
-	unsigned int bbcols = (bbox1.back() % WIDTH - bbox1.front() % WIDTH);
+	// Get bounding box dimensions
+	unsigned int bbrows = bbox1.back() / WIDTH - bbox1.front() / WIDTH + 1;
+	unsigned int bbcols = (bbox1.back() % WIDTH - bbox1.front() % WIDTH) + 1;
 
 	int x1 = bbox1.front() % WIDTH;
 	int y1 = bbox1.front() / WIDTH;
@@ -919,22 +919,70 @@ void GAEncoding_Ass1::permutationSlide(Genome& gen)
 	int dir_y = direction(gen_mt); // 0 is up 1 is down
 
 	if ((dir_y == 0) && (y1 > 0)) {
-
+		std::uniform_int_distribution<> translation(0, y1);
+		slide_y = -1 * translation(gen_mt);
 	}
-	else if ((dir_y == 1) && (y1 < HEIGHT))
+	else if ((dir_y == 1) && (y2 < HEIGHT))
 	{
-
+		std::uniform_int_distribution<> translation(y2, HEIGHT);
+		slide_y = translation(gen_mt);
 	}
 	else {
 		slide_y = 0;
 	}
 
+	// Generate an x slide
+	int dir_x = direction(gen_mt); // 0 is left 1 is right
+	if ((dir_x == 0) && (x1 > 0)) {
+		std::uniform_int_distribution<> translation(0, x1);
+		slide_x = -1 * translation(gen_mt);
+	}
+	else if ((dir_x == 1) && (x2 < HEIGHT))
+	{
+		std::uniform_int_distribution<> translation(x2, HEIGHT);
+		slide_x = translation(gen_mt);
+	}
+	else {
+		slide_x = 0;
+	}
 
-	//// Generate an x slide
+	// Apply slides
+	std::vector<unsigned int> bbox2;
+	for (int i = 0; i < bbox1.size(); i++)
+	{
+		bbox2.push_back(bbox1[i] + slide_x + slide_y * WIDTH);
+	}
 
+	std::map<int, int> map_1_2;
+	std::map<int, int> map_left_over;
 
-	std::vector<unsigned int> bbox2 = getBoundingBox(WIDTH, HEIGHT, gen_mt, -1, -1, -1, bbcols, bbrows);
+	// Build the first map
+	for (int i = 0; i < bbox1.size(); i++) 
+	{
+		map_1_2[bbox1[i]] = bbox2[i];
+	}
 
+	// Build the map for overlapping indices
+	for (auto const& x : map_1_2)
+	{
+
+		if (map_1_2.find(x.second) != map_1_2.end())
+		{
+
+			map_left_over[x.first] = map_1_2[x.second];
+			map_1_2.erase(map_1_2.find(x.first));
+		}
+
+		permutationSwap(gen, x.first, x.second);
+	}
+
+	// Perform the swaps in map_left_over
+	
+	for (auto const& x : map_left_over)
+	{
+		permutationSwap(gen, x.first, x.second);
+	}
+	
 }
 
 

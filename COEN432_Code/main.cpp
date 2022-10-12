@@ -3,12 +3,52 @@
 #include "encoding.h"
 #include "genetic_algorithm.h"
 
+#include <numeric>
+
 int main()
 {
 	// ############### Initialize the Encoding based on the input file
 
 	GAEncoding_Ass1 Encoding_Ass1("Ass1/Ass1Input.txt");
 	GAEncoding* Encoding = &Encoding_Ass1;
+
+
+	Genome test;
+	std::vector<std::vector<int>> v;
+	
+	int value = 0;
+	for (int i = 0; i < 64; i++) { 
+		std::vector<int> pair{ value, 0 };
+		v.push_back(pair); 
+		value++; 
+	}
+
+
+	for (int i = 0; i < v.size(); i++)
+	{
+		if ((i % 8) == 0)
+		{
+			std::cout << std::endl;
+		}
+
+		std::cout << v[i][0] << ", ";
+	}
+
+	test.genome_encoding_2b2_int = v; // vector with 100 ints.
+
+	Encoding->permutationSlide(test);
+
+	for (int i = 0; i < test.genome_encoding_2b2_int.size(); i++)
+	{
+		if ((i % 8) == 0)
+		{
+			std::cout << std::endl;
+		}
+
+		std::cout << test.genome_encoding_2b2_int[i][0] << ", ";
+	}
+
+	return 0;
 
 	// ############### Init Parameters
 	unsigned int POPULATION_SIZE = 500;
