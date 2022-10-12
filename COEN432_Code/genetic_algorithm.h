@@ -7,76 +7,54 @@
 #include "timer.h"
 #include <filesystem>
 
-class NetworkStatistics
-{
-
-private:
-	int stagnation_window = 10;
-	int fitnessRepeats = 0;
-	int previousFitness = 0;
-public:
-	NetworkStatistics();
-	std::vector<int> m_max_fitness;
-	std::vector<int> m_med_fitness;
-	std::vector<int> m_min_fitness;
-
-	int m_stagnation_countdown_val = 10;
-	int m_stagnation_modified_countdown;
-	bool stagnation_detected;
-	/*bool checkStagnation(int generation_range, int generation, int breath);*/
-	bool checkStagnation(int currentFitness, int generation);
-	void tuneParameter(float& parameter, const float tune, const float clamp_min, const float clamp_max);
-	void setStagnationWindow(int stagnation_window);
-};
-
-
 class GeneticAlgorithm
 {
 
 private:
-	struct Parameters { // Have this be initialized using a json file
+	struct Parameters { // Have this be initialized using a config file if time permits
+
 		// Parent Selection Params
-		unsigned int population_size;	// Size of population
-		int strategy;					// 0 for fitness proportionate (roulette), 1 for tournament
-		uint32_t carry_over;			// Elitism, number of genomes to carry over
-		float selection_ratio;			// Number of genomes to select from parents
-		uint32_t window_size;			// Specific to tournament selection, number of genomes in local tournament
-		bool replacement;				// Specific to tournament selection - if replacement should be used
-		float randomness;				// The ratio of randomly initialized new parents that should be added to the pool
-		float diversity_ratio;			// threshold of Max_fitness - Min_fitness / Max_fitness
-		float purge_ratio;				// If diversity ratio is reached, purge_ratio is ratio of pop to re-initialize
+		unsigned int population_size;			// Size of population
+		int strategy;							// 0 for fitness proportionate (roulette), 1 for tournament
+		uint32_t carry_over;					// Elitism, number of genomes to carry over
+		float selection_ratio;					// Number of genomes to select from parents
+		uint32_t window_size;					// Specific to tournament selection, number of genomes in local tournament
+		bool replacement;						// Specific to tournament selection - if replacement should be used
+		float randomness;						// The ratio of randomly initialized new parents that should be added to the pool
+		float diversity_ratio;					// threshold of Max_fitness - Min_fitness / Max_fitness
+		float purge_ratio;						// If diversity ratio is reached, purge_ratio is ratio of pop to re-initialize
 
 		// Recombination parameters
-		float crossoverProb;
-		bool skipCrossover;
-		int goalOffspringSize;
+		float crossoverProb;					// Probability of a parent to be selected for crossover reproduction
+		bool skipCrossover;						// Skip crossover step
+		int goalOffspringSize;					// Desired size of offspring pool
 
 		// Mutation parameters
-		float mutationProb;
-		bool accelerated;
+		float mutationProb;						// Probability of a gene in a genome to get mutated
+		bool accelerated;						// Accelerated mutation - random mutation sizes applied to genomes (accelerated climb rate early on)
 
 		// Survivor selection parameters
-		int survivorpolicy;
-		int survivorsize;
+		int survivorpolicy;						// 0 is ufromgamma, 1 is uplusgamma, 2 is uplusgamma fuds
+		int survivorsize;						// Desired size of population after the generation loop (generally population size)
 
 		// Termination Condition Parameters
-		int maxGeneration;
-		double maxRuntime;
-		int targetFitness;
+		int maxGeneration;						// Max number of generation loops to perform
+		double maxRuntime;						// Max run time in seconds
+		int targetFitness;						// Target fitness for termination condition
 
 		// Stagnation mitigation parameters
-		float random_parent_proportion;
-		bool inject_parents;
+		bool inject_parents;					// Introduce random parents into the population
+		float random_parent_proportion;			// Ratio of new parents to be introduce (with respect to the current parent size)
+
 
 		// Stats
-		bool dynamic_hyper_parameters;	// Dynamically tune Mutation Probability and Crossover Probability
-		int stagnation_check;			// Check if we have stagnated
-		int stagnation_breath;			// Number of generations to wait before addressing stagnation again
+		bool dynamic_hyper_parameters;			// Dynamically tune Mutation Probability and Crossover Probability
+		int stagnation_check;					// The number of generations to wait before flagging a stagnation
 
 		// Misc
-		bool save_population;
-		bool save_every_x_generation = true;
-		int save_every_x_generation_val = 500;
+		bool save_population;					// Flag to save the population
+		bool save_every_x_generation = true;	// Flag to save population every number of generations
+		int save_every_x_generation_val = 500;	// Specify number of generations to save the population
 
 
 	};

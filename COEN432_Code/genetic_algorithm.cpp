@@ -20,32 +20,24 @@ GeneticAlgorithm::GeneticAlgorithm(GAEncoding *encoding, int population_size, st
 
 }
 
-
 GeneticAlgorithm::~GeneticAlgorithm()
 {
-
+	// Destructor
 }
 
 void GeneticAlgorithm::initializePopulation(int population_size)
 {
 	m_watch.Start();
-	// This is where we specify our initialization parameters
-	genetic_algo_log() << "Initializing Population with size [" << population_size << "]" << std::endl;
-
-	// Initialize the population randomly and also collects their fitness
-	m_encoding->initializaPopulation(population_size);
-
-	genetic_algo_log() << "elapsed time: " << m_watch.Stop() << std::endl;
+	m_encoding->initializaPopulation(population_size); // Initialize the population randomly and also collect their fitness
+	genetic_algo_log() << "Initializing Population with size [" << population_size << "]" << " - elapsed time: " << m_watch.Stop() << std::endl;
 }
-
 
 void GeneticAlgorithm::parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness, float diversity_ratio, float purge_ratio)
 {
 	m_watch.Start();
-	m_encoding->parentSelection(strategy, carry_over, selection_ratio, window_size, replacement, randomness, diversity_ratio, purge_ratio);
+	m_encoding->parentSelection(strategy, carry_over, selection_ratio, window_size, replacement, randomness);
 	genetic_algo_log() << "Parent Selection time using strategy [" << strategy << "]: " << m_watch.Stop() << std::endl;
 }
-
 
 void GeneticAlgorithm::recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover)
 {
@@ -79,7 +71,6 @@ bool GeneticAlgorithm::terminationConditions(int currentGen, int maxGeneration, 
 std::string GeneticAlgorithm::printParameters()
 {
 	std::string output;
-
 	output = "\n===========================================================\n";
 	output += "The GA algorithm has the following parameters: \n";
 	output += "Population Size: " + std::to_string(m_encoding->m_population.size()) + '\n';
@@ -90,8 +81,6 @@ std::string GeneticAlgorithm::printParameters()
 	output += "window_size: " + std::to_string(m_params.window_size) + '\n';
 	output += "replacement: " + std::to_string(m_params.replacement) + '\n';
 	output += "randomness: " + std::to_string(m_params.randomness) + '\n';
-	output += "diversity_ratio: " + std::to_string(m_params.diversity_ratio) + '\n';
-	output += "purge_ratio: " + std::to_string(m_params.purge_ratio) + '\n';
 	output += "### Recombination Parameters ### \n";
 	output += "crossoverProb: " + std::to_string(m_params.crossoverProb) + '\n';
 	output += "skipCrossover: " + std::to_string(m_params.skipCrossover) + '\n';
@@ -125,20 +114,24 @@ std::string GeneticAlgorithm::printParameters()
 
 void GeneticAlgorithm::runGA(std::string population_file)
 {
+	// This is the main GA LOOP
 
 	if (!population_file.empty())
 	{
+		// Load population from file if we want to continue a previous run
 		m_encoding->loadPopulation(population_file, m_params.population_size);
 	}
 
+	// Print parameters to the logger to identify configuration of last run
 	Logger(printParameters());
+
+	// Start the timer
 	m_time_elapsed_timer.Start();
 	
-
 	// Set the stagnation window
 	stats.setStagnationWindow(m_params.stagnation_check);
 
-	// Run the GA loop as long as the terminationCondition does not evaluate to true
+	// Run the GA loop so long as the terminationCondition does not evaluate to true
 	while (!terminationConditions(m_generation,
 		m_params.maxGeneration,
 		m_time_elapsed_timer.Stop(),
@@ -148,7 +141,7 @@ void GeneticAlgorithm::runGA(std::string population_file)
 
 		genetic_algo_log() << "======================== GENERATION "<< m_generation << " =============================== " << std::endl;
 
-		// Pick parents from the current population
+		// Begin the loop with parent selection
 		genetic_algo_log() << "Starting parent selection for generation: " << m_generation << std::endl;
 		parentSelection(m_params.strategy,
 			m_params.carry_over,
@@ -173,6 +166,7 @@ void GeneticAlgorithm::runGA(std::string population_file)
 		genetic_algo_log() << "Starting recombination procedure..." << std::endl;
 		recombination(m_params.crossoverProb, m_params.goalOffspringSize, m_params.skipCrossover);
 
+		// Apply mutations to the population
 		genetic_algo_log() << "Starting mutation procedure... " << std::endl;
 		mutation(m_params.mutationProb, m_params.accelerated);
 
@@ -180,7 +174,7 @@ void GeneticAlgorithm::runGA(std::string population_file)
 		genetic_algo_log() << "Starting survivor selection... " << std::endl;
 		survivorSelection(m_params.survivorpolicy, m_params.survivorsize);
 
-
+		// Create string to log out to LOG
 		std::string logger_str = "GENERATION: " + std::to_string(m_generation)
 			+ " ;AVERAGE_FITNESS: " + std::to_string(m_encoding->getAverageFitness(m_encoding->m_population))
 			+ " ;MAX_FITNESS " + std::to_string(m_encoding->m_max_fitness)
@@ -204,22 +198,22 @@ void GeneticAlgorithm::runGA(std::string population_file)
 		stats.m_max_fitness.push_back(m_encoding->m_max_fitness);
 		stats.m_min_fitness.push_back(m_encoding->m_min_fitness);
 
-		// Tuneable hyperparameters
+		// Dynamically Tunee hyperparameters based on fitness
 		if (m_params.dynamic_hyper_parameters)
 		{
 			if (stats.stagnation_detected)
 			{
-				//stats.tuneParameter(m_params.crossoverProb, 0.8f, 0.0f, 0.9f);
-				//stats.tuneParameter(m_params.mutationProb, 1.1f, 0.2f, 1.0f);
-				stats.tuneParameter(m_params.crossoverProb, 1.1f, 0.0f, 0.9f);
-				stats.tuneParameter(m_params.mutationProb, 0.8f, 0.2f, 1.0f);
-				stats.tuneParameter(m_params.randomness, 1.05f, 0.0f, 0.2f);
+				//stats.tuneParameter(m_params.crossoverProb, 0.8f, 0.0f, 0.9f); // Experimenting with a decreasing crossoverprob
+				//stats.tuneParameter(m_params.mutationProb, 1.1f, 0.2f, 1.0f);  // Experimenting with an increasing mutationProb
+				stats.tuneParameter(m_params.crossoverProb, 1.1f, 0.0f, 0.9f);	 // Experimenting with an increasing crossoverprob
+				stats.tuneParameter(m_params.mutationProb, 0.8f, 0.2f, 1.0f);	 // Experimenting with a decreasing mutationprob
+				stats.tuneParameter(m_params.randomness, 1.05f, 0.0f, 0.2f);	 // Experimenting with an increasing randomness
 				stats.m_stagnation_modified_countdown = stats.m_stagnation_countdown_val; // Note down the generation where we tuned
 			}
 		}
 
 
-		// Save network every number of generations
+		// Save population every number of generations
 		if (m_params.save_every_x_generation)
 		{
 			if (m_generation % m_params.save_every_x_generation_val == 0)
@@ -232,89 +226,9 @@ void GeneticAlgorithm::runGA(std::string population_file)
 		m_generation++;
 	}
 
-
+	// Save the population after generation loop has been complete
 	if (m_params.save_population)
 	{
 		m_encoding->savePopulation();
 	}
-}
-
-
-//bool NetworkStatistics::checkStagnation(int generation_range, int generation, int breath)
-//{
-//	
-//	// Check Stagnation
-//	if (generation_range > m_max_fitness.size())
-//	{
-//		stagnation_detected = false;
-//		return false;
-//	}
-//
-//	if (m_max_fitness[(m_max_fitness.size() - generation_range)] != m_max_fitness.back())
-//	{
-//		stagnation_detected = false;
-//		m_stagnation_modified_countdown = -1;
-//		return false;
-//	}
-//
-//	if (m_stagnation_modified_countdown > 0)
-//	{
-//		return false;
-//	}
-//
-//	stagnation_detected = true;
-//	return true;
-//	
-//}
-
-bool NetworkStatistics::checkStagnation(int currentFitness, int generation)
-{
-
-	if (currentFitness == previousFitness)
-	{
-		fitnessRepeats++;
-	}
-	else {
-		fitnessRepeats = 0;
-	}
-
-	previousFitness = currentFitness;
-
-	if (fitnessRepeats > stagnation_window)
-	{
-		stagnation_detected = true;
-		fitnessRepeats = 0;
-	}
-	else {
-		stagnation_detected = false;
-	}
-
-	return stagnation_detected;
-	
-}
-
-void NetworkStatistics::tuneParameter(float& parameter, const float tune, const float clamp_min, const float clamp_max)
-{
-	if (parameter == 0.0f && tune > 1.0f)
-	{
-		parameter = 0.1f;
-	}
-	if (parameter > 0.0f && tune > 1.0f)
-	{
-		parameter += 0.05f;
-	}
-
-	parameter *= tune;
-	parameter = std::clamp(parameter, clamp_min, clamp_max);
-}
-
-NetworkStatistics::NetworkStatistics()
-{
-	stagnation_detected = false;
-	m_stagnation_modified_countdown = -1;
-}
-
-void NetworkStatistics::setStagnationWindow(int stagnation_window)
-{
-	this->stagnation_window = stagnation_window;
 }

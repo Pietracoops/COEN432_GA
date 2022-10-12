@@ -66,7 +66,6 @@ std::vector<Genome> shuffleVector(std::vector<Genome> vect)
 	return vect_tmp;
 }
 
-
 std::vector<std::string> splitString(std::string str, std::string delimiter)
 {
 	std::vector<std::string> output;
@@ -80,7 +79,6 @@ std::vector<std::string> splitString(std::string str, std::string delimiter)
 	output.push_back(str);
 	return output;
 }
-
 
 std::vector<std::vector<int>> vectTo2D(std::vector<int> vect_input, uint32_t row, uint32_t col)
 {
@@ -118,10 +116,10 @@ std::vector<std::vector<int>> vectSlide(std::vector<std::vector<int>>vect_input,
 	int bounding_box_width = indices[1][1] - indices[0][1];
 	int bounding_box_height = indices[1][0] - indices[0][0];
 	// Indices should be
-	// R1C1
-	// R2C2
+	// [Row1, Col1]
+	// [Row2, Col2]
 
-	// copy the second bounding box into its position in sliding_box
+	// Copy the second bounding box into its position in sliding_box
 	int starting_column = indices[0][1] + slide;
 	int starting_row = indices[0][0] + slide;
 	int ending_column = starting_column + bounding_box_width;
@@ -139,7 +137,7 @@ std::vector<std::vector<int>> vectSlide(std::vector<std::vector<int>>vect_input,
 
 	if (!vertical)
 	{
-		// this is for horizontal slide
+		// This is for horizontal slide
 		// Copy the non bounding box portion
 		for (int i = indices[0][0]; i < indices[1][0] + bounding_box_height; i++)
 		{
@@ -181,7 +179,6 @@ std::vector<std::vector<int>> vectSlide(std::vector<std::vector<int>>vect_input,
 
 	return sliding_box;
 }
-
 
 std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937& engine, int index1, int index2, int max_area, int max_cols, int max_rows)
 {
@@ -258,6 +255,13 @@ void printVector(std::vector<std::vector<int>> vect)
 	std::cout << std::endl;
 }
 
+void savePhenotypeToFile(std::string p, std::string filename)
+{
+	std::ofstream output(filename);
+	output << p;
+	output.close();
+}
+
 int CountRowMismatches(std::vector<std::string> first, std::vector<std::string> second, int row)
 {
 	int numberOfMismatches = 0;
@@ -287,14 +291,6 @@ int CountColumnMismatches(std::vector<std::string> first, std::vector<std::strin
 			numberOfMismatches++;
 
 	return numberOfMismatches;
-}
-
-
-void savePhenotypeToFile(std::string p, std::string filename)
-{
-	std::ofstream output(filename);
-	output << p;
-	output.close();
 }
 
 int ProfTest(std::string file_path)
