@@ -134,6 +134,10 @@ void GeneticAlgorithm::runGA(std::string population_file)
 	Logger(printParameters());
 	m_time_elapsed_timer.Start();
 	
+
+	// Set the stagnation window
+	stats.setStagnationWindow(m_params.stagnation_check);
+
 	// Run the GA loop as long as the terminationCondition does not evaluate to true
 	while (!terminationConditions(m_generation,
 		m_params.maxGeneration,
@@ -154,6 +158,16 @@ void GeneticAlgorithm::runGA(std::string population_file)
 			m_params.randomness,
 			m_params.diversity_ratio,
 			m_params.purge_ratio);
+
+		// Check for stagnation
+		stats.checkStagnation(m_encoding->m_max_fitness, m_generation);
+
+		// Inject parents if stagnated
+		if (stats.stagnation_detected && m_params.inject_parents)
+		{
+			genetic_algo_log() << "Stagnation detected. Injecting " << m_params.random_parent_proportion * m_encoding->m_parents.size() << " parents.";
+			m_encoding->injectParents(m_params.random_parent_proportion);
+		}
 
 		// Apply variation operators in order to create offspring
 		genetic_algo_log() << "Starting recombination procedure..." << std::endl;
@@ -190,10 +204,10 @@ void GeneticAlgorithm::runGA(std::string population_file)
 		stats.m_max_fitness.push_back(m_encoding->m_max_fitness);
 		stats.m_min_fitness.push_back(m_encoding->m_min_fitness);
 
-		// Check for stagnation
+		// Tuneable hyperparameters
 		if (m_params.dynamic_hyper_parameters)
 		{
-			if (stats.checkStagnation(m_params.stagnation_check, m_generation, m_params.stagnation_breath))
+			if (stats.stagnation_detected)
 			{
 				//stats.tuneParameter(m_params.crossoverProb, 0.8f, 0.0f, 0.9f);
 				//stats.tuneParameter(m_params.mutationProb, 1.1f, 0.2f, 1.0f);
@@ -226,30 +240,56 @@ void GeneticAlgorithm::runGA(std::string population_file)
 }
 
 
-bool NetworkStatistics::checkStagnation(int generation_range, int generation, int breath)
+//bool NetworkStatistics::checkStagnation(int generation_range, int generation, int breath)
+//{
+//	
+//	// Check Stagnation
+//	if (generation_range > m_max_fitness.size())
+//	{
+//		stagnation_detected = false;
+//		return false;
+//	}
+//
+//	if (m_max_fitness[(m_max_fitness.size() - generation_range)] != m_max_fitness.back())
+//	{
+//		stagnation_detected = false;
+//		m_stagnation_modified_countdown = -1;
+//		return false;
+//	}
+//
+//	if (m_stagnation_modified_countdown > 0)
+//	{
+//		return false;
+//	}
+//
+//	stagnation_detected = true;
+//	return true;
+//	
+//}
+
+bool NetworkStatistics::checkStagnation(int currentFitness, int generation)
 {
-	
-	// Check Stagnation
-	if (generation_range > m_max_fitness.size())
+
+	if (currentFitness == previousFitness)
 	{
+		fitnessRepeats++;
+	}
+	else {
+		fitnessRepeats = 0;
+	}
+
+	previousFitness = currentFitness;
+
+	if (fitnessRepeats > stagnation_window)
+	{
+		stagnation_detected = true;
+		fitnessRepeats = 0;
+	}
+	else {
 		stagnation_detected = false;
-		return false;
 	}
 
-	if (m_max_fitness[(m_max_fitness.size() - generation_range)] != m_max_fitness.back())
-	{
-		stagnation_detected = false;
-		m_stagnation_modified_countdown = -1;
-		return false;
-	}
-
-	if (m_stagnation_modified_countdown > 0)
-	{
-		return false;
-	}
-
-	stagnation_detected = true;
-	return true;
+	return stagnation_detected;
 	
 }
 
@@ -272,4 +312,9 @@ NetworkStatistics::NetworkStatistics()
 {
 	stagnation_detected = false;
 	m_stagnation_modified_countdown = -1;
+}
+
+void NetworkStatistics::setStagnationWindow(int stagnation_window)
+{
+	this->stagnation_window = stagnation_window;
 }

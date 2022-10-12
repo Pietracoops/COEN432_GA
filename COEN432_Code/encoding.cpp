@@ -394,19 +394,27 @@ void GAEncoding_Ass1::survivorSelection(int policy, int survivorSize)
 {
 	if (policy == 0)
 	{
+		m_offspring.insert(m_offspring.end(), m_elite.begin(), m_elite.end());
 		m_population = uFromGammaPolicy(survivorSize);
 		m_offspring.clear();
 	}
 	else if (policy == 1)
 	{
+		m_offspring.insert(m_offspring.end(), m_elite.begin(), m_elite.end());
 		m_population = uPlusGammaPolicy(survivorSize);
 		m_offspring.clear();
 	}
 	else if (policy == 2)
 	{
+
+		// For uFromGammaPolicy_Fuds, since high fitness individuals can be randomly
+		// eliminated, we add the elites to the population AFTER the selection.
 		m_population = uFromGammaPolicy_FUDS(survivorSize);
+		m_population.insert(m_population.end(), m_elite.begin(), m_elite.end());
 		m_offspring.clear();
 	}
+
+
 }
 
 /**
@@ -445,15 +453,94 @@ std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy_FUDS(int survivorSize)
 	// Initialize the bin
 	std::map<int, std::pair<int, std::vector<int>>> bins;
 
-	// Start building your bin
+
+	// Start building the bin
+
 	for (int i = 0; i < m_offspring.size(); i++)
 	{
 		auto elem = bins.find(m_offspring[i].getFitness());
 		if (elem == bins.end())
 		{
-			bins[m_offspring[i].getFitness()] = std::make_pair(1, std::vector<int>{i});
+			// First is the number of elements with that fitness, second is all their indices
+			bins[m_offspring[i].getFitness()] = std::make_pair(1, std::vector<int>{i}); 
+			continue;
+		}
+
+		bins[m_offspring[i].getFitness()].first++;
+		bins[m_offspring[i].getFitness()].second.push_back(i);
+	}
+
+	// Now that the bin is built, we create our probability map using the pairs in bins
+	int runningtotal = 0; // Mostly for debug purposes
+	std::multimap<int, std::pair<int, std::vector<int>>> probabilities;
+
+	for (auto const& [fitness, indices] : bins)
+	{
+		// indices.first is frequency, indices.second is indices
+		probabilities.insert({ indices.first, {fitness, indices.second} });
+		runningtotal += indices.first;
+	}
+
+	// Get boundaries and create random distribution
+	int maxprob = probabilities.rbegin()->first;
+	int minprob = probabilities.begin()->first;
+	int range = maxprob - minprob;
+
+	// Now select the indices to go extinct and not make it past survivor selection
+	std::vector<float> probFloats = generateRandVecFloat(m_offspring.size() - survivorSize, gen_mt);
+	//std::vector<int> extinctionIndices(m_offspring.size() - survivorSize);
+	std::set<int> extinctionIndices;
+
+	std::multimap<int, std::pair<int, std::vector<int>>>::iterator toFind_it;
+	//auto toFind_it;
+	for (float f : probFloats)
+	{
+		int toFind = (int)((f * (maxprob - minprob)) + minprob);
+
+		// Check if toFind is the same as maxprob since it won't work the intended way.
+		if (toFind == maxprob)
+		{
+			toFind_it = probabilities.lower_bound(toFind);	
+		}
+		else {
+
+			// Remove the extracted index
+			toFind_it = probabilities.upper_bound(toFind);
+		}
+
+		// Pop an index from the vector stored at the iterator
+		extinctionIndices.insert(toFind_it->second.second.back());
+		
+		// Check if that was the last element in the vector
+		if (toFind_it->second.second.size() == 1)
+		{
+			// Remove that element from the map
+			toFind_it->second.second.pop_back();
+			probabilities.erase(toFind_it);
+
+			// Recalculate maxprob and minprob
+			maxprob = probabilities.rbegin()->first;
+			minprob = probabilities.begin()->first;
+		}
+		else {
+			toFind_it->second.second.pop_back();
+		}
+		// Should the prob be decremented once an index is removed?
+	}
+
+	// Now that we have all our indices, copy those elements over from the offspring to the population
+	std::vector<Genome> survivors;
+
+	for (int i = 0; i < m_offspring.size(); i++)
+	{
+		if (extinctionIndices.find(i) == extinctionIndices.end())
+		{
+			survivors.push_back(m_offspring[i]);
 		}
 	}
+
+	return survivors;
+
 }
 
 
@@ -836,6 +923,102 @@ void GAEncoding_Ass1::permutationRandomDiversify(std::vector<Genome>& gen_v, con
 	}
 }
 
+void GAEncoding_Ass1::permutationSlide(Genome& gen)
+{
+	// Get a random bounding box in a genome
+	std::vector<unsigned int> bbox1 = getBoundingBox(WIDTH, HEIGHT, gen_mt);
+
+	// Get bounding box dimensions
+	unsigned int bbrows = bbox1.back() / WIDTH - bbox1.front() / WIDTH + 1;
+	unsigned int bbcols = (bbox1.back() % WIDTH - bbox1.front() % WIDTH) + 1;
+
+	int x1 = bbox1.front() % WIDTH;
+	int y1 = bbox1.front() / WIDTH;
+
+	int x2 = bbox1.back() % WIDTH;
+	int y2 = bbox1.back() / WIDTH;
+
+	int slide_x;
+	int slide_y;
+
+	std::uniform_int_distribution<> direction(0, 1);
+
+	// Generate a y slide
+	int dir_y = direction(gen_mt); // 0 is up 1 is down
+
+	if ((dir_y == 0) && (y1 > 0)) {
+		std::uniform_int_distribution<> translation(0, y1);
+		slide_y = -1 * translation(gen_mt);
+	}
+	else if ((dir_y == 1) && (y2 < HEIGHT))
+	{
+		std::uniform_int_distribution<> translation(y2, HEIGHT);
+		slide_y = translation(gen_mt);
+	}
+	else {
+		slide_y = 0;
+	}
+
+	// Generate an x slide
+	int dir_x = direction(gen_mt); // 0 is left 1 is right
+	if ((dir_x == 0) && (x1 > 0)) {
+		std::uniform_int_distribution<> translation(0, x1);
+		slide_x = -1 * translation(gen_mt);
+	}
+	else if ((dir_x == 1) && (x2 < HEIGHT))
+	{
+		std::uniform_int_distribution<> translation(x2, HEIGHT);
+		slide_x = translation(gen_mt);
+	}
+	else {
+		slide_x = 0;
+	}
+
+	// Apply slides
+	std::vector<unsigned int> bbox2;
+	for (int i = 0; i < bbox1.size(); i++)
+	{
+		bbox2.push_back(bbox1[i] + slide_x + slide_y * WIDTH);
+	}
+
+	std::map<int, int> map_1_2;
+	std::map<int, int> map_left_over;
+
+	// Build the first map
+	for (int i = 0; i < bbox1.size(); i++) 
+	{
+		map_1_2[bbox1[i]] = bbox2[i];
+	}
+
+	// Build the map for overlapping indices
+	std::map<int, int> copy_1_2(map_1_2);
+	for (auto const& x : map_1_2)
+	{
+		if (!copy_1_2.empty() && (copy_1_2.find(x.second) != copy_1_2.end()))
+		{
+
+			map_left_over[x.first] = copy_1_2[x.second];
+			copy_1_2.erase(copy_1_2.find(x.first));
+		}
+	}
+
+	// Perform swaps in copy_1_2 first
+	for (auto const& x : copy_1_2)
+	{
+		permutationSwap(gen, x.first, x.second);
+	}
+
+	// Perform the swaps in map_left_over
+	
+	for (auto const& x : map_left_over)
+	{
+		permutationSwap(gen, x.first, x.second);
+	}
+	
+}
+
+
+
 Genome GAEncoding_Ass1::returnRandomlyInitializedGenome()
 {
 	Genome tmp_gen;
@@ -937,7 +1120,6 @@ void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated)
 			{
 				permutationRandomScramble(m_offspring[i], mutationProb);
 			}
-			
 		}
 		else if (mutation_to_use == 1)
 		{
@@ -964,8 +1146,7 @@ void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated)
 		//	
 		//}
 	}
-	// Add the elite to the offspring pool
-	m_offspring.insert(m_offspring.end(), m_elite.begin(), m_elite.end());
+
 }
 
 /**
@@ -1167,6 +1348,14 @@ void GAEncoding_Ass1::loadPopulation(std::string file_name, unsigned int startin
 		}
 	}
 
+}
 
+void GAEncoding_Ass1::injectParents(float proportion)
+{
+	int num_new_parents = m_parents.size() * proportion;
 
+	for (int i = 0; i<num_new_parents;i++)
+	{
+		m_parents.push_back(returnRandomlyInitializedGenome());
+	}
 }

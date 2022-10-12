@@ -36,7 +36,8 @@ public:
 	virtual void permutationPointMutation(Genome& gen, unsigned int pos, unsigned int rot) = 0;
 	virtual void permutationRandomPointMutation(Genome& gen, float mutation_ratio) = 0;
 	virtual void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio) = 0;
-
+	virtual void permutationSlide(Genome& gen) = 0;
+	virtual void injectParents(float proportion) = 0;
 	virtual void savePopulation() = 0;
 	virtual void loadPopulation(std::string file_name, unsigned int starting_pop_size) = 0;
 
@@ -122,7 +123,7 @@ public:
 	void permutationPointMutation(Genome& gen, unsigned int pos, unsigned int rot) override;
 	void permutationRandomPointMutation(Genome& gen, float mutation_ratio) override;
 	void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio) override;
-
+	void permutationSlide(Genome& gen) override;
 	void permutationRandomScrambleOld(Genome& gen);
 	void permutationRandomInvertOld(Genome& gen);
 	void permutationRandomPointMutationOld(Genome& gen);
@@ -139,6 +140,7 @@ public:
 	// Utility Functions
 	virtual Genome getGenomeFromPopulation(const unsigned int gen_num) override;
 	virtual float getAverageFitness(std::vector<Genome> population) override;
+	virtual void injectParents(float proportion) override;
 
 	void savePopulation() override;
 	void loadPopulation(std::string file_name, unsigned int starting_pop_size) override;
