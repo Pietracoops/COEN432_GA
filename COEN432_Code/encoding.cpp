@@ -963,16 +963,20 @@ void GAEncoding_Ass1::permutationSlide(Genome& gen)
 	}
 
 	// Build the map for overlapping indices
+	std::map<int, int> copy_1_2(map_1_2);
 	for (auto const& x : map_1_2)
 	{
-
-		if (map_1_2.find(x.second) != map_1_2.end())
+		if (!copy_1_2.empty() && (copy_1_2.find(x.second) != copy_1_2.end()))
 		{
 
-			map_left_over[x.first] = map_1_2[x.second];
-			map_1_2.erase(map_1_2.find(x.first));
+			map_left_over[x.first] = copy_1_2[x.second];
+			copy_1_2.erase(copy_1_2.find(x.first));
 		}
+	}
 
+	// Perform swaps in copy_1_2 first
+	for (auto const& x : copy_1_2)
+	{
 		permutationSwap(gen, x.first, x.second);
 	}
 
