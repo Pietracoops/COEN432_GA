@@ -413,9 +413,6 @@ void GAEncoding_Ass1::survivorSelection(int policy, int survivorSize)
 		m_offspring.clear();
 	}
 
-	// Add the elite to the offspring pool
-	m_offspring.insert(m_offspring.end(), m_elite.begin(), m_elite.end());
-
 }
 
 /**
