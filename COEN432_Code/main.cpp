@@ -10,17 +10,8 @@ int main()
 	GAEncoding_Ass1 Encoding_Ass1("Ass1/Ass1Input.txt");
 	GAEncoding* Encoding = &Encoding_Ass1;
 
-	Genome mass;
-	mass.genome_encoding_2b2_int = Encoding_Ass1.m_original_genome;
-
-	mass.setFitness(Encoding_Ass1.fitnessOfGenome(mass));
-	Encoding_Ass1.permutationPointMutation(mass, 1, 3);
-
-	mass.setFitness(Encoding_Ass1.fitnessOfGenome(mass));
-
-
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 65;
+	unsigned int POPULATION_SIZE = 200;
 
 	//// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
@@ -40,12 +31,12 @@ int main()
 
 	// --- Recombination parameters
 
-	GA.m_params.crossoverProb = 0.2F;
+	GA.m_params.crossoverProb = 0.9F;
 	GA.m_params.skipCrossover = false;
 	GA.m_params.goalOffspringSize = 2 * POPULATION_SIZE;
 
 	// --- Mutation parameters
-	GA.m_params.mutationProb = 0.05F; // we should have higher mutation if diversity is low
+	GA.m_params.mutationProb = 0.07F; // we should have higher mutation if diversity is low
 	GA.m_params.accelerated = false;
 
 	// Survivor selection parameters
@@ -66,8 +57,10 @@ int main()
 	GA.m_params.save_every_x_generation = true;
 	GA.m_params.save_every_x_generation_val = 250;
 
-	GA.runGA();
-	
+
+	GA.runGA("ppopulation_MAXIMUS.txt");
+
+
 
 	return 0;
 }

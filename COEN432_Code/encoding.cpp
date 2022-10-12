@@ -783,6 +783,34 @@ void GAEncoding_Ass1::permutationRandomScrambleOld(Genome& gen)
 	gen.setFitness(fitnessOfGenome(gen));
 }
 
+void GAEncoding_Ass1::permutationRandomSlide(Genome& gen)
+{
+	// Generate distribution
+	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
+
+	// Pick from distribution
+	unsigned int size_of_indices = distribution(gen_mt);
+
+	std::set<int> shuffled_indices;
+	while (shuffled_indices.size() != size_of_indices)
+	{
+		shuffled_indices.insert(distribution(gen_mt));
+	}
+
+	std::vector<int> indices(shuffled_indices.begin(), shuffled_indices.end());
+	std::vector<int> shuffled_indices_v(shuffled_indices.begin(), shuffled_indices.end());
+	std::sort(indices.begin(), indices.end());
+	shuffled_indices_v = shuffleVector(shuffled_indices_v);
+
+	unsigned int counter = 0;
+	for (auto& n : shuffled_indices_v)
+	{
+		permutationSwap(gen, indices[counter], n);
+		counter++;
+	}
+	gen.setFitness(fitnessOfGenome(gen));
+}
+
 
 void GAEncoding_Ass1::permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio)
 {
