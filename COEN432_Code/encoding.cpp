@@ -464,6 +464,7 @@ std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy_FUDS(int survivorSize)
 			// First is the number of elements with that fitness, second is all their indices
 			bins[m_offspring[i].getFitness()] = std::make_pair(1, std::vector<int>{i}); 
 			continue;
+<<<<<<< Updated upstream
 		}
 
 		bins[m_offspring[i].getFitness()].first++;
@@ -528,6 +529,72 @@ std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy_FUDS(int survivorSize)
 		// Should the prob be decremented once an index is removed?
 	}
 
+=======
+		}
+
+		bins[m_offspring[i].getFitness()].first++;
+		bins[m_offspring[i].getFitness()].second.push_back(i);
+	}
+
+	// Now that the bin is built, we create our probability map using the pairs in bins
+	int runningtotal = 0; // Mostly for debug purposes
+	std::multimap<int, std::pair<int, std::vector<int>>> probabilities;
+
+	for (auto const& [fitness, indices] : bins)
+	{
+		// indices.first is frequency, indices.second is indices
+		probabilities.insert({ indices.first, {fitness, indices.second} });
+		runningtotal += indices.first;
+	}
+
+	// Get boundaries and create random distribution
+	int maxprob = probabilities.rbegin()->first;
+	int minprob = probabilities.begin()->first;
+	int range = maxprob - minprob;
+
+	// Now select the indices to go extinct and not make it past survivor selection
+	std::vector<float> probFloats = generateRandVecFloat(m_offspring.size() - survivorSize, gen_mt);
+	//std::vector<int> extinctionIndices(m_offspring.size() - survivorSize);
+	std::set<int> extinctionIndices;
+
+	std::multimap<int, std::pair<int, std::vector<int>>>::iterator toFind_it;
+	//auto toFind_it;
+	for (float f : probFloats)
+	{
+		int toFind = (int)((f * (maxprob - minprob)) + minprob);
+
+		// Check if toFind is the same as maxprob since it won't work the intended way.
+		if (toFind == maxprob)
+		{
+			toFind_it = probabilities.lower_bound(toFind);	
+		}
+		else {
+
+			// Remove the extracted index
+			toFind_it = probabilities.upper_bound(toFind);
+		}
+
+		// Pop an index from the vector stored at the iterator
+		extinctionIndices.insert(toFind_it->second.second.back());
+		
+		// Check if that was the last element in the vector
+		if (toFind_it->second.second.size() == 1)
+		{
+			// Remove that element from the map
+			toFind_it->second.second.pop_back();
+			probabilities.erase(toFind_it);
+
+			// Recalculate maxprob and minprob
+			maxprob = probabilities.rbegin()->first;
+			minprob = probabilities.begin()->first;
+		}
+		else {
+			toFind_it->second.second.pop_back();
+		}
+		// Should the prob be decremented once an index is removed?
+	}
+
+>>>>>>> Stashed changes
 	// Now that we have all our indices, copy those elements over from the offspring to the population
 	std::vector<Genome> survivors;
 
@@ -928,9 +995,15 @@ void GAEncoding_Ass1::permutationSlide(Genome& gen)
 	// Get a random bounding box in a genome
 	std::vector<unsigned int> bbox1 = getBoundingBox(WIDTH, HEIGHT, gen_mt);
 
+<<<<<<< Updated upstream
 	// Get bounding box dimensions
 	unsigned int bbrows = bbox1.back() / WIDTH - bbox1.front() / WIDTH + 1;
 	unsigned int bbcols = (bbox1.back() % WIDTH - bbox1.front() % WIDTH) + 1;
+=======
+	//// Get bounding box dimensions
+	unsigned int bbrows = bbox1.back() / WIDTH - bbox1.front() / WIDTH;
+	unsigned int bbcols = (bbox1.back() % WIDTH - bbox1.front() % WIDTH);
+>>>>>>> Stashed changes
 
 	int x1 = bbox1.front() % WIDTH;
 	int y1 = bbox1.front() / WIDTH;
@@ -947,6 +1020,7 @@ void GAEncoding_Ass1::permutationSlide(Genome& gen)
 	int dir_y = direction(gen_mt); // 0 is up 1 is down
 
 	if ((dir_y == 0) && (y1 > 0)) {
+<<<<<<< Updated upstream
 		std::uniform_int_distribution<> translation(0, y1);
 		slide_y = -1 * translation(gen_mt);
 	}
@@ -1015,6 +1089,24 @@ void GAEncoding_Ass1::permutationSlide(Genome& gen)
 		permutationSwap(gen, x.first, x.second);
 	}
 	
+=======
+
+	}
+	else if ((dir_y == 1) && (y1 < HEIGHT))
+	{
+
+	}
+	else {
+		slide_y = 0;
+	}
+
+
+	//// Generate an x slide
+
+
+	std::vector<unsigned int> bbox2 = getBoundingBox(WIDTH, HEIGHT, gen_mt, -1, -1, -1, bbcols, bbrows);
+
+>>>>>>> Stashed changes
 }
 
 

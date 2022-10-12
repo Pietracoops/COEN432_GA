@@ -42,12 +42,20 @@ int main()
 	GA.m_params.accelerated = false;
 
 	// Survivor selection parameters
+<<<<<<< Updated upstream
 	GA.m_params.survivorpolicy = 1; // 0 is ufromgamma, 1 is uplusgamma, 2 is uplusgamma fuds
+=======
+	GA.m_params.survivorpolicy = 2; // 0 is ufromgamma, 1 is uplusgamma, 2 is uplusgamma fuds
+>>>>>>> Stashed changes
 	GA.m_params.survivorsize = POPULATION_SIZE;
 
 	// Stagnation handling
 	GA.m_params.inject_parents = true;
+<<<<<<< Updated upstream
 	GA.m_params.random_parent_proportion = 0.5F;
+=======
+	GA.m_params.random_parent_proportion = 0.2F;
+>>>>>>> Stashed changes
 
 	// --- Termination Condition Parameters
 	GA.m_params.maxGeneration = 1000000;

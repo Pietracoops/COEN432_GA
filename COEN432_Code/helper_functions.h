@@ -58,6 +58,8 @@ std::vector<std::string> splitString(std::string str, std::string delimiter);
 std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937& engine, int index1 = -1, int index2 = -1, int max_area = -1, int max_cols = -1, int max_rows = -1);
 
 
+std::vector<std::vector<int>> vectTo2D(std::vector<int> vect_input, uint32_t row, uint32_t col);
+std::vector<std::vector<int>> vectSlide(std::vector<std::vector<int>>vect_input, std::vector<std::vector<int>> indices, int slide, bool vertical);
 
 // Prints a two dimensional vector
 /// \return: None

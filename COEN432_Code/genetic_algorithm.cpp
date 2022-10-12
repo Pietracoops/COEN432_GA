@@ -283,7 +283,10 @@ bool NetworkStatistics::checkStagnation(int currentFitness, int generation)
 	if (fitnessRepeats > stagnation_window)
 	{
 		stagnation_detected = true;
+<<<<<<< Updated upstream
 		fitnessRepeats = 0;
+=======
+>>>>>>> Stashed changes
 	}
 	else {
 		stagnation_detected = false;
