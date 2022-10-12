@@ -109,7 +109,6 @@ public:
 	std::vector<Genome> uPlusGammaPolicy(int survivorSize = 0);
 	std::vector<Genome> uFromGammaPolicy_FUDS(int survivorSize = 0); // Policy 2
 
-
 	// Mutation Functions
 	void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) override;
 	void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2) override;
@@ -126,6 +125,7 @@ public:
 	void permutationRandomScrambleOld(Genome& gen);
 	void permutationRandomInvertOld(Genome& gen);
 	void permutationRandomPointMutationOld(Genome& gen);
+	void permutationRandomSlide(Genome& gen);
 
 
 	// Crossover Functions

@@ -9,11 +9,17 @@ int main()
 {
 	// ############### Initialize the Encoding based on the input file
 
+
+	GAEncoding_Ass1 Encoding_test("Ass1/test.txt");
+	Genome mass = Encoding_test.m_original_genome;
+	mass.setFitness(Encoding_test.fitnessOfGenome(mass));
+
+
 	GAEncoding_Ass1 Encoding_Ass1("Ass1/Ass1Input.txt");
 	GAEncoding* Encoding = &Encoding_Ass1;
 
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 1000;
+	unsigned int POPULATION_SIZE = 200;
 
 	//// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
@@ -32,21 +38,23 @@ int main()
 
 	// --- Recombination parameters
 
-	GA.m_params.crossoverProb = 0.8F;
+	GA.m_params.crossoverProb = 0.9F;
 	GA.m_params.skipCrossover = false;
 	GA.m_params.goalOffspringSize = 2 * POPULATION_SIZE;
 
 	// --- Mutation parameters
-	GA.m_params.mutationProb = 0.05F; // we should have higher mutation if diversity is low
-	GA.m_params.accelerated = false;
+	GA.m_params.mutationProb = 0.07F; // we should have higher mutation if diversity is low
+	GA.m_params.accelerated = true;
 
 	// Survivor selection parameters
-	GA.m_params.survivorpolicy = 2; // 0 is ufromgamma, 1 is uplusgamma, 2 is uplusgamma fuds
+
+	GA.m_params.survivorpolicy = 0; // 0 is ufromgamma, 1 is uplusgamma, 2 is uplusgamma fuds
 	GA.m_params.survivorsize = POPULATION_SIZE;
 
 	// Stagnation handling
-	GA.m_params.inject_parents = true;
-	GA.m_params.random_parent_proportion = 0.2F;
+	GA.m_params.inject_parents = false;
+	GA.m_params.random_parent_proportion = 0.1F;
+
 
 	// --- Termination Condition Parameters
 	GA.m_params.maxGeneration = 1000000;
@@ -55,14 +63,14 @@ int main()
 
 	// --- Stats
 	GA.m_params.dynamic_hyper_parameters = false;
-	GA.m_params.stagnation_check = 15;
+	GA.m_params.stagnation_check = 50;
 	GA.m_params.stagnation_breath = 8;
 
 	GA.m_params.save_population = true;
 	GA.m_params.save_every_x_generation = true;
 	GA.m_params.save_every_x_generation_val = 250;
 
-	//GA.runGA();
+	GA.runGA();
 
 	Genome elite = Encoding_Ass1.getEliteFromFile("population_MAXIMUS.txt");
 	std::string elite_phenotype = Encoding_Ass1.genotypeToPhenotype(elite);
@@ -70,6 +78,7 @@ int main()
 	std::string savename = getCurrentDateTime("date") + "_maximuselite.txt";
 
 	savePhenotypeToFile(elite_phenotype, savename);
+
 
 
 	return 0;

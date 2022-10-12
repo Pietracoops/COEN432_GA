@@ -52,20 +52,28 @@ std::vector<int> GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
 
 	// Calculate rows
 	int row_mismatches = 0;
-	for (unsigned int i = 0; i < genome.getSize() - 1; i++)
+	int total = 0;
+
+	for (unsigned int i = 1; i < genome.getSize(); i++)
 	{
 		if (i % WIDTH == 0) 
 		{
+			std::cout << std::endl;
 			continue;
 		}
-		Tile T1 = m_map_index[genes[i][0]];
-		T1.rotate(genes[i][1]);
-		Tile T2 = m_map_index[genes[i + 1][0]];
-		T2.rotate(genes[i + 1][1]);
+		Tile T1 = m_map_index[genes[i - 1][0]];
+		T1.rotate(genes[i - 1][1]);
+		Tile T2 = m_map_index[genes[i][0]];
+		T2.rotate(genes[i][1]);
+		//std::cout << "comparing ROW Tile " << i << " right with " << T1.right << " and Tile " << i + 1 << " left " << T2.left << std::endl;
 		if (T1.right != T2.left)
 		{
+			//std::cout << "ROW MISMATCH: Tile " << i << " and Tile " << i + 1 << std::endl;
+			std::cout << T1.right << ":" << T2.left << "   ";
+
 			row_mismatches++;
 		}
+		total++;
 	}
 
 	// Calculate Columns
@@ -76,10 +84,13 @@ std::vector<int> GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
 		T1.rotate(genes[i][1]);
 		Tile T2 = m_map_index[genes[i + WIDTH][0]];
 		T2.rotate(genes[i + WIDTH][1]);
+		//std::cout << "comparing COL Tile " << i << " Bottom with " << T1.bottom << " and Tile " << i + WIDTH << " top " << T2.top << std::endl;
 		if (T1.bottom != T2.top)
 		{
+			//std::cout << "COLUMN MISMATCH: Tile " << i << " and Tile " << i + WIDTH << " col mismatch" << std::endl;
 			col_mismatches++;
 		}
+		total++;
 	}
 
 	output.push_back(MAX_MISMATCHES - (col_mismatches + row_mismatches));
@@ -843,6 +854,34 @@ void GAEncoding_Ass1::permutationRandomInvertOld(Genome& gen)
 }
 
 void GAEncoding_Ass1::permutationRandomScrambleOld(Genome& gen)
+{
+	// Generate distribution
+	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
+
+	// Pick from distribution
+	unsigned int size_of_indices = distribution(gen_mt);
+
+	std::set<int> shuffled_indices;
+	while (shuffled_indices.size() != size_of_indices)
+	{
+		shuffled_indices.insert(distribution(gen_mt));
+	}
+
+	std::vector<int> indices(shuffled_indices.begin(), shuffled_indices.end());
+	std::vector<int> shuffled_indices_v(shuffled_indices.begin(), shuffled_indices.end());
+	std::sort(indices.begin(), indices.end());
+	shuffled_indices_v = shuffleVector(shuffled_indices_v);
+
+	unsigned int counter = 0;
+	for (auto& n : shuffled_indices_v)
+	{
+		permutationSwap(gen, indices[counter], n);
+		counter++;
+	}
+	gen.setFitness(fitnessOfGenome(gen));
+}
+
+void GAEncoding_Ass1::permutationRandomSlide(Genome& gen)
 {
 	// Generate distribution
 	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
