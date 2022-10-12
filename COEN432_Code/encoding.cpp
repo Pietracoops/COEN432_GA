@@ -897,6 +897,44 @@ void GAEncoding_Ass1::permutationRandomDiversify(std::vector<Genome>& gen_v, con
 
 void GAEncoding_Ass1::permutationSlide(Genome& gen)
 {
+	// Get a random bounding box in a genome
+	std::vector<unsigned int> bbox1 = getBoundingBox(WIDTH, HEIGHT, gen_mt);
+
+	//// Get bounding box dimensions
+	unsigned int bbrows = bbox1.back() / WIDTH - bbox1.front() / WIDTH;
+	unsigned int bbcols = (bbox1.back() % WIDTH - bbox1.front() % WIDTH);
+
+	int x1 = bbox1.front() % WIDTH;
+	int y1 = bbox1.front() / WIDTH;
+
+	int x2 = bbox1.back() % WIDTH;
+	int y2 = bbox1.back() / WIDTH;
+
+	int slide_x;
+	int slide_y;
+
+	std::uniform_int_distribution<> direction(0, 1);
+
+	// Generate a y slide
+	int dir_y = direction(gen_mt); // 0 is up 1 is down
+
+	if ((dir_y == 0) && (y1 > 0)) {
+
+	}
+	else if ((dir_y == 1) && (y1 < HEIGHT))
+	{
+
+	}
+	else {
+		slide_y = 0;
+	}
+
+
+	//// Generate an x slide
+
+
+	std::vector<unsigned int> bbox2 = getBoundingBox(WIDTH, HEIGHT, gen_mt, -1, -1, -1, bbcols, bbrows);
+
 }
 
 

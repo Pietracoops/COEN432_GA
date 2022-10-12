@@ -82,7 +82,7 @@ std::vector<std::string> splitString(std::string str, std::string delimiter)
 }
 
 
-std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937 engine, int index1, int index2, int max_area)
+std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937 engine, int index1, int index2, int max_area, int max_cols, int max_rows)
 {
 	
 	// If indices are not given
@@ -117,16 +117,30 @@ std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937 
 	std::vector<unsigned int> indices{};
 
 
+	int rows_left = max_rows;
+	int cols_left = max_cols;
+
 	for (int i = 0; i <= num_rows; i++)
 	{
 		for (int j = 0; j <= num_cols; j++)
 		{
+			
 			indices.push_back(col_dim * i + j + index1);
 
 			if ((max_area != -1) && indices.size() == max_area)
 			{
 				return indices;
 			}
+
+			if ((max_cols != -1) && (max_cols == (j + 1)))
+			{
+				break;
+			}
+		}
+
+		if ((max_rows != -1) && (max_rows == (i + 1)))
+		{
+			break;
 		}
 	}
 
