@@ -80,10 +80,8 @@ class GAEncoding_Ass1 : public GAEncoding
 
 		Tile(std::string constructor = "0000");
 		void rotate(unsigned int rot_value = 1); // Rotate the tile up to 3 times
-		void printTile();					     // Print tile information
-
+		void printTile();					     // Print tile information	
 	};
-
 public:
 	GAEncoding_Ass1(std::string file_name = "");
 	~GAEncoding_Ass1();
@@ -144,6 +142,10 @@ public:
 
 	void savePopulation() override;
 	void loadPopulation(std::string file_name, unsigned int starting_pop_size) override;
+
+	Genome getEliteFromFile(std::string file_name);
+	std::string genotypeToPhenotype(Genome g);
+
 
 	// The original genome that was extracted from the input file
 	std::vector<std::vector<int>> m_original_genome;
