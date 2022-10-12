@@ -58,7 +58,7 @@ std::vector<int> GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
 	{
 		if (i % WIDTH == 0 && i != 0) 
 		{
-			std::cout << std::endl;
+			//std::cout << std::endl;
 			continue;
 		}
 		Tile T1 = m_map_index[genes[i - 1][0]];
@@ -69,7 +69,7 @@ std::vector<int> GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
 		if (T1.right != T2.left)
 		{
 			//std::cout << "ROW MISMATCH: Tile " << i << " and Tile " << i + 1 << std::endl;
-			std::cout << T1.right << ":" << T2.left << "   ";
+			//std::cout << T1.right << ":" << T2.left << "   ";
 
 			row_mismatches++;
 		}
