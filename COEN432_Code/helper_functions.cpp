@@ -82,9 +82,6 @@ std::vector<std::string> splitString(std::string str, std::string delimiter)
 }
 
 
-<<<<<<< Updated upstream
-std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937& engine, int index1, int index2, int max_area, int max_cols, int max_rows)
-=======
 std::vector<std::vector<int>> vectTo2D(std::vector<int> vect_input, uint32_t row, uint32_t col)
 {
 	std::vector<std::vector<int>> output;
@@ -186,8 +183,7 @@ std::vector<std::vector<int>> vectSlide(std::vector<std::vector<int>>vect_input,
 }
 
 
-std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937 engine, int index1, int index2, int max_area, int max_cols, int max_rows)
->>>>>>> Stashed changes
+std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937& engine, int index1, int index2, int max_area, int max_cols, int max_rows)
 {
 	
 	// If indices are not given

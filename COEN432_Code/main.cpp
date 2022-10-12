@@ -42,20 +42,13 @@ int main()
 	GA.m_params.accelerated = false;
 
 	// Survivor selection parameters
-<<<<<<< Updated upstream
-	GA.m_params.survivorpolicy = 1; // 0 is ufromgamma, 1 is uplusgamma, 2 is uplusgamma fuds
-=======
 	GA.m_params.survivorpolicy = 2; // 0 is ufromgamma, 1 is uplusgamma, 2 is uplusgamma fuds
->>>>>>> Stashed changes
 	GA.m_params.survivorsize = POPULATION_SIZE;
 
 	// Stagnation handling
 	GA.m_params.inject_parents = true;
-<<<<<<< Updated upstream
-	GA.m_params.random_parent_proportion = 0.5F;
-=======
-	GA.m_params.random_parent_proportion = 0.2F;
->>>>>>> Stashed changes
+	GA.m_params.random_parent_proportion = 0.1F;
+
 
 	// --- Termination Condition Parameters
 	GA.m_params.maxGeneration = 1000000;
@@ -64,7 +57,7 @@ int main()
 
 	// --- Stats
 	GA.m_params.dynamic_hyper_parameters = false;
-	GA.m_params.stagnation_check = 10;
+	GA.m_params.stagnation_check = 50;
 	GA.m_params.stagnation_breath = 8;
 
 	GA.m_params.save_population = true;
@@ -72,7 +65,7 @@ int main()
 	GA.m_params.save_every_x_generation_val = 250;
 
 
-	GA.runGA("ppopulation_MAXIMUS.txt");
+	GA.runGA("population_2022-10-11-15-56-08.txt");
 
 
 
