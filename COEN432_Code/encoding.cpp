@@ -1370,3 +1370,92 @@ void GAEncoding_Ass1::injectParents(float proportion)
 		m_parents.push_back(returnRandomlyInitializedGenome());
 	}
 }
+
+std::string GAEncoding_Ass1::genotypeToPhenotype(Genome g)
+{
+	std::stringstream phenotype;
+
+	// Cycle through all the tiles
+	for (int i = 0; i < g.genome_encoding_2b2_int.size(); i++)
+	{
+		// Get the tile
+		Tile t = m_map_index[g.genome_encoding_2b2_int[i][0]];
+
+		// Apply the rotations
+		t.rotate(g.genome_encoding_2b2_int[i][1]);
+
+		// Add to string stream
+		phenotype << t.top << t.right << t.bottom << t.left;
+
+		// if we reached the end of a row, add a newline. Else, add a space
+
+		if (i == g.genome_encoding_2b2_int.size() - 1)
+		{
+			break;
+		}
+
+		if (((i + 1) % WIDTH == 0))
+		{
+			phenotype << std::endl;
+		}
+		else {
+			phenotype << " ";
+		}
+
+	}
+
+	return phenotype.str();
+}
+
+
+Genome GAEncoding_Ass1::getEliteFromFile(std::string file_name)
+{
+
+	std::vector<Genome> loaded_pop;
+
+	std::ifstream fin(file_name);
+	std::string line;
+	std::string delimiter = ";";
+
+	if (fin.is_open())
+	{
+		while (std::getline(fin, line))
+		{
+			Genome genome;
+			size_t pos = 0;
+			std::string token;
+			std::vector<std::string> gene;
+			std::vector<int> couple;
+
+			if (line.find("|") != std::string::npos)
+			{
+				std::vector<std::string> data;
+				data = splitString(line, "|");
+				line = data[1];
+			}
+
+			while ((pos = line.find(delimiter)) != std::string::npos)
+			{
+				token = line.substr(0, pos);
+				gene = splitString(token, ",");
+				line.erase(0, pos + delimiter.length());
+				couple.push_back(std::stoi(gene[0]));
+				couple.push_back(std::stoi(gene[1]));
+				genome.genome_encoding_2b2_int.push_back(couple);
+				couple.clear();
+				gene.clear();
+			}
+
+			genome.setFitness(fitnessOfGenome(genome));
+			loaded_pop.push_back(genome);
+			genome.genome_encoding_2b2_int.clear();
+		}
+		fin.close();
+	}
+
+	// Sort the population
+	std::sort(loaded_pop.begin(), loaded_pop.end(), [](const Genome& lhs, const Genome& rhs) {return lhs.getFitness() > rhs.getFitness(); });
+
+
+	return loaded_pop[0];
+}

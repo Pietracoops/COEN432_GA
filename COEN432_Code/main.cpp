@@ -21,7 +21,6 @@ int main()
 	// ############### Init Parameters
 	unsigned int POPULATION_SIZE = 200;
 
-
 	//// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
 
@@ -41,13 +40,14 @@ int main()
 
 	GA.m_params.crossoverProb = 0.9F;
 	GA.m_params.skipCrossover = false;
-	GA.m_params.goalOffspringSize = 1.1 * POPULATION_SIZE;
+	GA.m_params.goalOffspringSize = 2 * POPULATION_SIZE;
 
 	// --- Mutation parameters
 	GA.m_params.mutationProb = 0.07F; // we should have higher mutation if diversity is low
 	GA.m_params.accelerated = true;
 
 	// Survivor selection parameters
+
 	GA.m_params.survivorpolicy = 0; // 0 is ufromgamma, 1 is uplusgamma, 2 is uplusgamma fuds
 	GA.m_params.survivorsize = POPULATION_SIZE;
 
@@ -70,8 +70,14 @@ int main()
 	GA.m_params.save_every_x_generation = true;
 	GA.m_params.save_every_x_generation_val = 250;
 
+	GA.runGA();
 
-	GA.runGA("population_2022-10-11-15-56-08.txt");
+	Genome elite = Encoding_Ass1.getEliteFromFile("population_MAXIMUS.txt");
+	std::string elite_phenotype = Encoding_Ass1.genotypeToPhenotype(elite);
+
+	std::string savename = getCurrentDateTime("date") + "_maximuselite.txt";
+
+	savePhenotypeToFile(elite_phenotype, savename);
 
 
 

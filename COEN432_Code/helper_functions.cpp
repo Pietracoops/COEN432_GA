@@ -290,6 +290,13 @@ int CountColumnMismatches(std::vector<std::string> first, std::vector<std::strin
 }
 
 
+void savePhenotypeToFile(std::string p, std::string filename)
+{
+	std::ofstream output(filename);
+	output << p;
+	output.close();
+}
+
 int ProfTest(std::string file_path)
 {
 	std::ifstream inputFile;
