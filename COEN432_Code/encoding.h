@@ -106,8 +106,9 @@ public:
 	virtual std::vector<Genome> parentSelectionTournament(std::vector<Genome> population, float selection_ratio, uint32_t window_size, bool replacement) override;
 
 	// Survivor selection policies
-	std::vector<Genome> uFromGammaPolicy(int survivorSize=0);
+	std::vector<Genome> uFromGammaPolicy(int survivorSize = 0);
 	std::vector<Genome> uPlusGammaPolicy(int survivorSize = 0);
+	std::vector<Genome> uFromGammaPolicy_FUDS(int survivorSize = 0) // Policy 2
 
 	// Mutation Functions
 	void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) override;

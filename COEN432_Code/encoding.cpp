@@ -231,13 +231,16 @@ void GAEncoding_Ass1::parentSelection(int strategy,
 	}
 	
 	// Apply Randomness to the new parents
-	unsigned int num_random_gen = (int)(parents.size() * randomness);
-	// Parents is a shuffled array so we'll just pop out the last ones in array
-	// and replace them with random initializations of the genome
-	parents.erase(parents.end() - num_random_gen, parents.end());
-	for (unsigned int i = 0; i < num_random_gen; i++)
+	if (randomness > 0.0) 
 	{
-		parents.push_back(returnRandomlyInitializedGenome());
+		unsigned int num_random_gen = (int)(parents.size() * randomness);
+		// Parents is a shuffled array so we'll just pop out the last ones in array
+		// and replace them with random initializations of the genome
+		parents.erase(parents.end() - num_random_gen, parents.end());
+		for (unsigned int i = 0; i < num_random_gen; i++)
+		{
+			parents.push_back(returnRandomlyInitializedGenome());
+		}
 	}
 
 	// If we are struggling to achieve desired diversity, soft reset
@@ -399,6 +402,11 @@ void GAEncoding_Ass1::survivorSelection(int policy, int survivorSize)
 		m_population = uPlusGammaPolicy(survivorSize);
 		m_offspring.clear();
 	}
+	else if (policy == 2)
+	{
+		m_population = uFromGammaPolicy_FUDS(survivorSize);
+		m_offspring.clear();
+	}
 }
 
 /**
@@ -426,6 +434,28 @@ std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy(int survivorSize)
 
 	return survivors;
 }
+
+
+std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy_FUDS(int survivorSize)
+{
+
+	// Sort the offspring
+	//std::sort(m_offspring.begin(), m_offspring.end(), [](const Genome& lhs, const Genome& rhs) {return lhs.getFitness() > rhs.getFitness(); });
+
+	// Initialize the bin
+	std::map<int, std::pair<int, std::vector<int>>> bins;
+
+	// Start building your bin
+	for (int i = 0; i < m_offspring.size(); i++)
+	{
+		auto elem = bins.find(m_offspring[i].getFitness());
+		if (elem == bins.end())
+		{
+			bins[m_offspring[i].getFitness()] = std::make_pair(1, std::vector<int>{i});
+		}
+	}
+}
+
 
 /**
 * Pick u survivors from offspring + parents

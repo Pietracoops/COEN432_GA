@@ -106,4 +106,5 @@ inline std::vector<T> erase_indices(const std::vector<T>& data, std::vector<size
 }
 
 
+
 #endif // HELPER_FUNCTIONS_H_
