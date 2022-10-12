@@ -9,6 +9,12 @@ int main()
 {
 	// ############### Initialize the Encoding based on the input file
 
+
+	GAEncoding_Ass1 Encoding_test("Ass1/test.txt");
+	Genome mass = Encoding_test.m_original_genome;
+	mass.setFitness(Encoding_test.fitnessOfGenome(mass));
+
+
 	GAEncoding_Ass1 Encoding_Ass1("Ass1/Ass1Input.txt");
 	GAEncoding* Encoding = &Encoding_Ass1;
 
@@ -39,14 +45,14 @@ int main()
 
 	// --- Mutation parameters
 	GA.m_params.mutationProb = 0.07F; // we should have higher mutation if diversity is low
-	GA.m_params.accelerated = false;
+	GA.m_params.accelerated = true;
 
 	// Survivor selection parameters
-	GA.m_params.survivorpolicy = 2; // 0 is ufromgamma, 1 is uplusgamma, 2 is uplusgamma fuds
+	GA.m_params.survivorpolicy = 0; // 0 is ufromgamma, 1 is uplusgamma, 2 is uplusgamma fuds
 	GA.m_params.survivorsize = POPULATION_SIZE;
 
 	// Stagnation handling
-	GA.m_params.inject_parents = true;
+	GA.m_params.inject_parents = false;
 	GA.m_params.random_parent_proportion = 0.1F;
 
 
