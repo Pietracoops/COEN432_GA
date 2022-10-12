@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <iostream>
 
 // XTensor Utilities
 #include <xtensor/xarray.hpp>
@@ -48,6 +49,7 @@ std::vector<std::vector<int>> shuffleVector(std::vector<std::vector<int>> vect);
 std::vector<int> shuffleVector(std::vector<int> vect);
 std::vector<Genome> shuffleVector(std::vector<Genome> vect);
 
+void savePhenotypeToFile(std::string p, std::string filename);
 
 // Given a string, will return a vector containing all parts of string
 // split by given delimiter
