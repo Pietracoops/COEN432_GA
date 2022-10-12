@@ -9,6 +9,11 @@
 
 class NetworkStatistics
 {
+
+private:
+	int stagnation_window = 10;
+	int fitnessRepeats = 0;
+	int previousFitness = 0;
 public:
 	NetworkStatistics();
 	std::vector<int> m_max_fitness;
@@ -18,8 +23,10 @@ public:
 	int m_stagnation_countdown_val = 10;
 	int m_stagnation_modified_countdown;
 	bool stagnation_detected;
-	bool checkStagnation(int generation_range, int generation, int breath);
+	/*bool checkStagnation(int generation_range, int generation, int breath);*/
+	bool checkStagnation(int currentFitness, int generation);
 	void tuneParameter(float& parameter, const float tune, const float clamp_min, const float clamp_max);
+	void setStagnationWindow(int stagnation_window);
 };
 
 
@@ -57,6 +64,10 @@ private:
 		double maxRuntime;
 		int targetFitness;
 
+		// Stagnation mitigation parameters
+		float random_parent_proportion;
+		bool inject_parents;
+
 		// Stats
 		bool dynamic_hyper_parameters;	// Dynamically tune Mutation Probability and Crossover Probability
 		int stagnation_check;			// Check if we have stagnated
@@ -66,6 +77,7 @@ private:
 		bool save_population;
 		bool save_every_x_generation = true;
 		int save_every_x_generation_val = 500;
+
 
 	};
 
@@ -95,6 +107,8 @@ public:
 
 	void runGA(std::string population_file = "");
 	std::string printParameters();
+
+	
 
 	Parameters m_params;
 

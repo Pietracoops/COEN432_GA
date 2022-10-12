@@ -394,19 +394,27 @@ void GAEncoding_Ass1::survivorSelection(int policy, int survivorSize)
 {
 	if (policy == 0)
 	{
+		m_offspring.insert(m_offspring.end(), m_elite.begin(), m_elite.end());
 		m_population = uFromGammaPolicy(survivorSize);
 		m_offspring.clear();
 	}
 	else if (policy == 1)
 	{
+		m_offspring.insert(m_offspring.end(), m_elite.begin(), m_elite.end());
 		m_population = uPlusGammaPolicy(survivorSize);
 		m_offspring.clear();
 	}
 	else if (policy == 2)
 	{
+
+		// For uFromGammaPolicy_Fuds, since high fitness individuals can be randomly
+		// eliminated, we add the elites to the population AFTER the selection.
 		m_population = uFromGammaPolicy_FUDS(survivorSize);
+		m_population.insert(m_population.end(), m_elite.begin(), m_elite.end());
 		m_offspring.clear();
 	}
+
+
 }
 
 /**
@@ -445,15 +453,94 @@ std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy_FUDS(int survivorSize)
 	// Initialize the bin
 	std::map<int, std::pair<int, std::vector<int>>> bins;
 
-	// Start building your bin
+
+	// Start building the bin
+
 	for (int i = 0; i < m_offspring.size(); i++)
 	{
 		auto elem = bins.find(m_offspring[i].getFitness());
 		if (elem == bins.end())
 		{
-			bins[m_offspring[i].getFitness()] = std::make_pair(1, std::vector<int>{i});
+			// First is the number of elements with that fitness, second is all their indices
+			bins[m_offspring[i].getFitness()] = std::make_pair(1, std::vector<int>{i}); 
+			continue;
+		}
+
+		bins[m_offspring[i].getFitness()].first++;
+		bins[m_offspring[i].getFitness()].second.push_back(i);
+	}
+
+	// Now that the bin is built, we create our probability map using the pairs in bins
+	int runningtotal = 0; // Mostly for debug purposes
+	std::multimap<int, std::pair<int, std::vector<int>>> probabilities;
+
+	for (auto const& [fitness, indices] : bins)
+	{
+		// indices.first is frequency, indices.second is indices
+		probabilities.insert({ indices.first, {fitness, indices.second} });
+		runningtotal += indices.first;
+	}
+
+	// Get boundaries and create random distribution
+	int maxprob = probabilities.rbegin()->first;
+	int minprob = probabilities.begin()->first;
+	int range = maxprob - minprob;
+
+	// Now select the indices to go extinct and not make it past survivor selection
+	std::vector<float> probFloats = generateRandVecFloat(m_offspring.size() - survivorSize, gen_mt);
+	//std::vector<int> extinctionIndices(m_offspring.size() - survivorSize);
+	std::set<int> extinctionIndices;
+
+	std::multimap<int, std::pair<int, std::vector<int>>>::iterator toFind_it;
+	//auto toFind_it;
+	for (float f : probFloats)
+	{
+		int toFind = (int)((f * (maxprob - minprob)) + minprob);
+
+		// Check if toFind is the same as maxprob since it won't work the intended way.
+		if (toFind == maxprob)
+		{
+			toFind_it = probabilities.lower_bound(toFind);	
+		}
+		else {
+
+			// Remove the extracted index
+			toFind_it = probabilities.upper_bound(toFind);
+		}
+
+		// Pop an index from the vector stored at the iterator
+		extinctionIndices.insert(toFind_it->second.second.back());
+		
+		// Check if that was the last element in the vector
+		if (toFind_it->second.second.size() == 1)
+		{
+			// Remove that element from the map
+			toFind_it->second.second.pop_back();
+			probabilities.erase(toFind_it);
+
+			// Recalculate maxprob and minprob
+			maxprob = probabilities.rbegin()->first;
+			minprob = probabilities.begin()->first;
+		}
+		else {
+			toFind_it->second.second.pop_back();
+		}
+		// Should the prob be decremented once an index is removed?
+	}
+
+	// Now that we have all our indices, copy those elements over from the offspring to the population
+	std::vector<Genome> survivors;
+
+	for (int i = 0; i < m_offspring.size(); i++)
+	{
+		if (extinctionIndices.find(i) == extinctionIndices.end())
+		{
+			survivors.push_back(m_offspring[i]);
 		}
 	}
+
+	return survivors;
+
 }
 
 
@@ -808,6 +895,12 @@ void GAEncoding_Ass1::permutationRandomDiversify(std::vector<Genome>& gen_v, con
 	}
 }
 
+void GAEncoding_Ass1::permutationSlide(Genome& gen)
+{
+}
+
+
+
 Genome GAEncoding_Ass1::returnRandomlyInitializedGenome()
 {
 	Genome tmp_gen;
@@ -909,7 +1002,6 @@ void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated)
 			{
 				permutationRandomScramble(m_offspring[i], mutationProb);
 			}
-			
 		}
 		else if (mutation_to_use == 1)
 		{
@@ -936,8 +1028,7 @@ void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated)
 		//	
 		//}
 	}
-	// Add the elite to the offspring pool
-	m_offspring.insert(m_offspring.end(), m_elite.begin(), m_elite.end());
+
 }
 
 /**
@@ -1139,6 +1230,14 @@ void GAEncoding_Ass1::loadPopulation(std::string file_name, unsigned int startin
 		}
 	}
 
+}
 
+void GAEncoding_Ass1::injectParents(float proportion)
+{
+	int num_new_parents = m_parents.size() * proportion;
 
+	for (int i = 0; i<num_new_parents;i++)
+	{
+		m_parents.push_back(returnRandomlyInitializedGenome());
+	}
 }
