@@ -28,6 +28,7 @@ int main()
 	GA.m_params.diversity_ratio = 0.0F;
 	GA.m_params.purge_ratio = 0.0f;
 
+
 	// --- Recombination parameters
 
 	GA.m_params.crossoverProb = 0.9F;
@@ -61,7 +62,6 @@ int main()
 	GA.m_params.save_every_x_generation_val = 250;
 
 	GA.runGA();
-
 
 	return 0;
 }

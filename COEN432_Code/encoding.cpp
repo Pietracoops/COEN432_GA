@@ -406,12 +406,14 @@ void GAEncoding_Ass1::survivorSelection(int policy, int survivorSize)
 	}
 	else if (policy == 2)
 	{
+
 		// For uFromGammaPolicy_Fuds, since high fitness individuals can be randomly
 		// eliminated, we add the elites to the population AFTER the selection.
 		m_population = uFromGammaPolicy_FUDS(survivorSize);
 		m_population.insert(m_population.end(), m_elite.begin(), m_elite.end());
 		m_offspring.clear();
 	}
+
 
 }
 
@@ -451,7 +453,9 @@ std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy_FUDS(int survivorSize)
 	// Initialize the bin
 	std::map<int, std::pair<int, std::vector<int>>> bins;
 
+
 	// Start building the bin
+
 	for (int i = 0; i < m_offspring.size(); i++)
 	{
 		auto elem = bins.find(m_offspring[i].getFitness());
@@ -536,6 +540,7 @@ std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy_FUDS(int survivorSize)
 	}
 
 	return survivors;
+
 }
 
 
