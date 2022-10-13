@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <random>
 #include <regex>
+#include <functional>
 
 #include "logging.h"
 #include "Genome.h"

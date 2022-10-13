@@ -447,7 +447,7 @@ std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy_FUDS(int survivorSize)
 	int range = maxprob - minprob;
 
 	// Now select the indices to go extinct and not make it past survivor selection
-	std::vector<float> probFloats = generateRandVecFloat(m_offspring.size() - survivorSize, gen_mt);
+	std::vector<float> probFloats = generateRandVecFloat((int)m_offspring.size() - survivorSize, gen_mt);
 	//std::vector<int> extinctionIndices(m_offspring.size() - survivorSize);
 	std::set<int> extinctionIndices;
 
@@ -945,7 +945,7 @@ void GAEncoding_Ass1::permutationSlide(Genome& gen)
 
 void GAEncoding_Ass1::injectParents(float proportion)
 {
-	int num_new_parents = m_parents.size() * proportion;
+	int num_new_parents = (int)(m_parents.size() * proportion);
 
 	for (int i = 0; i < num_new_parents; i++)
 	{
@@ -1044,7 +1044,7 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 		}
 	}
 
-	int breedingsize = m_parents.size() * crossoverProb;
+	int breedingsize = (int)(m_parents.size() * crossoverProb);
 	std::uniform_int_distribution distr(0, (int)(breedingsize));
 	std::vector<Genome> pair, babies;
 
@@ -1220,12 +1220,13 @@ bool GAEncoding_Ass1::terminationConditions(int currentGen, int maxGeneration, d
 
 }
 
-void GAEncoding_Ass1::savePopulation()
+std::string GAEncoding_Ass1::savePopulation()
 {
 
 	std::string date = getCurrentDateTime("date");
 	std::ofstream fout;
-	fout.open("population_" + date + ".txt");
+	std::string file_name = "population_" + date + ".txt";
+	fout.open(file_name);
 
 	for (unsigned int i = 0; i < m_population.size(); i++)
 	{
@@ -1241,6 +1242,7 @@ void GAEncoding_Ass1::savePopulation()
 		fout << "\n";
 	}
 
+	return file_name;
 }
 
 void GAEncoding_Ass1::loadPopulation(std::string file_name, unsigned int starting_pop_size)
@@ -1293,7 +1295,7 @@ void GAEncoding_Ass1::loadPopulation(std::string file_name, unsigned int startin
 	}
 
 	// Set the population size attribute of the encoding
-	unsigned int remaining_genomes = starting_pop_size - m_population.size();
+	unsigned int remaining_genomes = starting_pop_size - (int)m_population.size();
 	if (remaining_genomes > 0)
 	{
 		for (unsigned int i = 0; i < remaining_genomes; i++)

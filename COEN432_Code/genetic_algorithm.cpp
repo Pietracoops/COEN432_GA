@@ -32,7 +32,7 @@ void GeneticAlgorithm::initializePopulation(int population_size)
 	genetic_algo_log() << "Initializing Population with size [" << population_size << "]" << " - elapsed time: " << m_watch.Stop() << std::endl;
 }
 
-void GeneticAlgorithm::parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness, float diversity_ratio, float purge_ratio)
+void GeneticAlgorithm::parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness)
 {
 	m_watch.Start();
 	m_encoding->parentSelection(strategy, carry_over, selection_ratio, window_size, replacement, randomness);
@@ -112,6 +112,15 @@ std::string GeneticAlgorithm::printParameters()
 	return output;
 }
 
+void GeneticAlgorithm::returnEliteFenotype()
+{
+	// Export to file
+	Genome elite = m_encoding->getEliteFromFile(m_population_log_name);
+	std::string elite_phenotype = m_encoding->genotypeToPhenotype(elite);
+	std::string savename = m_population_log_name + "_Elite.txt";
+	savePhenotypeToFile(elite_phenotype, savename);
+}
+
 void GeneticAlgorithm::runGA(std::string population_file)
 {
 	// This is the main GA LOOP
@@ -148,9 +157,7 @@ void GeneticAlgorithm::runGA(std::string population_file)
 			m_params.selection_ratio,
 			m_params.window_size,
 			m_params.replacement,
-			m_params.randomness,
-			m_params.diversity_ratio,
-			m_params.purge_ratio);
+			m_params.randomness);
 
 		// Check for stagnation
 		stats.checkStagnation(m_encoding->m_max_fitness, m_generation);
