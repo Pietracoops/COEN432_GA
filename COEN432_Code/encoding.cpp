@@ -1,12 +1,5 @@
-
+// Christopher Neves: 27521979 / Massimo Pietracupa: 27313683
 #include "encoding.h"
-
-
-size_t Genome::getSize() const
-{
-	return this->genome_encoding_2b2_int.size();
-}
-
 
 // TILE OBJECTS
 
@@ -35,7 +28,6 @@ void GAEncoding_Ass1::Tile::printTile()
 }
 
 
-
 // ASS1 ENCODINGS
 
 std::vector<std::vector<int>> GAEncoding_Ass1::returnGenome()
@@ -54,29 +46,25 @@ std::vector<int> GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
 	int row_mismatches = 0;
 	int total = 0;
 
+	// Check mismatches between tiles in same row
 	for (unsigned int i = 1; i < genome.getSize(); i++)
 	{
 		if (i % WIDTH == 0) 
 		{
-			std::cout << std::endl;
 			continue;
 		}
 		Tile T1 = m_map_index[genes[i - 1][0]];
 		T1.rotate(genes[i - 1][1]);
 		Tile T2 = m_map_index[genes[i][0]];
 		T2.rotate(genes[i][1]);
-		//std::cout << "comparing ROW Tile " << i << " right with " << T1.right << " and Tile " << i + 1 << " left " << T2.left << std::endl;
 		if (T1.right != T2.left)
 		{
-			//std::cout << "ROW MISMATCH: Tile " << i << " and Tile " << i + 1 << std::endl;
-			std::cout << T1.right << ":" << T2.left << "   ";
-
 			row_mismatches++;
 		}
 		total++;
 	}
 
-	// Calculate Columns
+	// Check mismatches between tiles in columns
 	int col_mismatches = 0;
 	for (unsigned int i = 0; i < genome.getSize() - WIDTH; i++)
 	{
@@ -84,21 +72,19 @@ std::vector<int> GAEncoding_Ass1::fitnessOfGenome(const Genome& genome)
 		T1.rotate(genes[i][1]);
 		Tile T2 = m_map_index[genes[i + WIDTH][0]];
 		T2.rotate(genes[i + WIDTH][1]);
-		//std::cout << "comparing COL Tile " << i << " Bottom with " << T1.bottom << " and Tile " << i + WIDTH << " top " << T2.top << std::endl;
 		if (T1.bottom != T2.top)
 		{
-			//std::cout << "COLUMN MISMATCH: Tile " << i << " and Tile " << i + WIDTH << " col mismatch" << std::endl;
 			col_mismatches++;
 		}
 		total++;
 	}
 
+	// Revert the fitness so that it increases (Fitness = number of successful edges)
 	output.push_back(MAX_MISMATCHES - (col_mismatches + row_mismatches));
 	output.push_back(row_mismatches);
 	output.push_back(col_mismatches);
 	return output;
 }
-
 
 std::vector<std::vector<std::vector<int>>> GAEncoding_Ass1::returnRandomizedGenome(const unsigned int number_of_genomes)
 {
@@ -114,7 +100,6 @@ std::vector<std::vector<std::vector<int>>> GAEncoding_Ass1::returnRandomizedGeno
 
 void GAEncoding_Ass1::initializaPopulation(const unsigned int number_of_genomes)
 {
-
 	// Set the population size attribute of the encoding
 	starting_pop_size = number_of_genomes;
 
@@ -127,7 +112,7 @@ void GAEncoding_Ass1::initializaPopulation(const unsigned int number_of_genomes)
 
 void GAEncoding_Ass1::encodeToMap(std::vector<std::vector<std::string>> input)
 {
-	
+	// Store the input into the m_original_genome map
 	unsigned int tile_index = 0;
 	for (unsigned int i = 0; i < input.size(); i++)
 	{
@@ -142,12 +127,11 @@ void GAEncoding_Ass1::encodeToMap(std::vector<std::vector<std::string>> input)
 			tile_index++;
 		}
 	}
-
 }
-
 
 GAEncoding_Ass1::GAEncoding_Ass1(std::string file_name)
 {
+	// CONSTRUCTOR
 	// Read input file
 	std::vector<std::string> vs_file = void_file;
 	if (!file_name.empty())
@@ -161,7 +145,6 @@ GAEncoding_Ass1::GAEncoding_Ass1(std::string file_name)
 	for (unsigned int i = 0; i < vs_file.size(); i++)
 	{
 		// Loop through each row of file and delimit according to spaces
-
 		std::stringstream currentLine(vs_file[i]);
 		std::string currentNumber;
 		std::vector<std::string> row;
@@ -176,32 +159,23 @@ GAEncoding_Ass1::GAEncoding_Ass1(std::string file_name)
 	encodeToMap(puzzle_box);
 
 	// Generate a random seed
-	
 	seed = rd() ^ ((std::mt19937::result_type)std::chrono::duration_cast<std::chrono::seconds>(
 			std::chrono::system_clock::now().time_since_epoch()).count() + (std::mt19937::result_type)
 			std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 	gen_mt.seed(seed);
 
-
 	// Initialize Fitness Trackers
 	m_max_fitness = 0;
+	m_med_fitness = 0;
 	m_min_fitness = 0;
 }
-
 
 GAEncoding_Ass1::~GAEncoding_Ass1()
 {
 	// Destructor
 }
 
-void GAEncoding_Ass1::parentSelection(int strategy,
-									  uint32_t carry_over,
-									  float selection_ratio,
-									  uint32_t window_size,
-									  bool replacement,
-									  float randomness,
-									  float diversity_ratio,
-									  float purge_ratio)
+void GAEncoding_Ass1::parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness)
 {
 	// Two types of parent selection
 	// 1: Generational: Each individual survives for exactly one generation - set of parents completely replaced
@@ -209,7 +183,6 @@ void GAEncoding_Ass1::parentSelection(int strategy,
 
 	// Generation Gap is the input into parent selection where 1.0 is Generational and 1/pop_size is Steady-State
 
-	
 	// The process
 	// 1. clear parents
 	m_parents.clear();
@@ -222,7 +195,7 @@ void GAEncoding_Ass1::parentSelection(int strategy,
 	m_med_fitness = m_population[m_population.size()/2].getFitness();
 	m_min_fitness = m_population[m_population.size() - 1].getFitness();
 
-	// 3. append the carry over to parents + remove them from original population list
+	// 3. append the carry over to parents + remove them from original population list (ELITISM)
 	for (unsigned int i = 0; i < carry_over; i++)
 	{
 		m_elite.push_back(m_population[0]);			// Store the first element in parents
@@ -254,13 +227,6 @@ void GAEncoding_Ass1::parentSelection(int strategy,
 		}
 	}
 
-	// If we are struggling to achieve desired diversity, soft reset
-	//if (((m_max_fitness - m_min_fitness) / m_max_fitness) < diversity_ratio)
-	//{
-	//	permutationRandomDiversify(parents, purge_ratio);
-	//}
-
-
 	// Complete
 	m_parents = parents;
 	
@@ -288,6 +254,7 @@ std::vector<Genome> GAEncoding_Ass1::parentSelectionFitnessProportionate(std::ve
 		unsigned int current = 0;
 		for (unsigned int i = 0; i < population.size(); i++)
 		{
+			// Roulette style picking
 			current += population[i].getFitness();
 			if (current > pick)
 			{
@@ -299,7 +266,6 @@ std::vector<Genome> GAEncoding_Ass1::parentSelectionFitnessProportionate(std::ve
 		}
 		genomes_to_pick--;
 	}
-
 
 	return parents;
 }
@@ -393,14 +359,9 @@ std::vector<Genome> GAEncoding_Ass1::parentSelectionTournament(std::vector<Genom
 		}
 	}
 
-
 	return parents;
-
 }
 
-/**
-* 
-*/
 void GAEncoding_Ass1::survivorSelection(int policy, int survivorSize)
 {
 	if (policy == 0)
@@ -424,13 +385,8 @@ void GAEncoding_Ass1::survivorSelection(int policy, int survivorSize)
 		m_population.insert(m_population.end(), m_elite.begin(), m_elite.end());
 		m_offspring.clear();
 	}
-
-
 }
 
-/**
-* (u, g) policy. Pick u survivors from g children. Children are ranked based on fitness and u survivors are chosen
-*/
 std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy(int survivorSize) 
 {
 	if (survivorSize == 0)
@@ -454,19 +410,12 @@ std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy(int survivorSize)
 	return survivors;
 }
 
-
 std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy_FUDS(int survivorSize)
 {
-
-	// Sort the offspring
-	//std::sort(m_offspring.begin(), m_offspring.end(), [](const Genome& lhs, const Genome& rhs) {return lhs.getFitness() > rhs.getFitness(); });
-
 	// Initialize the bin
 	std::map<int, std::pair<int, std::vector<int>>> bins;
 
-
 	// Start building the bin
-
 	for (int i = 0; i < m_offspring.size(); i++)
 	{
 		auto elem = bins.find(m_offspring[i].getFitness());
@@ -498,7 +447,7 @@ std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy_FUDS(int survivorSize)
 	int range = maxprob - minprob;
 
 	// Now select the indices to go extinct and not make it past survivor selection
-	std::vector<float> probFloats = generateRandVecFloat(m_offspring.size() - survivorSize, gen_mt);
+	std::vector<float> probFloats = generateRandVecFloat((int)m_offspring.size() - survivorSize, gen_mt);
 	//std::vector<int> extinctionIndices(m_offspring.size() - survivorSize);
 	std::set<int> extinctionIndices;
 
@@ -554,12 +503,6 @@ std::vector<Genome> GAEncoding_Ass1::uFromGammaPolicy_FUDS(int survivorSize)
 
 }
 
-
-/**
-* Pick u survivors from offspring + parents
-* 
-* (Not recommended by prof and textbook)
-*/
 std::vector<Genome> GAEncoding_Ass1::uPlusGammaPolicy(int survivorSize)
 {
 	if (survivorSize == 0)
@@ -592,7 +535,6 @@ std::vector<Genome> GAEncoding_Ass1::uPlusGammaPolicy(int survivorSize)
 
 void GAEncoding_Ass1::permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps)
 {
-
 	// Generate distribution
 	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
 
@@ -621,7 +563,6 @@ void GAEncoding_Ass1::permutationSwap(Genome& gen, const uint32_t pos1, const ui
 	}
 
 	std::iter_swap(gen.genome_encoding_2b2_int.begin() + pos1, gen.genome_encoding_2b2_int.begin() + pos2);
-	
 }
 
 void GAEncoding_Ass1::permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos)
@@ -641,6 +582,7 @@ void GAEncoding_Ass1::permutationInsert(Genome& gen, const uint32_t initial_pos,
 	// Get vector from genome
 	std::vector<std::vector<int>> genome_enc = gen.genome_encoding_2b2_int;
 
+	// Store the initial position data
 	std::vector<int> initial = gen.genome_encoding_2b2_int[initial_pos];
 
 	// Insert the initial vect into final position
@@ -672,6 +614,7 @@ void GAEncoding_Ass1::permutationRandomInsert(Genome& gen)
 	// Get vector from genome
 	std::vector<std::vector<int>> genome_enc = gen.genome_encoding_2b2_int;
 
+	// Store the initial position data
 	std::vector<int> initial = gen.genome_encoding_2b2_int[initial_pos];
 
 	// Insert the initial vect into final position
@@ -771,10 +714,7 @@ void GAEncoding_Ass1::permutationRandomInvert(Genome& gen, float mutation_ratio)
 
 void GAEncoding_Ass1::permutationPointMutation(Genome& gen, unsigned int pos, unsigned int rot)
 {
-	// Our point mutation will simply rotate the tile at the specified index
-	// We should also consider rotating more than just once at a time.
 	if (rot > 3) rot = 3;
-
 	gen.genome_encoding_2b2_int[pos][1] = rot;
 }
 
@@ -812,7 +752,7 @@ void GAEncoding_Ass1::permutationRandomPointMutation(Genome& gen, float mutation
 	gen.setFitness(fitnessOfGenome(gen));
 }
 
-void GAEncoding_Ass1::permutationRandomPointMutationOld(Genome& gen)
+void GAEncoding_Ass1::permutationRandomPointMutationOriginal(Genome& gen)
 {
 	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
 	std::uniform_int_distribution<unsigned int> distribution_rot(0, 3);
@@ -825,7 +765,7 @@ void GAEncoding_Ass1::permutationRandomPointMutationOld(Genome& gen)
 	gen.setFitness(fitnessOfGenome(gen));
 }
 
-void GAEncoding_Ass1::permutationRandomInvertOld(Genome& gen)
+void GAEncoding_Ass1::permutationRandomInvertOriginal(Genome& gen)
 {
 	// Generate distribution
 	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
@@ -853,7 +793,7 @@ void GAEncoding_Ass1::permutationRandomInvertOld(Genome& gen)
 	gen.setFitness(fitnessOfGenome(gen));
 }
 
-void GAEncoding_Ass1::permutationRandomScrambleOld(Genome& gen)
+void GAEncoding_Ass1::permutationRandomScrambleOriginal(Genome& gen)
 {
 	// Generate distribution
 	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
@@ -907,31 +847,6 @@ void GAEncoding_Ass1::permutationRandomSlide(Genome& gen)
 		counter++;
 	}
 	gen.setFitness(fitnessOfGenome(gen));
-}
-
-
-void GAEncoding_Ass1::permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio)
-{
-	// Generate distribution
-	std::uniform_int_distribution<unsigned int> distribution(0, int(gen_v.size() - 1));
-
-	// Pick from distribution
-	unsigned int number_of_parents_to_pick = distribution(gen_mt);
-	std::set<unsigned int> selected_indices;
-
-	while (selected_indices.size() != (int)(purge_ratio * gen_v.size()))
-	{
-		int index = distribution(gen_mt);
-		selected_indices.insert(index);
-	}
-
-	// Convert the set to a vector
-	//std::vector<int> selected_indices_v(selected_indices.begin(), selected_indices.end());
-
-	for (auto index : selected_indices)
-	{
-		gen_v[index] = returnRandomlyInitializedGenome();
-	}
 }
 
 void GAEncoding_Ass1::permutationSlide(Genome& gen)
@@ -996,7 +911,7 @@ void GAEncoding_Ass1::permutationSlide(Genome& gen)
 	std::map<int, int> map_left_over;
 
 	// Build the first map
-	for (int i = 0; i < bbox1.size(); i++) 
+	for (int i = 0; i < bbox1.size(); i++)
 	{
 		map_1_2[bbox1[i]] = bbox2[i];
 	}
@@ -1020,15 +935,82 @@ void GAEncoding_Ass1::permutationSlide(Genome& gen)
 	}
 
 	// Perform the swaps in map_left_over
-	
+
 	for (auto const& x : map_left_over)
 	{
 		permutationSwap(gen, x.first, x.second);
 	}
-	
+
 }
 
+void GAEncoding_Ass1::injectParents(float proportion)
+{
+	int num_new_parents = (int)(m_parents.size() * proportion);
 
+	for (int i = 0; i < num_new_parents; i++)
+	{
+		m_parents.push_back(returnRandomlyInitializedGenome());
+	}
+}
+
+std::string GAEncoding_Ass1::genotypeToPhenotype(Genome g)
+{
+	std::stringstream phenotype;
+
+	// Cycle through all the tiles
+	for (int i = 0; i < g.genome_encoding_2b2_int.size(); i++)
+	{
+		// Get the tile
+		Tile t = m_map_index[g.genome_encoding_2b2_int[i][0]];
+
+		// Apply the rotations
+		t.rotate(g.genome_encoding_2b2_int[i][1]);
+
+		// Add to string stream
+		phenotype << t.top << t.right << t.bottom << t.left;
+
+		// if we reached the end of a row, add a newline. Else, add a space
+		if (i == g.genome_encoding_2b2_int.size() - 1)
+		{
+			break;
+		}
+
+		if (((i + 1) % WIDTH == 0))
+		{
+			phenotype << std::endl;
+		}
+		else {
+			phenotype << " ";
+		}
+
+	}
+
+	return phenotype.str();
+}
+
+void GAEncoding_Ass1::permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio)
+{
+	// Generate distribution
+	std::uniform_int_distribution<unsigned int> distribution(0, int(gen_v.size() - 1));
+
+	// Pick from distribution
+	unsigned int number_of_parents_to_pick = distribution(gen_mt);
+	std::set<unsigned int> selected_indices;
+
+	while (selected_indices.size() != (int)(purge_ratio * gen_v.size()))
+	{
+		int index = distribution(gen_mt);
+		selected_indices.insert(index);
+	}
+
+	// Convert the set to a vector
+	//std::vector<int> selected_indices_v(selected_indices.begin(), selected_indices.end());
+
+	for (auto index : selected_indices)
+	{
+		gen_v[index] = returnRandomlyInitializedGenome();
+	}
+}
 
 Genome GAEncoding_Ass1::returnRandomlyInitializedGenome()
 {
@@ -1045,11 +1027,6 @@ Genome GAEncoding_Ass1::returnRandomlyInitializedGenome()
 	return tmp_gen;
 }
 
-/**
-* Acts on m_parents to create m_offspring.
-* 
-* TODO: add an argument that takes a crossover function so that it does not need to be changed manually
-*/
 void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover)
 {
 
@@ -1067,9 +1044,7 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 		}
 	}
 
-	int breedingsize = m_parents.size() * crossoverProb;
-
-
+	int breedingsize = (int)(m_parents.size() * crossoverProb);
 	std::uniform_int_distribution distr(0, (int)(breedingsize));
 	std::vector<Genome> pair, babies;
 
@@ -1083,12 +1058,12 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 	while (m_offspring.size() < goalOffspringSize)
 	{
 		int mating_parent = 0;
-		for (int i = 0; i < breedingsize; i++)								// Loop through parents designated for mating
+		for (int i = 0; i < breedingsize; i++)		// Loop through parents designated for mating
 		{
 			pair.push_back(m_parents[i]);
 			while (mating_parent == i)
 			{
-				mating_parent = distr(gen_mt);								// Select another parent that isn't the same parent
+				mating_parent = distr(gen_mt);		// Select another parent that isn't the same parent
 			} 
 			pair.push_back(m_parents[mating_parent]);
 
@@ -1125,7 +1100,7 @@ void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated)
 		{
 			if (accelerated)
 			{
-				permutationRandomScrambleOld(m_offspring[i]);
+				permutationRandomScrambleOriginal(m_offspring[i]);
 			}
 			else
 			{
@@ -1136,39 +1111,20 @@ void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated)
 		{
 			if (accelerated)
 			{
-				permutationRandomPointMutationOld(m_offspring[i]);
+				permutationRandomPointMutationOriginal(m_offspring[i]);
 			}
 			else
 			{
 				permutationRandomPointMutation(m_offspring[i], mutationProb);
 			}
 		}
-		//else if (mutation_to_use == 2)
-		//{
-		//
-		//	if (accelerated)
-		//	{
-		//		permutationRandomInvertOld(m_offspring[i]);
-		//	}
-		//	else
-		//	{
-		//		permutationRandomInvert(m_offspring[i], mutationProb);
-		//	}
-		//	
-		//}
 	}
 
 }
 
-/**
-* Takes two parents and produces a vector containing 2 offspring genomes
-* 
-* THIS WILL NOT WORK FOR OUR PROBLEM, LEADS TO INADMISSIBLE SOLUTION
-*/
-std::vector<Genome> GAEncoding_Ass1::singlePointCrossover(Genome& parent1, Genome& parent2)
+std::vector<Genome> GAEncoding_Ass1::singlePointCrossover(Genome& parent1, Genome& parent2) // Not used because we need PMX
 {
-	std::vector<std::vector<int>> off1vec(parent1.genome_encoding_2b2_int), 
-		off2vec(parent2.genome_encoding_2b2_int);
+	std::vector<std::vector<int>> off1vec(parent1.genome_encoding_2b2_int), off2vec(parent2.genome_encoding_2b2_int);
 
 	// Get random integer between start + 1 and end - 1
 	std::uniform_int_distribution<> distr(1, (int)(parent1.getSize() - 1));
@@ -1179,13 +1135,11 @@ std::vector<Genome> GAEncoding_Ass1::singlePointCrossover(Genome& parent1, Genom
 
 	// Set the fitness of the resulting offspring
 	Genome off1(off1vec);
-	off1.setFitness(fitnessOfGenome(off1));
-
 	Genome off2(off2vec);
+	off1.setFitness(fitnessOfGenome(off1));
 	off2.setFitness(fitnessOfGenome(off2));
 
 	return std::vector<Genome> {off1, off2};
-
 }
 
 std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, Genome& parent2, std::vector<unsigned int> cross_indices)
@@ -1202,7 +1156,6 @@ std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, G
 	Genome child2;
 	child1.genome_encoding_2b2_int = parent2.genome_encoding_2b2_int;
 	child2.genome_encoding_2b2_int = parent1.genome_encoding_2b2_int;
-
 
 	// These maps are used to store the indices of each value for the vectors
 	// For quick querry
@@ -1222,7 +1175,6 @@ std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, G
 	// these swaps down the crossed section, all the pieces will fall into place
 	for (unsigned int i = 0; i < cross_indices.size(); i++)
 	{
-		
 		permutationSwap(child1, cross_indices[0], map_parent1[parent2.genome_encoding_2b2_int[cross_indices[0]][0]]);
 		permutationSwap(child2, cross_indices[0], map_parent2[parent1.genome_encoding_2b2_int[cross_indices[0]][0]]);
 	}
@@ -1230,13 +1182,11 @@ std::vector<Genome> GAEncoding_Ass1::partiallyMappedCrossover(Genome& parent1, G
 	child1.setFitness(fitnessOfGenome(child1));
 	child2.setFitness(fitnessOfGenome(child2));
 
-	
 	output.push_back(child1);
 	output.push_back(child2);
 
 	return output;
 }
-
 
 Genome GAEncoding_Ass1::getGenomeFromPopulation(const unsigned int gen_num)
 {
@@ -1254,13 +1204,8 @@ float GAEncoding_Ass1::getAverageFitness(std::vector<Genome> population)
 	return average / (float)population.size();
 }
 
-/**
-* If arguments are not specified then the termination condition linked to those arguments
-* will not execute.
-*/
 bool GAEncoding_Ass1::terminationConditions(int currentGen, int maxGeneration, double currRuntime, double maxRuntime, int targetFitness)
 {
-	
 	if (maxGeneration != -1 && (currentGen == maxGeneration))
 	{
 		return true;
@@ -1275,13 +1220,13 @@ bool GAEncoding_Ass1::terminationConditions(int currentGen, int maxGeneration, d
 
 }
 
-
-void GAEncoding_Ass1::savePopulation()
+std::string GAEncoding_Ass1::savePopulation()
 {
 
 	std::string date = getCurrentDateTime("date");
 	std::ofstream fout;
-	fout.open("population_" + date + ".txt");
+	std::string file_name = "population_" + date + ".txt";
+	fout.open(file_name);
 
 	for (unsigned int i = 0; i < m_population.size(); i++)
 	{
@@ -1297,11 +1242,11 @@ void GAEncoding_Ass1::savePopulation()
 		fout << "\n";
 	}
 
+	return file_name;
 }
 
 void GAEncoding_Ass1::loadPopulation(std::string file_name, unsigned int starting_pop_size)
 {
-
 	m_population.clear();
 
 	std::ifstream fin(file_name);
@@ -1350,7 +1295,7 @@ void GAEncoding_Ass1::loadPopulation(std::string file_name, unsigned int startin
 	}
 
 	// Set the population size attribute of the encoding
-	unsigned int remaining_genomes = starting_pop_size - m_population.size();
+	unsigned int remaining_genomes = starting_pop_size - (int)m_population.size();
 	if (remaining_genomes > 0)
 	{
 		for (unsigned int i = 0; i < remaining_genomes; i++)
@@ -1360,53 +1305,6 @@ void GAEncoding_Ass1::loadPopulation(std::string file_name, unsigned int startin
 	}
 
 }
-
-void GAEncoding_Ass1::injectParents(float proportion)
-{
-	int num_new_parents = m_parents.size() * proportion;
-
-	for (int i = 0; i<num_new_parents;i++)
-	{
-		m_parents.push_back(returnRandomlyInitializedGenome());
-	}
-}
-
-std::string GAEncoding_Ass1::genotypeToPhenotype(Genome g)
-{
-	std::stringstream phenotype;
-
-	// Cycle through all the tiles
-	for (int i = 0; i < g.genome_encoding_2b2_int.size(); i++)
-	{
-		// Get the tile
-		Tile t = m_map_index[g.genome_encoding_2b2_int[i][0]];
-
-		// Apply the rotations
-		t.rotate(g.genome_encoding_2b2_int[i][1]);
-
-		// Add to string stream
-		phenotype << t.top << t.right << t.bottom << t.left;
-
-		// if we reached the end of a row, add a newline. Else, add a space
-
-		if (i == g.genome_encoding_2b2_int.size() - 1)
-		{
-			break;
-		}
-
-		if (((i + 1) % WIDTH == 0))
-		{
-			phenotype << std::endl;
-		}
-		else {
-			phenotype << " ";
-		}
-
-	}
-
-	return phenotype.str();
-}
-
 
 Genome GAEncoding_Ass1::getEliteFromFile(std::string file_name)
 {
@@ -1455,7 +1353,6 @@ Genome GAEncoding_Ass1::getEliteFromFile(std::string file_name)
 
 	// Sort the population
 	std::sort(loaded_pop.begin(), loaded_pop.end(), [](const Genome& lhs, const Genome& rhs) {return lhs.getFitness() > rhs.getFitness(); });
-
 
 	return loaded_pop[0];
 }

@@ -1,3 +1,4 @@
+// Christopher Neves: 27521979 / Massimo Pietracupa: 27313683
 #pragma once
 
 #ifndef _LOGGING_H_
@@ -30,11 +31,11 @@ inline std::string getCurrentDateTime(std::string s)
         strftime(buf, sizeof(buf), "%Y-%m-%d-%H-%M-%S", &tstruct);
     return std::string(buf);
 };
+
 inline void Logger(std::string logMsg) 
 {
     if (!LOG_PATH.empty())
     {
-        //std::string filePath = LOG_PATH + "/log_" + getCurrentDateTime("date") + ".log";
         std::string now = getCurrentDateTime("now");
         std::ofstream ofs(LOG_PATH.c_str(), std::ios_base::out | std::ios_base::app);
         ofs << now << '\t' << logMsg << '\n';

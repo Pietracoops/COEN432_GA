@@ -1,3 +1,4 @@
+// Christopher Neves: 27521979 / Massimo Pietracupa: 27313683
 #pragma once
 
 
@@ -8,7 +9,7 @@
 #include "helper_functions.h"
 
 
-class GAEncoding
+class GAEncoding // Base Encoding Class
 {
 public:
 
@@ -20,7 +21,7 @@ public:
 	virtual void mutation(float mutationProb, bool accelerated) = 0;
 
 	// Parent Selection
-	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness, float diversity_ratio, float purge_ratio) = 0;
+	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness) = 0;
 	virtual std::vector<Genome> parentSelectionFitnessProportionate(std::vector<Genome> population, float selection_ratio) = 0;
 	virtual std::vector<Genome> parentSelectionTournament(std::vector<Genome> population, float selection_ratio, uint32_t window_size, bool replacement) = 0;
 
@@ -38,12 +39,14 @@ public:
 	virtual void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio) = 0;
 	virtual void permutationSlide(Genome& gen) = 0;
 	virtual void injectParents(float proportion) = 0;
-	virtual void savePopulation() = 0;
 	virtual void loadPopulation(std::string file_name, unsigned int starting_pop_size) = 0;
+	virtual std::string savePopulation() = 0;
 
 	// Utility Functions
 	virtual Genome getGenomeFromPopulation(const unsigned int gen_num) = 0;
 	virtual float getAverageFitness(std::vector<Genome> population) = 0;
+	virtual Genome getEliteFromFile(std::string file_name) = 0;
+	virtual std::string genotypeToPhenotype(Genome g) = 0;
 
 	// Termination Condition Functions
 	virtual bool terminationConditions(int currentGen, int maxGeneration, double currRuntime, double maxRuntime, int targetFitness) = 0;
@@ -67,7 +70,7 @@ public:
 
 };
 
-class GAEncoding_Ass1 : public GAEncoding
+class GAEncoding_Ass1 : public GAEncoding // Derived Class for Assignment 1
 {
 	// Tile Class containing any operations required to manipulate Tiles
 	class Tile
@@ -95,12 +98,12 @@ public:
 
 	// Core Functions
 	
-	virtual void recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover = false) override;	// Crossover 
+	virtual void recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover = false) override;
 	virtual void mutation(float mutationProb, bool accelerated) override;
-	virtual void survivorSelection(int policy = 0, int survivorSize = 0) override;							// Select Survivors
+	virtual void survivorSelection(int policy = 0, int survivorSize = 0) override;
 
 	// Parent Selection
-	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness, float diversity_ratio, float purge_ratio);
+	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness);
 	virtual std::vector<Genome> parentSelectionFitnessProportionate(std::vector<Genome> population, float selection_ratio) override;
 	virtual std::vector<Genome> parentSelectionTournament(std::vector<Genome> population, float selection_ratio, uint32_t window_size, bool replacement) override;
 
@@ -110,21 +113,21 @@ public:
 	std::vector<Genome> uFromGammaPolicy_FUDS(int survivorSize = 0); // Policy 2
 
 	// Mutation Functions
-	void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) override;
-	void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2) override;
-	void permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos) override;
-	void permutationRandomInsert(Genome& gen) override;
-	void permutationScramble(Genome& gen, std::vector<int> indices) override;
-	void permutationRandomScramble(Genome& gen, float mutation_ratio) override;
-	void permutationInvert(Genome& gen, std::vector<int> indices) override;
-	void permutationRandomInvert(Genome& gen, float mutation_ratio) override;
-	void permutationPointMutation(Genome& gen, unsigned int pos, unsigned int rot) override;
-	void permutationRandomPointMutation(Genome& gen, float mutation_ratio) override;
-	void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio) override;
-	void permutationSlide(Genome& gen) override;
-	void permutationRandomScrambleOld(Genome& gen);
-	void permutationRandomInvertOld(Genome& gen);
-	void permutationRandomPointMutationOld(Genome& gen);
+	void permutationRandomSwap(Genome& gen, const uint32_t num_of_swaps) override;							// Randomly swap two indices
+	void permutationSwap(Genome& gen, const uint32_t pos1, const uint32_t pos2) override;					// Swap two specified indices
+	void permutationInsert(Genome& gen, const uint32_t initial_pos, const uint32_t final_pos) override;		// Insert a specified Indice into a new location
+	void permutationRandomInsert(Genome& gen) override;														// Randomly insert an indice into a new random location
+	void permutationScramble(Genome& gen, std::vector<int> indices) override;								// Scramble selected Index
+	void permutationRandomScramble(Genome& gen, float mutation_ratio) override;								// Scramble a randomly selected set of genes based on mutation ratio
+	void permutationInvert(Genome& gen, std::vector<int> indices) override;									// Invert a specified list of Indices
+	void permutationRandomInvert(Genome& gen, float mutation_ratio) override;								// Invert a randomly selected list of Indices based on mutation ratio
+	void permutationPointMutation(Genome& gen, unsigned int pos, unsigned int rot) override;				// Perform a point mutation (rotation) on with designated index and rotation
+	void permutationRandomPointMutation(Genome& gen, float mutation_ratio) override;						// Perform a point mutation with randomly selected indices and rotation based on mutation ratio
+	void permutationRandomDiversify(std::vector<Genome>& gen_v, const float purge_ratio) override;			// Purge population based on purge ratio and introduce new genomes
+	void permutationSlide(Genome& gen) override;															// Slide a box of indices to another location in 2d grid
+	void permutationRandomScrambleOriginal(Genome& gen);													// Scramble a randomly selected set of genes
+	void permutationRandomInvertOriginal(Genome& gen);														// Invert a randomly selected list of Indices
+	void permutationRandomPointMutationOriginal(Genome& gen);												// Perform a point mutation with randomly selected indices and rotation
 	void permutationRandomSlide(Genome& gen);
 
 
@@ -139,31 +142,30 @@ public:
 	virtual Genome getGenomeFromPopulation(const unsigned int gen_num) override;
 	virtual float getAverageFitness(std::vector<Genome> population) override;
 	virtual void injectParents(float proportion) override;
+	Genome getEliteFromFile(std::string file_name) override;
+	std::string genotypeToPhenotype(Genome g) override;
 
-	void savePopulation() override;
+	// Save and Load Functions
+	std::string savePopulation() override;
 	void loadPopulation(std::string file_name, unsigned int starting_pop_size) override;
-
-	Genome getEliteFromFile(std::string file_name);
-	std::string genotypeToPhenotype(Genome g);
-
 
 	// The original genome that was extracted from the input file
 	std::vector<std::vector<int>> m_original_genome;
 
 private:
 
-	// Random tools
+	// Random Seed tools
 	std::random_device rd;
 	std::mt19937::result_type seed;
 	std::mt19937 gen_mt;
 
+	// These should be dynamically set based on input file
 	int WIDTH = 8;
 	int HEIGHT = 8;
 
 	int starting_pop_size;
 
 	uint32_t MAX_MISMATCHES = 112;
-
 
 	// Map containing the indexes of each tile (1 - 64) and the corresponding Tile
 	// Tile object where each individual tile of the puzzle can be stored
