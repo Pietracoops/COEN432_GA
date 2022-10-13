@@ -87,7 +87,7 @@ public:
 	bool terminationConditions(int currentGen, int maxGeneration = -1, double currRuntime = -1, double maxRuntime = -1, int targetFitness = -1);
 
 	void runGA(std::string population_file = "");
-	void returnEliteFenotype();
+	void returnElitePhenotype();
 	std::string printParameters();
 
 	Parameters m_params;

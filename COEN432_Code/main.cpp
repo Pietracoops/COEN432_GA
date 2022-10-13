@@ -13,7 +13,7 @@ int main()
 	GAEncoding* Encoding = &Encoding_Ass1;
 
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 200;
+	unsigned int POPULATION_SIZE = 2000;
 
 	//// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
@@ -48,7 +48,7 @@ int main()
 	GA.m_params.random_parent_proportion = 0.1F;
 
 	// --- Termination Condition Parameters
-	GA.m_params.maxGeneration = 5;
+	GA.m_params.maxGeneration = 1;
 	GA.m_params.maxRuntime = 600; // seconds
 	GA.m_params.targetFitness = 112;
 
@@ -61,8 +61,8 @@ int main()
 	GA.m_params.save_every_x_generation = true;
 	GA.m_params.save_every_x_generation_val = 250;
 
-	GA.runGA();
-	GA.returnEliteFenotype();
+	GA.runGA("record_breaker.txt");
+	GA.returnElitePhenotype();
 
 	std::cout << "Program Terminated." << std::endl;
 	return 0;

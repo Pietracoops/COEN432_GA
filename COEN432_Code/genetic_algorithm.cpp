@@ -113,7 +113,7 @@ std::string GeneticAlgorithm::printParameters()
 	return output;
 }
 
-void GeneticAlgorithm::returnEliteFenotype()
+void GeneticAlgorithm::returnElitePhenotype()
 {
 	// Export to file
 	Genome elite = m_encoding->getEliteFromFile(m_population_log_name);

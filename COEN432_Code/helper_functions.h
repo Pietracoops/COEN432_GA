@@ -47,6 +47,14 @@ std::vector<std::string> splitString(std::string str, std::string delimiter);
 // Generates the indices for a random bounding box in a 2D vector
 std::vector<unsigned int> getBoundingBox(int col_dim, int row_dim, std::mt19937& engine, int index1 = -1, int index2 = -1, int max_area = -1, int max_cols = -1, int max_rows = -1);
 
+// Converts a 2 Dimensional vector to a 1 Dimensional vector (specific to our genome)
+/// \return: vector of ints (2D)
+std::vector<std::vector<int>> vectTo1D_g(std::vector<std::vector<std::vector<int>>> vect_input, uint32_t row, uint32_t col);
+
+// Converts a 2 Dimensional vector to a 1 Dimensional vector (specific to our genome)
+/// \return: vector of ints (2D)
+std::vector<std::vector<std::vector<int>>> vectTo2D_g(std::vector<std::vector<int>> vect_input, uint32_t row, uint32_t col);
+
 // Converts a 1 Dimensional vector to a 2 Dimensional vector
 /// \return: vector of ints (2D)
 std::vector<std::vector<int>> vectTo2D(std::vector<int> vect_input, uint32_t row, uint32_t col);

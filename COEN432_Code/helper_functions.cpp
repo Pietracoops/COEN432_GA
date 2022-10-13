@@ -82,6 +82,123 @@ std::vector<std::string> splitString(std::string str, std::string delimiter)
 	return output;
 }
 
+std::vector<std::vector<int>> vectTo1D_g(std::vector<std::vector<std::vector<int>>> vect_input, uint32_t row, uint32_t col)
+{
+	std::vector<std::vector<int>> output;
+
+	for (unsigned int i = 0; i < vect_input.size(); i++)
+	{
+		for (unsigned int j = 0; j < vect_input[0].size(); j++)
+		{
+			output.push_back(vect_input[i][j]);
+
+		}
+	}
+
+	return output;
+}
+
+std::vector<std::vector<std::vector<int>>> vectTo2D_g(std::vector<std::vector<int>> vect_input, uint32_t row, uint32_t col)
+{
+	std::vector<std::vector<std::vector<int>>> output;
+	std::vector<std::vector<int>> row_vect;
+	std::vector<int> zero = { 0,0 };
+
+	int counter = 0;
+	for (unsigned int i = 0; i < row; i++)
+	{
+		for (unsigned int j = 0; j < col; j++)
+		{
+			if (counter > vect_input.size())
+			{
+				row_vect.push_back(zero);
+			}
+			else
+			{
+				row_vect.push_back(vect_input[counter]);
+				counter++;
+			}
+		}
+
+		output.push_back(row_vect);
+		row_vect.clear();
+	}
+
+	return output;
+}
+
+std::vector<std::vector<std::vector<int>>> vectSlide_g(std::vector<std::vector<std::vector<int>>>vect_input, std::vector<std::vector<int>> indices, int slide, bool vertical)
+{
+	std::vector<std::vector<std::vector<int>>> sliding_box = vect_input;
+	std::vector<std::vector<int>> row_vect;
+
+	int bounding_box_width = indices[1][1] - indices[0][1];
+	int bounding_box_height = indices[1][0] - indices[0][0];
+	// Indices should be
+	// [Row1, Col1]
+	// [Row2, Col2]
+
+	// Copy the second bounding box into its position in sliding_box
+	int starting_column = indices[0][1] + slide;
+	int starting_row = indices[0][0] + slide;
+	int ending_column = starting_column + bounding_box_width;
+	int ending_row = starting_row + bounding_box_height;
+
+	if (bounding_box_height - slide > 0)
+	{
+		starting_row += bounding_box_height - slide;
+	}
+
+	if (bounding_box_width - slide > 0)
+	{
+		starting_column += bounding_box_width - slide;
+	}
+
+	if (!vertical)
+	{
+		// This is for horizontal slide
+		// Copy the non bounding box portion
+		for (int i = indices[0][0]; i < indices[1][0] + bounding_box_height; i++)
+		{
+			for (int j = starting_column; j <= ending_column; j++)
+			{
+				sliding_box[i][indices[0][1] + (j - starting_column)] = vect_input[i][j];
+
+			}
+		}
+		// Copy the bounding box
+		for (int i = indices[0][0]; i <= indices[1][0]; i++)
+		{
+			for (int j = indices[0][1] + slide; j <= indices[1][1] + slide; j++)
+			{
+				sliding_box[i][j] = vect_input[i][j - slide];
+			}
+		}
+	}
+	else
+	{
+		// this is for horizontal slide
+		// Copy the non bounding box portion
+		for (int i = starting_row; i <= ending_row; i++)
+		{
+			for (int j = indices[0][1]; j <= indices[1][1]; j++)
+			{
+				sliding_box[indices[0][0] + (i - starting_row)][j] = vect_input[i][j];
+			}
+		}
+		// Copy the bounding box
+		for (int i = indices[0][0] + slide; i <= indices[1][0] + slide; i++)
+		{
+			for (int j = indices[0][1]; j <= indices[1][1]; j++)
+			{
+				sliding_box[i][j] = vect_input[i - slide][j];
+			}
+		}
+	}
+
+	return sliding_box;
+}
+
 std::vector<std::vector<int>> vectTo2D(std::vector<int> vect_input, uint32_t row, uint32_t col)
 {
 	std::vector<std::vector<int>> output;
