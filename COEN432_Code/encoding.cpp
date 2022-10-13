@@ -1084,12 +1084,19 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 
 }
 
-void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated)
+void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated, bool slide)
 {
 	// Applies a random mutation to random offspring with a mutation probability mutationProb
 
+	
+	unsigned int permuatation_val = 1;
 	// Generate distribution
-	std::uniform_int_distribution<unsigned int> distribution(0, 2);
+	if (slide)
+	{
+		permuatation_val = 2;
+	}
+
+	std::uniform_int_distribution<unsigned int> distribution(0, permuatation_val);
 
 	// Pick from distribution to select mutation to use
 	unsigned int mutation_to_use; 

@@ -47,10 +47,10 @@ void GeneticAlgorithm::recombination(float crossoverProb, int goalOffspringSize,
 	genetic_algo_log() << "Recombination time using crossover prob [" << crossoverProb << "]: " << m_watch.Stop() << std::endl;
 }
 
-void GeneticAlgorithm::mutation(float mutationProb, bool accelerated)
+void GeneticAlgorithm::mutation(float mutationProb, bool accelerated, bool slide)
 {
 	m_watch.Start();
-	m_encoding->mutation(mutationProb, accelerated);
+	m_encoding->mutation(mutationProb, accelerated, slide);
 	genetic_algo_log() << "Mutation time using mutationProb [" << mutationProb << "]: " << m_watch.Stop() << std::endl;
 }
 
@@ -176,7 +176,7 @@ void GeneticAlgorithm::runGA(std::string population_file)
 
 		// Apply mutations to the population
 		genetic_algo_log() << "Starting mutation procedure... " << std::endl;
-		mutation(m_params.mutationProb, m_params.accelerated);
+		mutation(m_params.mutationProb, m_params.accelerated, m_params.slide);
 
 		// Select the survivors
 		genetic_algo_log() << "Starting survivor selection... " << std::endl;
