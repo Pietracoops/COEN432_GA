@@ -32,6 +32,7 @@ private:
 		// Mutation Parameters
 		float mutationProb;						// Probability of a gene in a genome to get mutated
 		bool accelerated;						// Accelerated mutation - random mutation sizes applied to genomes (accelerated climb rate early on)
+		bool slide;								// Add permutation function to randomly slide rectangles of indices around
 
 		// Survivor Selection Parameters
 		int survivorpolicy;						// 0 is ufromgamma, 1 is uplusgamma, 2 is uplusgamma fuds
@@ -82,7 +83,7 @@ public:
 	void initializePopulation(int population_size);																				
 	void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness);											// Select Parents
 	void recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover = false);									
-	void mutation(float mutationProb, bool accelerated);																	
+	void mutation(float mutationProb, bool accelerated, bool slide);
 	void survivorSelection(int policy, int survivorSize);	
 	bool terminationConditions(int currentGen, int maxGeneration = -1, double currRuntime = -1, double maxRuntime = -1, int targetFitness = -1);
 

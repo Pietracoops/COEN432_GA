@@ -64,6 +64,11 @@ std::vector<std::vector<int>> vectTo2D(std::vector<int> vect_input, uint32_t row
 /// \return: New 2 Dimensional bounding box with displaced indices
 std::vector<std::vector<int>> vectSlide(std::vector<std::vector<int>>vect_input, std::vector<std::vector<int>> indices, int slide, bool vertical);
 
+// Slides a 2 Dimensional box within a larger bounding box and displaces (specific to our genome)
+// All other boxes accordingly
+/// \return: New 2 Dimensional bounding box with displaced indices
+std::vector<std::vector<std::vector<int>>> vectSlide_g(std::vector<std::vector<std::vector<int>>>vect_input, std::vector<std::vector<int>> indices, int slide, bool vertical);
+
 // Prints a two dimensional vector
 /// \return: None
 void printVector(std::vector<std::vector<int>> vect);

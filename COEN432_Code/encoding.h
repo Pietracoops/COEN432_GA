@@ -18,7 +18,7 @@ public:
 	// Core Functions
 	virtual void survivorSelection(int policy = 0, int survivorSize = 0) = 0;		// Select Survivors from the parents + offspring
 	virtual void recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover) = 0;		// Crossover to generate offspring
-	virtual void mutation(float mutationProb, bool accelerated) = 0;
+	virtual void mutation(float mutationProb, bool accelerated, bool slide) = 0;
 
 	// Parent Selection
 	virtual void parentSelection(int strategy, uint32_t carry_over, float selection_ratio, uint32_t window_size, bool replacement, float randomness) = 0;
@@ -99,7 +99,7 @@ public:
 	// Core Functions
 	
 	virtual void recombination(float crossoverProb, int goalOffspringSize, bool skipCrossover = false) override;
-	virtual void mutation(float mutationProb, bool accelerated) override;
+	virtual void mutation(float mutationProb, bool accelerated, bool slide) override;
 	virtual void survivorSelection(int policy = 0, int survivorSize = 0) override;
 
 	// Parent Selection

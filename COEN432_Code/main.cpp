@@ -13,7 +13,7 @@ int main()
 	GAEncoding* Encoding = &Encoding_Ass1;
 
 	// ############### Init Parameters
-	unsigned int POPULATION_SIZE = 2000;
+	unsigned int POPULATION_SIZE = 1000;
 
 	//// ############### INitialize the GA using the Encoding and parameters
 	GeneticAlgorithm GA(Encoding, POPULATION_SIZE);
@@ -31,24 +31,25 @@ int main()
 	GA.m_params.randomness = 0.0f;
 
 	// --- Recombination parameters
-	GA.m_params.crossoverProb = 0.7F;
+	GA.m_params.crossoverProb = 0.8F;
 	GA.m_params.skipCrossover = false;
 	GA.m_params.goalOffspringSize = 2 * POPULATION_SIZE;
 
 	// --- Mutation parameters
 	GA.m_params.mutationProb = 0.05F;
 	GA.m_params.accelerated = false;
+	GA.m_params.slide = false;
 
 	// --- Survivor selection parameters
 	GA.m_params.survivorpolicy = 0; // Note: 0 is ufromgamma, 1 is uplusgamma, 2 is uplusgamma fuds
 	GA.m_params.survivorsize = POPULATION_SIZE;
 
 	// --- Stagnation handling
-	GA.m_params.inject_parents = false;
-	GA.m_params.random_parent_proportion = 0.1F;
+	GA.m_params.inject_parents = true;
+	GA.m_params.random_parent_proportion = 0.2F;
 
 	// --- Termination Condition Parameters
-	GA.m_params.maxGeneration = 1;
+	GA.m_params.maxGeneration = 10000000;
 	GA.m_params.maxRuntime = 600; // seconds
 	GA.m_params.targetFitness = 112;
 
@@ -61,7 +62,7 @@ int main()
 	GA.m_params.save_every_x_generation = true;
 	GA.m_params.save_every_x_generation_val = 250;
 
-	GA.runGA("record_breaker.txt");
+	GA.runGA();
 	GA.returnElitePhenotype();
 
 	std::cout << "Program Terminated." << std::endl;

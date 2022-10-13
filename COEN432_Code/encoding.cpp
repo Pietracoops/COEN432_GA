@@ -824,28 +824,30 @@ void GAEncoding_Ass1::permutationRandomScrambleOriginal(Genome& gen)
 void GAEncoding_Ass1::permutationRandomSlide(Genome& gen)
 {
 	// Generate distribution
-	std::uniform_int_distribution<unsigned int> distribution(0, int(gen.genome_encoding_2b2_int.size() - 1));
+	std::uniform_int_distribution<unsigned int> distribution(0, 3);
+	std::uniform_int_distribution<unsigned int> distributionBool(0, 1);
 
 	// Pick from distribution
-	unsigned int size_of_indices = distribution(gen_mt);
+	unsigned int bounding_box_row = distribution(gen_mt);
+	unsigned int bounding_box_col = distribution(gen_mt);
+	unsigned int slide = distribution(gen_mt);
+	bool vertical = distributionBool(gen_mt);
 
-	std::set<int> shuffled_indices;
-	while (shuffled_indices.size() != size_of_indices)
-	{
-		shuffled_indices.insert(distribution(gen_mt));
-	}
+	std::vector<std::vector<int>> indices;
+	std::vector<int> index = {0,0};
+	indices.push_back(index);
+	index[0] = bounding_box_row;
+	index[1] = bounding_box_col;
+	indices.push_back(index);
+	
+	// Convert Genome to 2D array
+	std::vector<std::vector<std::vector<int>>> vect_2d = vectTo2D_g(gen.genome_encoding_2b2_int, HEIGHT, WIDTH);
 
-	std::vector<int> indices(shuffled_indices.begin(), shuffled_indices.end());
-	std::vector<int> shuffled_indices_v(shuffled_indices.begin(), shuffled_indices.end());
-	std::sort(indices.begin(), indices.end());
-	shuffled_indices_v = shuffleVector(shuffled_indices_v);
-
-	unsigned int counter = 0;
-	for (auto& n : shuffled_indices_v)
-	{
-		permutationSwap(gen, indices[counter], n);
-		counter++;
-	}
+	// Perform the slide
+	vect_2d = vectSlide_g(vect_2d, indices, slide, vertical);
+	
+	// Convert back to 1 Dimensional
+	gen.genome_encoding_2b2_int = vectTo1D_g(vect_2d, HEIGHT, WIDTH);
 	gen.setFitness(fitnessOfGenome(gen));
 }
 
@@ -1082,12 +1084,19 @@ void GAEncoding_Ass1::recombination(float crossoverProb, int goalOffspringSize, 
 
 }
 
-void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated)
+void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated, bool slide)
 {
 	// Applies a random mutation to random offspring with a mutation probability mutationProb
 
+	
+	unsigned int permuatation_val = 1;
 	// Generate distribution
-	std::uniform_int_distribution<unsigned int> distribution(0, 1);
+	if (slide)
+	{
+		permuatation_val = 2;
+	}
+
+	std::uniform_int_distribution<unsigned int> distribution(0, permuatation_val);
 
 	// Pick from distribution to select mutation to use
 	unsigned int mutation_to_use; 
@@ -1117,6 +1126,10 @@ void GAEncoding_Ass1::mutation(float mutationProb, bool accelerated)
 			{
 				permutationRandomPointMutation(m_offspring[i], mutationProb);
 			}
+		}
+		else if (mutation_to_use == 2)
+		{
+			permutationRandomSlide(m_offspring[i]);
 		}
 	}
 
