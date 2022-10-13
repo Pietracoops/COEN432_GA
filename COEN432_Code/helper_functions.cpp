@@ -1,3 +1,5 @@
+// Christopher Neves: 27521979 / Massimo Pietracupa: 27313683
+
 #include "helper_functions.h"
 
 std::vector<float> generateRandVecFloat(int n_elem, std::mt19937& engine)

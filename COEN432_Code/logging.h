@@ -1,3 +1,4 @@
+// Christopher Neves: 27521979 / Massimo Pietracupa: 27313683
 #pragma once
 
 #ifndef _LOGGING_H_

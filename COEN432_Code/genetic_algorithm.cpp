@@ -1,3 +1,4 @@
+// Christopher Neves: 27521979 / Massimo Pietracupa: 27313683
 #include "genetic_algorithm.h"
 
 GeneticAlgorithm::GeneticAlgorithm(GAEncoding *encoding, int population_size, std::string log_path):
