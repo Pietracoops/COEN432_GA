@@ -237,6 +237,6 @@ void GeneticAlgorithm::runGA(std::string population_file)
 	// Save the population after generation loop has been complete
 	if (m_params.save_population)
 	{
-		m_encoding->savePopulation();
+		m_population_log_name = m_encoding->savePopulation();
 	}
 }

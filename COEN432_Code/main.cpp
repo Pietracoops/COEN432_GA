@@ -48,7 +48,7 @@ int main()
 	GA.m_params.random_parent_proportion = 0.1F;
 
 	// --- Termination Condition Parameters
-	GA.m_params.maxGeneration = 1000000;
+	GA.m_params.maxGeneration = 5;
 	GA.m_params.maxRuntime = 600; // seconds
 	GA.m_params.targetFitness = 112;
 
